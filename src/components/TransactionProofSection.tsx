@@ -1,17 +1,38 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, CheckCircle2, Star, ShieldCheck, Eye, X, Image as ImageIcon } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ShieldCheck,
+  Star,
+  Eye,
+  X,
+  PlusCircle,
+  MessageSquarePlus,
+} from 'lucide-react';
 import { TransactionProof } from '@/types';
-import { formatRupiah } from '@/lib/store-service';
+import { formatRupiah, saveTransactionProof } from '@/lib/store-service';
+import SubmitReviewModal from './SubmitReviewModal';
 
 interface TransactionProofSectionProps {
   transactions: TransactionProof[];
+  onTransactionsUpdate?: (updated: TransactionProof[]) => void;
 }
 
-export default function TransactionProofSection({ transactions }: TransactionProofSectionProps) {
+export default function TransactionProofSection({
+  transactions,
+  onTransactionsUpdate,
+}: TransactionProofSectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [localTransactions, setLocalTransactions] = useState<TransactionProof[]>(transactions);
+
+  // Sync if prop updates
+  React.useEffect(() => {
+    setLocalTransactions(transactions);
+  }, [transactions]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
@@ -20,7 +41,21 @@ export default function TransactionProofSection({ transactions }: TransactionPro
     }
   };
 
-  if (!transactions || transactions.length === 0) return null;
+  const handleAddReview = async (proof: Partial<TransactionProof>): Promise<boolean> => {
+    try {
+      const saved = await saveTransactionProof(proof as any);
+      if (saved) {
+        const updated = [saved, ...localTransactions];
+        setLocalTransactions(updated);
+        onTransactionsUpdate?.(updated);
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  };
 
   return (
     <section id="bukti-transaksi" className="py-14 sm:py-20 relative bg-[#08090d] border-b border-zinc-800/80 scroll-mt-20">
@@ -28,46 +63,58 @@ export default function TransactionProofSection({ transactions }: TransactionPro
       <div className="absolute inset-0 bg-topo-grid opacity-20 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Section Header with Navigation Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+        {/* Section Header with Actions & Navigation */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-700 text-zinc-300 text-xs font-bold mb-3 tracking-widest uppercase">
               <ShieldCheck className="w-3.5 h-3.5 text-[#ccff00]" />
               <span>TESTIMONI & BUKTI REALTIME</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-tight font-mono">
-              Bukti Transaksi Sukses
+              Bukti Transaksi & Ulasan
             </h2>
             <p className="mt-2 text-zinc-400 text-xs sm:text-sm">
-              Geser ke samping untuk melihat bukti pengerjaan joki & pembelian item yang telah berhasil.
+              Geser ke samping untuk melihat bukti joki & pembelian item. Anda juga dapat mengirimkan ulasan dan screenshot langsung.
             </p>
           </div>
 
-          {/* Carousel Arrows */}
-          <div className="flex items-center gap-2.5 self-start sm:self-auto">
+          {/* Action: Add Review Button + Carousel Arrows */}
+          <div className="flex flex-wrap items-center gap-3 self-start md:self-auto">
+            {/* Customer Review Button */}
             <button
-              onClick={() => scroll('left')}
-              className="p-2.5 rounded-xl metallic-card hover:border-white text-zinc-300 hover:text-white transition-all active:scale-95"
-              aria-label="Geser ke Kiri"
+              onClick={() => setIsReviewModalOpen(true)}
+              className="px-4 py-2.5 rounded-xl bg-[#ccff00] text-black hover:bg-[#bbf000] font-black text-xs flex items-center gap-2 shadow-lg shadow-[#ccff00]/15 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <MessageSquarePlus className="w-4 h-4" />
+              <span>+ Tulis Testimoni & Upload Bukti</span>
             </button>
-            <button
-              onClick={() => scroll('right')}
-              className="p-2.5 rounded-xl metallic-card hover:border-white text-zinc-300 hover:text-white transition-all active:scale-95"
-              aria-label="Geser ke Kanan"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+
+            {/* Carousel Arrows */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => scroll('left')}
+                className="p-2.5 rounded-xl metallic-card hover:border-white text-zinc-300 hover:text-white transition-all active:scale-95"
+                aria-label="Geser ke Kiri"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => scroll('right')}
+                className="p-2.5 rounded-xl metallic-card hover:border-white text-zinc-300 hover:text-white transition-all active:scale-95"
+                aria-label="Geser ke Kanan"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Horizontal Scrollable Carousel with Animation */}
+        {/* Horizontal Scrollable Carousel */}
         <div
           ref={scrollRef}
           className="flex items-stretch gap-5 overflow-x-auto pb-4 pt-1 no-scrollbar scroll-smooth snap-x snap-mandatory"
         >
-          {transactions.map((trx) => (
+          {localTransactions.map((trx) => (
             <div
               key={trx.id}
               className="metallic-card rounded-2xl p-5 min-w-[280px] sm:min-w-[340px] max-w-[360px] snap-start flex flex-col justify-between group hover:border-[#ccff00]/60 transition-all duration-300 relative"
@@ -75,8 +122,8 @@ export default function TransactionProofSection({ transactions }: TransactionPro
               <div>
                 {/* Header Row: Buyer & Category */}
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-7 h-7 rounded-lg bg-zinc-900 border border-zinc-700 flex items-center justify-center text-xs font-mono font-bold text-white uppercase">
+                  <div className="flex items-center gap-2">
+                    <span className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-700 flex items-center justify-center text-xs font-mono font-bold text-[#ccff00] uppercase">
                       {trx.buyer_name.charAt(0)}
                     </span>
                     <div>
@@ -99,9 +146,11 @@ export default function TransactionProofSection({ transactions }: TransactionPro
                   <p className="font-bold text-zinc-200 text-xs sm:text-sm line-clamp-1">
                     {trx.service_name}
                   </p>
-                  <p className="text-sm font-black text-white font-mono mt-1">
-                    {formatRupiah(trx.amount)}
-                  </p>
+                  {trx.amount > 0 && (
+                    <p className="text-sm font-black text-white font-mono mt-1">
+                      {formatRupiah(trx.amount)}
+                    </p>
+                  )}
                 </div>
 
                 {/* Rating Stars */}
@@ -109,12 +158,14 @@ export default function TransactionProofSection({ transactions }: TransactionPro
                   {[...Array(trx.rating || 5)].map((_, i) => (
                     <Star key={i} className="w-3.5 h-3.5 fill-[#ccff00] text-[#ccff00]" />
                   ))}
-                  <span className="text-[11px] font-mono text-zinc-400 ml-1.5 font-bold">5.0 / 5.0</span>
+                  <span className="text-[11px] font-mono text-zinc-400 ml-1.5 font-bold">
+                    {trx.rating || 5}.0 / 5.0
+                  </span>
                 </div>
 
                 {/* Buyer Testimonial Note */}
                 {trx.notes && (
-                  <p className="text-xs text-zinc-400 italic line-clamp-2 leading-relaxed mb-4">
+                  <p className="text-xs text-zinc-300 italic line-clamp-2 leading-relaxed mb-4">
                     &ldquo;{trx.notes}&rdquo;
                   </p>
                 )}
@@ -128,7 +179,7 @@ export default function TransactionProofSection({ transactions }: TransactionPro
                     className="w-full py-2 px-3 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors group/btn"
                   >
                     <Eye className="w-3.5 h-3.5 text-[#ccff00] group-hover/btn:scale-110 transition-transform" />
-                    <span>Lihat Bukti Transaksi</span>
+                    <span>Lihat Bukti Foto</span>
                   </button>
                 </div>
               )}
@@ -163,6 +214,13 @@ export default function TransactionProofSection({ transactions }: TransactionPro
           </div>
         </div>
       )}
+
+      {/* Customer Review & File Upload Modal */}
+      <SubmitReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        onSubmit={handleAddReview}
+      />
     </section>
   );
 }

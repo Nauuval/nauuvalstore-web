@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import {
   Shield,
@@ -28,8 +28,13 @@ import {
   Award,
   Star,
   Check,
+  Upload,
+  Loader2,
+  X,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { Product, ProductCategory, StoreSettings, VisitorAnalytics, TransactionProof } from '@/types';
+import { compressImageFile } from '@/lib/image-utils';
 import {
   getProducts,
   getStoreSettings,
@@ -82,6 +87,9 @@ export default function AdminPage() {
   // Transaction Proof Form Modal state
   const [isTrxModalOpen, setIsTrxModalOpen] = useState(false);
   const [editingTrx, setEditingTrx] = useState<Partial<TransactionProof> | null>(null);
+  const [isProcessingTrxImage, setIsProcessingTrxImage] = useState(false);
+  const [trxImageError, setTrxImageError] = useState<string | null>(null);
+  const trxFileInputRef = useRef<HTMLInputElement>(null);
 
   // Stock edit state
   const [stockInputs, setStockInputs] = useState<Record<string, number>>({});
@@ -239,6 +247,8 @@ export default function AdminPage() {
 
   // Open Transaction Proof Modal
   const openTrxModal = (trx?: TransactionProof) => {
+    setTrxImageError(null);
+    setIsProcessingTrxImage(false);
     if (trx) {
       setEditingTrx({ ...trx });
     } else {
@@ -249,11 +259,30 @@ export default function AdminPage() {
         amount: 50000,
         date: 'Hari ini',
         rating: 5,
-        image_url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80',
+        image_url: '',
         notes: '',
       });
     }
     setIsTrxModalOpen(true);
+  };
+
+  // Handle transaction proof file upload
+  const handleTrxFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setTrxImageError(null);
+    setIsProcessingTrxImage(true);
+
+    try {
+      const compressed = await compressImageFile(file);
+      setEditingTrx((prev) => (prev ? { ...prev, image_url: compressed } : null));
+    } catch (err: any) {
+      console.error(err);
+      setTrxImageError(err.message || 'Gagal memproses gambar. Coba file lain.');
+    } finally {
+      setIsProcessingTrxImage(false);
+    }
   };
 
   // Save Transaction Proof
@@ -261,6 +290,11 @@ export default function AdminPage() {
     e.preventDefault();
     if (!editingTrx?.buyer_name || !editingTrx?.service_name) {
       showNotify('error', 'Nama Pembeli dan Layanan wajib diisi.');
+      return;
+    }
+
+    if (!editingTrx?.image_url) {
+      showNotify('error', 'Mohon upload foto bukti transaksi atau masukkan URL gambar.');
       return;
     }
 
@@ -941,6 +975,16 @@ export default function AdminPage() {
                         &ldquo;{trx.notes}&rdquo;
                       </p>
                     )}
+
+                    {trx.image_url && (
+                      <div className="relative mt-3 h-28 rounded-xl overflow-hidden border border-zinc-800 bg-black/60">
+                        <img
+                          src={trx.image_url}
+                          alt={`Bukti ${trx.buyer_name}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <div className="mt-4 pt-3 border-t border-zinc-900 flex items-center justify-between">
@@ -948,10 +992,10 @@ export default function AdminPage() {
                       href={trx.image_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-[#ccff00] hover:underline flex items-center gap-1"
+                      className="text-xs text-[#ccff00] hover:underline flex items-center gap-1 font-semibold"
                     >
                       <Eye className="w-3.5 h-3.5" />
-                      <span>Lihat Foto</span>
+                      <span>Lihat Foto Full</span>
                     </a>
 
                     <div className="flex items-center gap-2">
@@ -1246,11 +1290,20 @@ export default function AdminPage() {
       {/* TRANSACTION PROOF CREATE/EDIT MODAL */}
       {/* ============================================================== */}
       {isTrxModalOpen && editingTrx && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="relative w-full max-w-lg rounded-2xl metallic-card p-6 sm:p-7 shadow-2xl">
-            <h3 className="text-lg font-black text-white uppercase font-mono mb-4">
-              {editingTrx.id ? 'Edit Bukti Transaksi' : 'Tambah Bukti Transaksi Baru'}
-            </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto">
+          <div className="relative w-full max-w-lg rounded-2xl metallic-card p-6 sm:p-7 shadow-2xl my-6 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-800">
+              <h3 className="text-lg font-black text-white uppercase font-mono">
+                {editingTrx.id ? 'Edit Bukti Transaksi' : 'Tambah Bukti Transaksi Baru'}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsTrxModalOpen(false)}
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-white bg-zinc-900 border border-zinc-800"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
             <form onSubmit={handleSaveTrx} className="space-y-4 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1337,18 +1390,117 @@ export default function AdminPage() {
                 </div>
               </div>
 
+              {/* Rating Selector */}
               <div>
                 <label className="block font-bold text-zinc-300 mb-1 uppercase">
-                  URL Screenshot Bukti (Foto / Resi Transfer):
+                  Rating Testimoni:
+                </label>
+                <div className="flex items-center gap-2 bg-black border border-zinc-800 rounded-xl p-2.5">
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setEditingTrx({ ...editingTrx, rating: star })}
+                        className="p-1 hover:scale-110 transition-transform"
+                      >
+                        <Star
+                          className={`w-5 h-5 ${
+                            star <= (editingTrx.rating ?? 5)
+                              ? 'text-yellow-400 fill-yellow-400'
+                              : 'text-zinc-700'
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                  <span className="text-zinc-400 font-mono text-xs ml-2">
+                    {editingTrx.rating ?? 5} / 5 Bintang
+                  </span>
+                </div>
+              </div>
+
+              {/* Upload Screenshot from Device */}
+              <div>
+                <label className="block font-bold text-zinc-300 mb-1 uppercase">
+                  Bukti Screenshot (Upload dari Perangkat / Galeri):
                 </label>
                 <input
-                  type="text"
-                  required
-                  value={editingTrx.image_url || ''}
-                  onChange={(e) => setEditingTrx({ ...editingTrx, image_url: e.target.value })}
-                  placeholder="https://images.unsplash.com/... atau URL foto"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00]"
+                  type="file"
+                  ref={trxFileInputRef}
+                  accept="image/*"
+                  onChange={handleTrxFileChange}
+                  className="hidden"
                 />
+
+                {editingTrx.image_url ? (
+                  <div className="relative rounded-xl border border-zinc-700 overflow-hidden bg-black p-2">
+                    <img
+                      src={editingTrx.image_url}
+                      alt="Preview Bukti"
+                      className="w-full h-40 object-cover rounded-lg border border-zinc-800"
+                    />
+                    <div className="flex items-center justify-between gap-2 mt-2 px-1">
+                      <button
+                        type="button"
+                        onClick={() => trxFileInputRef.current?.click()}
+                        className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[11px] font-bold flex items-center gap-1.5"
+                      >
+                        <Upload className="w-3.5 h-3.5 text-[#ccff00]" />
+                        <span>Ganti Gambar</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditingTrx({ ...editingTrx, image_url: '' })}
+                        className="px-3 py-1.5 rounded-lg bg-red-950/60 hover:bg-red-900 border border-red-800/50 text-red-300 text-[11px] font-bold flex items-center gap-1.5"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Hapus</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => trxFileInputRef.current?.click()}
+                    className="border-2 border-dashed border-zinc-800 hover:border-[#ccff00] rounded-xl p-5 text-center cursor-pointer bg-zinc-950/60 hover:bg-zinc-900/40 transition-all flex flex-col items-center justify-center gap-2"
+                  >
+                    {isProcessingTrxImage ? (
+                      <>
+                        <Loader2 className="w-6 h-6 text-[#ccff00] animate-spin" />
+                        <span className="text-zinc-400">Mengompres & memproses gambar...</span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300">
+                          <Upload className="w-5 h-5 text-[#ccff00]" />
+                        </div>
+                        <div className="text-zinc-200 font-bold">Pilih Gambar dari Perangkat</div>
+                        <div className="text-zinc-500 text-[11px]">
+                          Pilih file JPG, PNG, WEBP dari komputer atau HP
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {trxImageError && (
+                  <p className="mt-1 text-red-400 text-[11px]">{trxImageError}</p>
+                )}
+
+                <div className="mt-2">
+                  <details className="text-[11px] text-zinc-500">
+                    <summary className="cursor-pointer hover:text-zinc-300 select-none">
+                      Atau ketik tautan URL gambar secara manual
+                    </summary>
+                    <input
+                      type="text"
+                      value={editingTrx.image_url || ''}
+                      onChange={(e) => setEditingTrx({ ...editingTrx, image_url: e.target.value })}
+                      placeholder="https://..."
+                      className="mt-1.5 w-full px-3 py-2 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00]"
+                    />
+                  </details>
+                </div>
               </div>
 
               <div>
@@ -1359,7 +1511,7 @@ export default function AdminPage() {
                   rows={2}
                   value={editingTrx.notes || ''}
                   onChange={(e) => setEditingTrx({ ...editingTrx, notes: e.target.value })}
-                  placeholder="Contoh: Proses kilat 30 menit selesai, amanah banget!"
+                  placeholder="Contoh: Proses kilat 30 menit selesai, rod mythic langsung dapat!"
                   className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00]"
                 />
               </div>
@@ -1374,7 +1526,8 @@ export default function AdminPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#ccff00] text-black hover:bg-[#bbf000] font-black text-xs shadow-md"
+                  disabled={isProcessingTrxImage}
+                  className="px-5 py-2 rounded-xl bg-[#ccff00] text-black hover:bg-[#bbf000] font-black text-xs shadow-md disabled:opacity-50"
                 >
                   Simpan Bukti
                 </button>

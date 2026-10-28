@@ -16,13 +16,17 @@ export function formatRupiah(amount: number): string {
   }).format(amount);
 }
 
+const PRODUCT_DATA_VERSION = 'v2_catalog_36';
+
 // Helper local storage
 function getLocalProducts(): Product[] {
   if (typeof window === 'undefined') return INITIAL_PRODUCTS;
   try {
     const raw = localStorage.getItem(LOCAL_PRODUCTS_KEY);
-    if (!raw) {
+    const version = localStorage.getItem('nauuval_product_version');
+    if (!raw || version !== PRODUCT_DATA_VERSION) {
       localStorage.setItem(LOCAL_PRODUCTS_KEY, JSON.stringify(INITIAL_PRODUCTS));
+      localStorage.setItem('nauuval_product_version', PRODUCT_DATA_VERSION);
       return INITIAL_PRODUCTS;
     }
     return JSON.parse(raw);

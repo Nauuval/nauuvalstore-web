@@ -108,12 +108,8 @@ export default function HomePage() {
         onExploreClick={scrollToCatalog}
       />
 
-      {/* Navigation with Overall Star Rating */}
-      <Navbar
-        settings={settings}
-        rating={averageRating}
-        totalReviews={totalReviews}
-      />
+      {/* Navigation */}
+      <Navbar settings={settings} />
 
       {/* Hero Section with Rating Pill & Cinematic Singularity Background */}
       <Hero

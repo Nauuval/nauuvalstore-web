@@ -23,20 +23,20 @@ export default function Hero({
 }: HeroProps) {
   return (
     <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28 border-b border-zinc-800/80 bg-[#08090d]">
-      {/* 1. Full-Bleed Singularity Cinematic Background Image (Requested by User) */}
+      {/* 1. Full-Bleed Singularity Cinematic Background Image (Vivid & Striking) */}
       <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
         <img
           src="/singularity-hero.jpg"
           alt="Singularity Event Horizon Background"
-          className="w-full h-full object-cover object-center opacity-30 sm:opacity-40 brightness-110 scale-105"
+          className="w-full h-full object-cover object-right sm:object-center opacity-85 sm:opacity-95 contrast-125 brightness-115"
         />
 
-        {/* Cinematic Vignette Gradients for High Legibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#08090d] via-[#08090d]/60 to-[#08090d]/80" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,#08090d_80%)]" />
+        {/* Directional Vignette: Left side shadowed for 100% text legibility, right side crystal clear for black hole */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#08090d] via-[#08090d]/80 via-45% to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#08090d] via-transparent to-[#08090d]/40 pointer-events-none" />
 
-        {/* Topo Grid Overlay */}
-        <div className="absolute inset-0 bg-topo-grid opacity-25" />
+        {/* Subtle Topo Grid Overlay */}
+        <div className="absolute inset-0 bg-topo-grid opacity-15 pointer-events-none" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -90,9 +90,9 @@ export default function Hero({
             </div>
           </div>
 
-          {/* Main Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white uppercase font-mono leading-none drop-shadow-md">
-            {settings.store_name || 'nauuvalstore'}
+          {/* Main Headline - Bold & Assertive Sci-Fi Gaming Font (Requested by User) */}
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-wider text-white uppercase font-brand-bold leading-none drop-shadow-[0_4px_30px_rgba(0,0,0,0.95)]">
+            {settings.store_name?.toUpperCase() || 'NAUUVALSTORE'}
           </h1>
 
           <p className="mt-4 text-lg sm:text-xl font-bold tracking-wide text-zinc-200 uppercase">

@@ -3,17 +3,15 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { MessageCircle, Shield, Menu, X, ArrowUpRight, Star } from 'lucide-react';
+import { MessageCircle, Shield, Menu, X, ArrowUpRight } from 'lucide-react';
 import { StoreSettings } from '@/types';
 import { buildWhatsAppConsultUrl } from '@/lib/store-service';
 
 interface NavbarProps {
   settings: StoreSettings;
-  rating?: number;
-  totalReviews?: number;
 }
 
-export default function Navbar({ settings, rating = 5.0, totalReviews = 36 }: NavbarProps) {
+export default function Navbar({ settings }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -67,27 +65,8 @@ export default function Navbar({ settings, rating = 5.0, totalReviews = 36 }: Na
             ))}
           </div>
 
-          {/* Action Buttons & Overall Star Rating */}
+          {/* Action Buttons */}
           <div className="hidden sm:flex items-center gap-3">
-            {/* Header Star Rating Badge */}
-            <a
-              href="#bukti-transaksi"
-              className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-950 border border-zinc-800 hover:border-[#ccff00] transition-colors group shadow-sm"
-              title="Lihat Rating & Bukti Testimoni"
-            >
-              <div className="flex items-center gap-0.5">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Star key={i} className="w-3 h-3 fill-[#ccff00] text-[#ccff00]" />
-                ))}
-              </div>
-              <span className="font-bold font-mono text-white text-xs">
-                {rating ? rating.toFixed(1) : '5.0'}
-              </span>
-              <span className="text-[10px] text-zinc-400 group-hover:text-zinc-200 transition-colors font-mono">
-                ({totalReviews} Ulasan)
-              </span>
-            </a>
-
             <Link
               href="/admin"
               className="px-3 py-2 rounded-xl text-xs font-semibold text-zinc-400 hover:text-white bg-zinc-950 border border-zinc-800 hover:border-zinc-600 transition-all flex items-center gap-1.5"
@@ -110,15 +89,6 @@ export default function Navbar({ settings, rating = 5.0, totalReviews = 36 }: Na
 
           {/* Mobile Header Elements */}
           <div className="flex md:hidden items-center gap-2">
-            {/* Mobile Star Rating Pill */}
-            <a
-              href="#bukti-transaksi"
-              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-950 border border-zinc-800 text-[11px] font-mono font-bold text-white hover:border-[#ccff00]"
-            >
-              <Star className="w-3 h-3 fill-[#ccff00] text-[#ccff00]" />
-              <span>{rating ? rating.toFixed(1) : '5.0'}</span>
-            </a>
-
             <Link
               href="/admin"
               className="p-2 rounded-xl text-zinc-400 hover:text-white bg-zinc-900 border border-zinc-800 text-xs"

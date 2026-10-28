@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&family=Russo+One&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap');
 @import url('https://fonts.cdnfonts.com/css/minecraft-4');
 @import "tailwindcss";
 
@@ -125,4 +125,11 @@ body {
   font-family: 'Minecraft', 'Silkscreen', 'Press Start 2P', monospace;
   letter-spacing: 0.04em;
   text-rendering: pixelated;
+}
+
+/* Bold & Assertive Sci-Fi Gaming Headline (Requested by User) */
+.font-brand-bold {
+  font-family: 'Orbitron', 'Russo One', -apple-system, sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.06em;
 }

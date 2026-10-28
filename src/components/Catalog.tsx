@@ -1,7 +1,19 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { Search, Flame, Radio, Check, Sparkles, Zap } from 'lucide-react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import {
+  Search,
+  Flame,
+  Radio,
+  Check,
+  Sparkles,
+  Zap,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsDown,
+  Layers,
+  ArrowUpDown,
+} from 'lucide-react';
 import { Product, ProductCategory } from '@/types';
 import ProductCard from './ProductCard';
 
@@ -31,6 +43,32 @@ export default function Catalog({
   const [searchQuery, setSearchQuery] = useState('');
   const [onlyReadyStock, setOnlyReadyStock] = useState(false);
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'stock'>('default');
+
+  // Progressive Disclosure & Mobile Pagination state
+  const [viewMode, setViewMode] = useState<'load-more' | 'pagination'>('load-more');
+  const [pageSize, setPageSize] = useState<number>(8); // 8 items default (ideal for mobile thumbs)
+  const [visibleCount, setVisibleCount] = useState<number>(8);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const catalogGridRef = useRef<HTMLDivElement>(null);
+
+  // Dynamic Product Counts per Category Tab
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      ALL: products.filter((p) => p.is_active).length,
+      PROMO: products.filter(
+        (p) =>
+          p.is_active &&
+          (p.is_discount || (p.original_price && p.original_price > p.price))
+      ).length,
+    };
+    TABS.forEach((tab) => {
+      if (tab !== 'ALL' && tab !== 'PROMO') {
+        counts[tab] = products.filter((p) => p.is_active && p.category === tab).length;
+      }
+    });
+    return counts;
+  }, [products]);
 
   // Pinned Promo Products
   const pinnedPromoProducts = useMemo(() => {
@@ -78,6 +116,42 @@ export default function Catalog({
         return 0;
       });
   }, [products, selectedTab, searchQuery, onlyReadyStock, sortBy]);
+
+  // Reset pagination / load more when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+    setVisibleCount(pageSize);
+  }, [selectedTab, searchQuery, onlyReadyStock, sortBy, pageSize]);
+
+  // Total pages calculation for pagination mode
+  const totalPages = Math.ceil(filteredProducts.length / pageSize) || 1;
+
+  // Sliced products for current view
+  const displayedProducts = useMemo(() => {
+    if (viewMode === 'load-more') {
+      return filteredProducts.slice(0, visibleCount);
+    } else {
+      const start = (currentPage - 1) * pageSize;
+      return filteredProducts.slice(start, start + pageSize);
+    }
+  }, [filteredProducts, viewMode, visibleCount, currentPage, pageSize]);
+
+  const hasMore = visibleCount < filteredProducts.length;
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    if (catalogGridRef.current) {
+      catalogGridRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => Math.min(prev + pageSize, filteredProducts.length));
+  };
+
+  const handleShowAll = () => {
+    setVisibleCount(filteredProducts.length);
+  };
 
   return (
     <section id="catalog" className="py-14 sm:py-20 relative bg-[#08090d] scroll-mt-20">
@@ -144,7 +218,7 @@ export default function Catalog({
           </div>
         )}
 
-        {/* Category Tabs */}
+        {/* Category Tabs with Dynamic Count Pills */}
         <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none no-scrollbar">
           {TABS.map((tab) => {
             const isSelected = selectedTab === tab;
@@ -152,11 +226,13 @@ export default function Catalog({
             if (tab === 'ALL') label = 'SEMUA LAYANAN';
             if (tab === 'PROMO') label = '⚡ PRODUK PROMO';
 
+            const count = categoryCounts[tab] ?? 0;
+
             return (
               <button
                 key={tab}
                 onClick={() => setSelectedTab(tab)}
-                className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all whitespace-nowrap flex items-center gap-2 ${
+                className={`px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all whitespace-nowrap flex items-center gap-2 ${
                   isSelected
                     ? tab === 'PROMO'
                       ? 'promo-lime-badge shadow-md scale-[1.02]'
@@ -165,6 +241,17 @@ export default function Catalog({
                 }`}
               >
                 <span>{label}</span>
+                <span
+                  className={`text-[10px] font-mono px-1.5 py-0.5 rounded-md ${
+                    isSelected
+                      ? tab === 'PROMO'
+                        ? 'bg-black text-[#ccff00]'
+                        : 'bg-zinc-800 text-white'
+                      : 'bg-zinc-900 border border-zinc-800 text-zinc-400'
+                  }`}
+                >
+                  {count}
+                </span>
               </button>
             );
           })}
@@ -217,17 +304,163 @@ export default function Catalog({
           </div>
         </div>
 
+        {/* Product Grid Anchor */}
+        <div ref={catalogGridRef} className="scroll-mt-28" />
+
         {/* Product Grid */}
         {filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onOrder={onOrderProduct}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+              {displayedProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onOrder={onOrderProduct}
+                />
+              ))}
+            </div>
+
+            {/* Smart Progressive Load More & Pagination Controls (Solusi Ramah Mobile) */}
+            {filteredProducts.length > pageSize && (
+              <div className="mt-10 pt-8 border-t border-zinc-800/80 flex flex-col items-center gap-5">
+                {/* Progress Bar & Indikator Jumlah Produk */}
+                <div className="w-full max-w-md text-center">
+                  <div className="flex items-center justify-between text-xs font-mono text-zinc-400 mb-2">
+                    <span>
+                      Menampilkan <strong className="text-white">{displayedProducts.length}</strong> dari{' '}
+                      <strong className="text-white">{filteredProducts.length}</strong> Layanan
+                    </span>
+                    <span className="text-[#ccff00] font-bold">
+                      {Math.round((displayedProducts.length / filteredProducts.length) * 100)}%
+                    </span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full bg-zinc-900 overflow-hidden border border-zinc-800">
+                    <div
+                      className="h-full bg-gradient-to-r from-zinc-600 via-zinc-400 to-[#ccff00] transition-all duration-300 rounded-full"
+                      style={{
+                        width: `${Math.min(
+                          100,
+                          (displayedProducts.length / filteredProducts.length) * 100
+                        )}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Primary Action Buttons based on View Mode */}
+                {viewMode === 'load-more' ? (
+                  <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                    {hasMore ? (
+                      <button
+                        onClick={handleLoadMore}
+                        className="w-full sm:w-auto px-7 py-3 rounded-xl bg-white text-black hover:bg-zinc-200 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95"
+                      >
+                        <ChevronsDown className="w-4 h-4 text-black" />
+                        <span>
+                          + Muat {Math.min(pageSize, filteredProducts.length - visibleCount)} Layanan Lagi
+                        </span>
+                      </button>
+                    ) : (
+                      <div className="px-4 py-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800 text-zinc-400 text-xs font-mono">
+                        ✓ Seluruh {filteredProducts.length} layanan telah ditampilkan
+                      </div>
+                    )}
+
+                    {hasMore && (
+                      <button
+                        onClick={handleShowAll}
+                        className="w-full sm:w-auto px-5 py-3 rounded-xl metallic-card text-zinc-300 hover:text-white text-xs font-bold transition-colors"
+                      >
+                        Tampilkan Semua Sekaligus
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  /* Numbered Pagination Mode */
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="px-4 py-2.5 rounded-xl metallic-card text-xs font-bold text-zinc-300 hover:text-white disabled:opacity-40 disabled:pointer-events-none flex items-center gap-1.5"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      <span>Sebelumnya</span>
+                    </button>
+
+                    <div className="flex items-center gap-1 px-1">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => handlePageChange(page)}
+                          className={`w-9 h-9 rounded-xl text-xs font-mono font-bold transition-all ${
+                            currentPage === page
+                              ? 'bg-[#ccff00] text-black shadow-md'
+                              : 'metallic-card text-zinc-400 hover:text-white'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="px-4 py-2.5 rounded-xl metallic-card text-xs font-bold text-zinc-300 hover:text-white disabled:opacity-40 disabled:pointer-events-none flex items-center gap-1.5"
+                    >
+                      <span>Selanjutnya</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Sub Controls: Switch Mode & Batch Size */}
+                <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-zinc-400 pt-2">
+                  <div className="flex items-center gap-1 bg-zinc-950/80 p-1 rounded-xl border border-zinc-800">
+                    <button
+                      onClick={() => setViewMode('load-more')}
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                        viewMode === 'load-more'
+                          ? 'bg-zinc-800 text-white'
+                          : 'text-zinc-500 hover:text-zinc-300'
+                      }`}
+                    >
+                      Mode Muat Bertahap
+                    </button>
+                    <button
+                      onClick={() => setViewMode('pagination')}
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                        viewMode === 'pagination'
+                          ? 'bg-zinc-800 text-white'
+                          : 'text-zinc-500 hover:text-zinc-300'
+                      }`}
+                    >
+                      Mode Halaman (Page)
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2 bg-zinc-950/80 px-3 py-1 rounded-xl border border-zinc-800">
+                    <span className="text-[11px] text-zinc-400">Per Batch:</span>
+                    <select
+                      value={pageSize}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        setPageSize(val);
+                        setVisibleCount(val);
+                        setCurrentPage(1);
+                      }}
+                      className="bg-transparent border-0 text-[#ccff00] font-mono text-xs font-bold focus:outline-none cursor-pointer"
+                    >
+                      <option value="8" className="bg-black text-white">8 Item</option>
+                      <option value="12" className="bg-black text-white">12 Item</option>
+                      <option value="16" className="bg-black text-white">16 Item</option>
+                      <option value="24" className="bg-black text-white">24 Item</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <div className="py-16 text-center metallic-card rounded-2xl max-w-md mx-auto p-8">
             <p className="text-base font-bold text-white">Tidak ada produk ditemukan</p>

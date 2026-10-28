@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Orbit, MessageCircle, Shield, ArrowUp, Heart } from 'lucide-react';
+import { MessageCircle, Shield, ArrowUp } from 'lucide-react';
 import { StoreSettings } from '@/types';
 import { buildWhatsAppConsultUrl } from '@/lib/store-service';
 
@@ -16,71 +16,78 @@ export default function Footer({ settings }: FooterProps) {
   };
 
   return (
-    <footer className="relative border-t border-slate-800/80 bg-slate-950 pt-16 pb-12 overflow-hidden text-slate-400 text-xs sm:text-sm">
+    <footer className="relative border-t border-zinc-900 bg-black pt-14 pb-12 text-zinc-400 text-xs sm:text-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* Brand Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-cyan-500 p-0.5 shadow-lg shadow-violet-500/20">
-                <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                  <Orbit className="w-4 h-4 text-cyan-300" />
-                </div>
+              <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-700 p-1 flex items-center justify-center overflow-hidden">
+                <img
+                  src="/logo-store.png"
+                  alt="nauuvalstore"
+                  className="w-full h-full object-contain"
+                />
               </div>
-              <span className="font-black text-lg text-white font-mono tracking-wider">
-                {settings.store_name}
-              </span>
+              <div>
+                <span className="font-black text-lg text-white font-mono uppercase tracking-tight">
+                  {settings.store_name}
+                </span>
+                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">
+                  {settings.tagline}
+                </p>
+              </div>
             </div>
 
-            <p className="text-slate-400 text-xs leading-relaxed">
+            <p className="text-zinc-400 text-xs leading-relaxed">
               Penyedia jasa joki Roblox Fisch, Blox Fruit serta kebutuhan akun & koin terpercaya dengan pantauan stok realtime.
             </p>
 
-            <div className="flex items-center gap-2 pt-2">
+            <div className="pt-2">
               <a
                 href={buildWhatsAppConsultUrl(settings.wa_number)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-1.5 rounded-lg bg-emerald-950/70 border border-emerald-700/50 text-emerald-300 text-xs font-semibold flex items-center gap-1.5 hover:bg-emerald-900 transition-colors"
+                className="px-3.5 py-2 rounded-xl bg-white text-black font-extrabold text-xs inline-flex items-center gap-1.5 hover:bg-zinc-200 transition-colors"
               >
                 <MessageCircle className="w-3.5 h-3.5" />
-                <span>WA: +{settings.wa_number}</span>
+                <span>Chat Admin: +{settings.wa_number}</span>
               </a>
             </div>
           </div>
 
           {/* Kategori Layanan */}
           <div>
-            <h4 className="font-bold text-white text-sm mb-3 uppercase tracking-wider text-slate-200">
+            <h4 className="font-bold text-white text-xs mb-3 uppercase tracking-wider">
               Kategori Layanan
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <a href="#catalog" className="hover:text-cyan-400 transition-colors">
-                  • Joki Fisch (Level, Rod Quest, Bestiary)
+                <a href="#catalog" className="hover:text-white transition-colors">
+                  • Joki Fisch (Level 1-100, Rod Quests)
                 </a>
               </li>
               <li>
-                <a href="#catalog" className="hover:text-cyan-400 transition-colors">
-                  • Joki Blox Fruit (Level 1-2550, Godhuman, CDK)
+                <a href="#catalog" className="hover:text-white transition-colors">
+                  • Joki Blox Fruit (Max Level, Godhuman, CDK)
                 </a>
               </li>
               <li>
-                <a href="#catalog" className="hover:text-cyan-400 transition-colors">
-                  • Kebutuhan Fisch (C$ Cash, Relics, Totems)
+                <a href="#catalog" className="hover:text-white transition-colors">
+                  • Kebutuhan Fisch (Koin C$, Relics, Totems)
                 </a>
               </li>
               <li>
-                <a href="#catalog" className="hover:text-cyan-400 transition-colors">
-                  • Kebutuhan Blox Fruit (Beli, Fruit Fisik, Carry)
+                <a href="#catalog" className="hover:text-white transition-colors">
+                  • Kebutuhan Blox Fruit (Beli, Fruit, Carry)
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Link Komunitas & Saluran */}
+          {/* Saluran & Komunitas */}
           <div>
-            <h4 className="font-bold text-white text-sm mb-3 uppercase tracking-wider text-slate-200">
+            <h4 className="font-bold text-white text-xs mb-3 uppercase tracking-wider">
               Saluran & Komunitas
             </h4>
             <ul className="space-y-2 text-xs">
@@ -89,7 +96,7 @@ export default function Footer({ settings }: FooterProps) {
                   href={settings.wa_channel_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-violet-400 transition-colors flex items-center gap-1.5"
+                  className="hover:text-white transition-colors flex items-center gap-1.5"
                 >
                   <span>📢 Saluran Resmi WhatsApp</span>
                 </a>
@@ -99,25 +106,15 @@ export default function Footer({ settings }: FooterProps) {
                   href={settings.wa_group_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-cyan-400 transition-colors flex items-center gap-1.5"
+                  className="hover:text-white transition-colors flex items-center gap-1.5"
                 >
                   <span>👥 Grup Komunitas Mabar</span>
                 </a>
               </li>
               <li>
-                <a
-                  href={buildWhatsAppConsultUrl(settings.wa_number)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-emerald-400 transition-colors flex items-center gap-1.5"
-                >
-                  <span>💬 Direct WhatsApp Customer Care</span>
-                </a>
-              </li>
-              <li>
                 <Link
                   href="/admin"
-                  className="hover:text-amber-400 transition-colors flex items-center gap-1.5 pt-1 text-slate-400"
+                  className="hover:text-white transition-colors flex items-center gap-1.5 pt-1 text-zinc-400"
                 >
                   <Shield className="w-3.5 h-3.5" />
                   <span>Admin Control Panel</span>
@@ -128,35 +125,35 @@ export default function Footer({ settings }: FooterProps) {
 
           {/* Jam Operasional */}
           <div>
-            <h4 className="font-bold text-white text-sm mb-3 uppercase tracking-wider text-slate-200">
+            <h4 className="font-bold text-white text-xs mb-3 uppercase tracking-wider">
               Jam Operasional
             </h4>
-            <div className="space-y-2 text-xs text-slate-400">
+            <div className="space-y-2 text-xs text-zinc-400">
               <p className="flex justify-between">
                 <span>Pelayanan Chat:</span>
-                <span className="text-emerald-400 font-semibold">24 Jam Siaga</span>
+                <span className="text-white font-bold">24 Jam Siaga</span>
               </p>
               <p className="flex justify-between">
                 <span>Pengerjaan Joki:</span>
-                <span className="text-slate-200">08:00 - 23:00 WIB</span>
+                <span className="text-zinc-200">08:00 - 23:00 WIB</span>
               </p>
               <p className="flex justify-between">
                 <span>Metode Bayar:</span>
-                <span className="text-slate-200">QRIS / E-Wallet / Bank</span>
+                <span className="text-zinc-200">QRIS / E-Wallet / Bank</span>
               </p>
             </div>
           </div>
         </div>
 
         {/* Disclaimer & Copyright */}
-        <div className="pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div className="pt-8 border-t border-zinc-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
           <p className="text-center sm:text-left">
-            © 2026 {settings.store_name}. All rights reserved. Game content and materials are trademarks and copyrights of Roblox Corp.
+            © 2026 {settings.store_name}. All rights reserved. Game content and materials are trademarks of Roblox Corp.
           </p>
 
           <button
             onClick={scrollToTop}
-            className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-colors flex items-center gap-1.5 text-xs"
+            className="p-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-400 hover:text-white transition-colors flex items-center gap-1.5 text-xs"
           >
             <ArrowUp className="w-3.5 h-3.5" />
             <span>Kembali ke Atas</span>

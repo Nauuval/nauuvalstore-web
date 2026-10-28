@@ -2,10 +2,10 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'SINGULARITY STORE | Joki & Kebutuhan Fisch & Blox Fruit',
-  description: 'Penyedia jasa joki Roblox Fisch, Blox Fruit & kebutuhan akun terpercaya, aman, bergaransi dengan katalog stok realtime.',
-  keywords: ['joki fisch', 'joki blox fruit', 'beli cash fisch', 'beli godhuman', 'singularity joki', 'roblox joki'],
-  authors: [{ name: 'Singularity Store' }],
+  title: 'nauuvalstore | TERMURAH - TERCEPAT - TERPERCAYA',
+  description: 'nauuvalstore - Layanan joki & kebutuhan akun Fisch dan Blox Fruit Roblox terlengkap, termurah, tercepat, dan terpercaya dengan pantauan stok realtime.',
+  keywords: ['nauuvalstore', 'joki fisch', 'joki blox fruit', 'roblox joki murah', 'termurah tercepat terpercaya'],
+  authors: [{ name: 'nauuvalstore' }],
 };
 
 export const viewport: Viewport = {
@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" className="dark scroll-smooth">
-      <body className="min-h-screen bg-[#030712] text-slate-100 antialiased selection:bg-violet-600 selection:text-white">
+      <body className="min-h-screen bg-black text-white antialiased selection:bg-white selection:text-black">
         {children}
       </body>
     </html>

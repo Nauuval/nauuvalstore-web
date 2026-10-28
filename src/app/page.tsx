@@ -4,9 +4,8 @@ import React, { useEffect, useState, useMemo } from 'react';
 import Navbar from '@/components/Navbar';
 import AnnouncementBar from '@/components/AnnouncementBar';
 import Hero from '@/components/Hero';
-import PromoBanner from '@/components/PromoBanner';
-import Catalog from '@/components/Catalog';
 import WhatsAppHub from '@/components/WhatsAppHub';
+import Catalog from '@/components/Catalog';
 import HowToOrder from '@/components/HowToOrder';
 import WhyUs from '@/components/WhyUs';
 import Footer from '@/components/Footer';
@@ -18,6 +17,7 @@ import {
   getStoreSettings,
   subscribeToProducts,
 } from '@/lib/store-service';
+import { recordVisit } from '@/lib/analytics-service';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { INITIAL_PRODUCTS, INITIAL_SETTINGS } from '@/lib/mock-data';
 
@@ -29,9 +29,12 @@ export default function HomePage() {
   const [isRealtimeActive, setIsRealtimeActive] = useState(false);
 
   useEffect(() => {
-    // 1. Fetch initial products & settings
     let isMounted = true;
 
+    // 1. Record visitor analytics (daily, weekly, monthly tracking)
+    recordVisit('/');
+
+    // 2. Fetch initial products & settings
     async function loadData() {
       try {
         const [prodList, storeConfig] = await Promise.all([
@@ -50,7 +53,7 @@ export default function HomePage() {
 
     loadData();
 
-    // 2. Subscribe to real-time changes
+    // 3. Subscribe to real-time changes
     const unsubscribe = subscribeToProducts((updatedProducts) => {
       if (isMounted && updatedProducts) {
         setProducts(updatedProducts);
@@ -63,13 +66,13 @@ export default function HomePage() {
     };
   }, []);
 
-  // Filter products that have discount (is_discount = true or original_price > price)
-  const discountProducts = useMemo(() => {
+  // Filter promo products count
+  const promoCount = useMemo(() => {
     return products.filter(
       (p) =>
         p.is_active &&
         (p.is_discount || (p.original_price && p.original_price > p.price))
-    );
+    ).length;
   }, [products]);
 
   const handleOrderProduct = (product: Product) => {
@@ -77,45 +80,38 @@ export default function HomePage() {
     setIsModalOpen(true);
   };
 
-  const scrollToPromo = () => {
-    const el = document.getElementById('flash-sale') || document.getElementById('catalog');
+  const scrollToCatalog = () => {
+    const el = document.getElementById('catalog');
     el?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <main className="min-h-screen flex flex-col bg-[#030712] relative overflow-hidden">
+    <main className="min-h-screen flex flex-col bg-black text-white relative overflow-hidden">
       {/* Top Announcement Bar */}
       <AnnouncementBar
         text={settings.announcement}
-        onExploreClick={scrollToPromo}
+        onExploreClick={scrollToCatalog}
       />
 
       {/* Navigation */}
       <Navbar settings={settings} />
 
-      {/* Hero Section */}
+      {/* Hero Section with Singularity Artwork & Game Logos */}
       <Hero
         settings={settings}
         totalProducts={products.length}
-        discountCount={discountProducts.length}
+        promoCount={promoCount}
       />
 
-      {/* Flash Sale / Discount Section at the Top */}
-      <PromoBanner
-        discountProducts={discountProducts}
-        settings={settings}
-        onOrderProduct={handleOrderProduct}
-      />
+      {/* Pusat Komunikasi Resmi (WhatsApp Hub) - Placed prominent at top, clean & non-overlapping */}
+      <WhatsAppHub settings={settings} />
 
-      {/* Main Catalog with Categories & Realtime Stock */}
+      {/* Unified Catalog with Pinned Promo Products at top */}
       <Catalog
         products={products}
         onOrderProduct={handleOrderProduct}
         isRealtimeActive={isRealtimeActive}
       />
-
-      {/* WhatsApp Hub (Channel, Community Group, Direct CS) */}
-      <WhatsAppHub settings={settings} />
 
       {/* How To Order */}
       <HowToOrder />

@@ -11,7 +11,10 @@ interface WhatsAppHubProps {
 
 export default function WhatsAppHub({ settings }: WhatsAppHubProps) {
   return (
-    <section id="whatsapp-hub" className="py-14 sm:py-20 relative bg-black border-b border-zinc-900 scroll-mt-20">
+    <section id="whatsapp-hub" className="py-14 sm:py-20 relative bg-[#08090d] border-b border-zinc-800/80 scroll-mt-20">
+      {/* Topo background */}
+      <div className="absolute inset-0 bg-topo-grid opacity-20 pointer-events-none" />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">
@@ -27,16 +30,16 @@ export default function WhatsAppHub({ settings }: WhatsAppHubProps) {
           </p>
         </div>
 
-        {/* 3 Clean Monochrome Cards */}
+        {/* 3 Metallic Graphite Cards (Reference Image 3 Inspiration) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {/* Card 1: Saluran WhatsApp (Channel) */}
-          <div className="bg-zinc-950 rounded-2xl p-6 sm:p-7 border border-zinc-800 hover:border-white transition-all flex flex-col justify-between group">
+          <div className="metallic-card rounded-2xl p-6 sm:p-7 flex flex-col justify-between group">
             <div>
               <div className="w-11 h-11 rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-white mb-5 group-hover:bg-white group-hover:text-black transition-colors">
                 <BellRing className="w-5 h-5" />
               </div>
 
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-900 border border-zinc-800 text-zinc-300">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-black/60 border border-zinc-800 text-zinc-400 font-mono">
                 Official Channel
               </span>
 
@@ -72,13 +75,13 @@ export default function WhatsAppHub({ settings }: WhatsAppHubProps) {
           </div>
 
           {/* Card 2: Grup Komunitas WhatsApp */}
-          <div className="bg-zinc-950 rounded-2xl p-6 sm:p-7 border border-zinc-800 hover:border-white transition-all flex flex-col justify-between group">
+          <div className="metallic-card rounded-2xl p-6 sm:p-7 flex flex-col justify-between group">
             <div>
               <div className="w-11 h-11 rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-white mb-5 group-hover:bg-white group-hover:text-black transition-colors">
                 <Users className="w-5 h-5" />
               </div>
 
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-900 border border-zinc-800 text-zinc-300">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-black/60 border border-zinc-800 text-zinc-400 font-mono">
                 Community Group
               </span>
 
@@ -114,17 +117,17 @@ export default function WhatsAppHub({ settings }: WhatsAppHubProps) {
           </div>
 
           {/* Card 3: Direct WhatsApp Admin */}
-          <div className="bg-zinc-950 rounded-2xl p-6 sm:p-7 border border-zinc-800 hover:border-white transition-all flex flex-col justify-between group">
+          <div className="metallic-card rounded-2xl p-6 sm:p-7 flex flex-col justify-between group">
             <div>
               <div className="w-11 h-11 rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-white mb-5 group-hover:bg-white group-hover:text-black transition-colors">
                 <MessageCircle className="w-5 h-5" />
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-900 border border-zinc-800 text-zinc-300">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-black/60 border border-zinc-800 text-zinc-400 font-mono">
                   Direct CS 24/7
                 </span>
-                <span className="text-[10px] text-zinc-400 font-semibold flex items-center gap-1">
+                <span className="text-[10px] text-zinc-400 font-semibold flex items-center gap-1 font-mono">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                   <span>Online Siaga</span>
                 </span>
@@ -138,8 +141,8 @@ export default function WhatsAppHub({ settings }: WhatsAppHubProps) {
                 Hubungi admin langsung untuk konsultasi pesanan khusus, konfirmasi bayar QRIS/E-Wallet, dan proses joki cepat.
               </p>
 
-              <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 mb-6 font-mono text-xs text-zinc-300 flex items-center justify-between">
-                <span className="text-zinc-400">Nomor:</span>
+              <div className="p-2.5 rounded-xl bg-black/70 border border-zinc-800 mb-6 font-mono text-xs text-zinc-300 flex items-center justify-between">
+                <span className="text-zinc-500">Nomor Admin:</span>
                 <span className="font-bold text-white">+{settings.wa_number}</span>
               </div>
             </div>
@@ -157,7 +160,7 @@ export default function WhatsAppHub({ settings }: WhatsAppHubProps) {
         </div>
 
         {/* Security Alert Note */}
-        <div className="mt-8 p-3.5 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center gap-3 text-xs text-zinc-400">
+        <div className="mt-8 p-3.5 rounded-xl metallic-card flex items-center gap-3 text-xs text-zinc-400">
           <ShieldCheck className="w-4 h-4 text-zinc-300 shrink-0" />
           <span>
             <strong className="text-white">Peringatan Keamanan:</strong> Jangan pernah bertransaksi di luar nomor WhatsApp resmi tertera (+{settings.wa_number}). Nauuvalstore tidak bertanggung jawab atas penipuan di luar kontak resmi kami.

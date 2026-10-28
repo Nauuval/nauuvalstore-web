@@ -16,7 +16,7 @@ export default function Footer({ settings }: FooterProps) {
   };
 
   return (
-    <footer className="relative border-t border-zinc-900 bg-black pt-14 pb-12 text-zinc-400 text-xs sm:text-sm">
+    <footer className="relative border-t border-zinc-800/80 bg-[#08090d] pt-14 pb-12 text-zinc-400 text-xs sm:text-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* Brand Info */}

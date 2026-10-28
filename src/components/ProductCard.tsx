@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MessageCircle, Zap } from 'lucide-react';
+import { MessageCircle, Zap, Flame, Tag } from 'lucide-react';
 import { Product } from '@/types';
 import { formatRupiah } from '@/lib/store-service';
 
@@ -23,59 +23,76 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
       ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
       : null;
 
+  const savingsAmount =
+    product.original_price && product.original_price > product.price
+      ? product.original_price - product.price
+      : 0;
+
   return (
-    <div className="bg-zinc-950 rounded-2xl p-5 border border-zinc-800 hover:border-white transition-all flex flex-col justify-between group relative">
+    <div
+      className={`metallic-card rounded-2xl p-5 flex flex-col justify-between group relative transition-all duration-300 ${
+        isPromo ? 'promo-border-glow' : ''
+      }`}
+    >
       <div>
-        {/* Top Badges */}
+        {/* Top Meta Bar (Category + Badges) */}
         <div className="flex items-start justify-between gap-2 mb-3">
-          <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-zinc-900 border border-zinc-700 text-zinc-300">
+          <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-black/60 border border-zinc-700/80 text-zinc-300 font-mono">
             {product.category}
           </span>
 
           <div className="flex items-center gap-1.5 flex-wrap justify-end">
-            {/* Promo Tag */}
+            {/* Eye-Catching Promo Badge (Vibrant High-Converting Contrast) */}
             {isPromo && (
-              <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-white text-black flex items-center gap-1">
-                <Zap className="w-3 h-3 fill-black" />
-                <span>PRODUK PROMO</span>
-                {discountPercent && <span>(-{discountPercent}%)</span>}
+              <span className="promo-badge-glow px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider flex items-center gap-1 animate-pulse">
+                <Flame className="w-3.5 h-3.5 fill-white text-white shrink-0" />
+                <span>PROMO {discountPercent ? `-${discountPercent}%` : ''}</span>
               </span>
             )}
 
             {/* Stock Tag */}
             <span
-              className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+              className={`px-2 py-0.5 rounded text-[10px] font-bold border font-mono ${
                 isOutOfStock
-                  ? 'bg-zinc-900 text-zinc-500 border-zinc-800'
+                  ? 'bg-zinc-950 text-zinc-500 border-zinc-800'
                   : isLowStock
-                  ? 'bg-zinc-900 text-amber-300 border-zinc-700'
+                  ? 'bg-amber-950/80 text-amber-300 border-amber-700/60'
                   : 'bg-zinc-900 text-zinc-200 border-zinc-700'
               }`}
             >
               {isOutOfStock
                 ? 'Stok Habis'
                 : isLowStock
-                ? `Sisa ${product.stock} Slot!`
+                ? `Sisa ${product.stock}!`
                 : `Ready: ${product.stock}`}
             </span>
           </div>
         </div>
 
-        {/* Product Title Only (No Image, No Description) */}
+        {/* Product Title Only (Clean, Typographic, No Image) */}
         <h4 className="font-bold text-white text-base sm:text-lg group-hover:text-zinc-200 transition-colors leading-snug min-h-[2.5rem]">
           {product.name}
         </h4>
       </div>
 
       {/* Price & Action Section */}
-      <div className="mt-5 pt-4 border-t border-zinc-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="mt-5 pt-4 border-t border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           {isPromo && product.original_price && (
-            <div className="text-xs text-zinc-500 line-through font-mono">
-              {formatRupiah(product.original_price)}
+            <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-mono">
+              <span className="line-through">{formatRupiah(product.original_price)}</span>
+              {savingsAmount > 0 && (
+                <span className="text-[10px] font-bold text-amber-400 bg-amber-950/60 border border-amber-800/60 px-1.5 py-0.2 rounded">
+                  Hemat {formatRupiah(savingsAmount)}
+                </span>
+              )}
             </div>
           )}
-          <div className="text-xl font-black text-white font-mono tracking-tight">
+          <div
+            className={`text-xl font-black font-mono tracking-tight ${
+              isPromo ? 'text-amber-400' : 'text-white'
+            }`}
+          >
             {formatRupiah(product.price)}
           </div>
         </div>
@@ -83,9 +100,11 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
         <button
           onClick={() => onOrder(product)}
           disabled={isOutOfStock}
-          className={`py-2.5 px-4 rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-sm ${
+          className={`py-2.5 px-4 rounded-xl font-black text-xs flex items-center justify-center gap-2 transition-all shadow-md ${
             isOutOfStock
               ? 'bg-zinc-900 text-zinc-600 cursor-not-allowed border border-zinc-800'
+              : isPromo
+              ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-extrabold shadow-amber-950/50 hover:scale-[1.02] active:scale-[0.98]'
               : 'bg-white text-black hover:bg-zinc-200 active:scale-95'
           }`}
         >

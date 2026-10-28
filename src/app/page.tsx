@@ -86,7 +86,7 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col bg-black text-white relative overflow-hidden">
+    <main className="min-h-screen flex flex-col bg-[#08090d] text-zinc-100 relative overflow-hidden">
       {/* Top Announcement Bar */}
       <AnnouncementBar
         text={settings.announcement}

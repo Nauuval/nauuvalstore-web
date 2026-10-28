@@ -38,7 +38,9 @@ export default function WhyUs() {
   ];
 
   return (
-    <section id="why-us" className="py-14 sm:py-20 relative bg-black border-b border-zinc-900 scroll-mt-20">
+    <section id="why-us" className="py-14 sm:py-20 relative bg-[#08090d] border-b border-zinc-800/80 scroll-mt-20">
+      <div className="absolute inset-0 bg-topo-grid opacity-20 pointer-events-none" />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-700 text-zinc-300 text-xs font-bold mb-3 tracking-widest uppercase">
@@ -59,7 +61,7 @@ export default function WhyUs() {
             return (
               <div
                 key={i}
-                className="bg-zinc-950 rounded-2xl p-6 border border-zinc-800 hover:border-white transition-all flex items-start gap-4"
+                className="metallic-card rounded-2xl p-6 flex items-start gap-4"
               >
                 <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-700 shrink-0 text-white">
                   <Icon className="w-5 h-5" />

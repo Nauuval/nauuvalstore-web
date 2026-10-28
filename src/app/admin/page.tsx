@@ -323,7 +323,7 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white pb-20">
+    <main className="min-h-screen bg-[#08090d] text-zinc-100 pb-20">
       {/* Toast Notification */}
       {notification && (
         <div
@@ -752,17 +752,17 @@ export default function AdminPage() {
                 return (
                   <div
                     key={p.id}
-                    className="bg-zinc-950 rounded-2xl p-5 border border-zinc-800 hover:border-zinc-600 flex flex-col justify-between"
+                    className="metallic-card rounded-2xl p-5 flex flex-col justify-between"
                   >
                     <div>
                       <div className="flex items-start justify-between gap-2 mb-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-black border border-zinc-800 text-zinc-300 uppercase">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-black border border-zinc-800 text-zinc-300 uppercase font-mono">
                           {p.category}
                         </span>
 
                         <div className="flex items-center gap-1.5">
                           {isPromo && (
-                            <span className="px-2 py-0.5 rounded text-[10px] font-black bg-white text-black">
+                            <span className="promo-badge-glow px-2 py-0.5 rounded text-[10px] font-black">
                               PROMO
                             </span>
                           )}

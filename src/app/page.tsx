@@ -80,6 +80,16 @@ export default function HomePage() {
     ).length;
   }, [products]);
 
+  // Overall Testimonial Rating Statistics (Requested by User)
+  const { averageRating, totalReviews } = useMemo(() => {
+    if (!transactions || transactions.length === 0) {
+      return { averageRating: 5.0, totalReviews: 0 };
+    }
+    const sum = transactions.reduce((acc, t) => acc + (t.rating || 5), 0);
+    const avg = parseFloat((sum / transactions.length).toFixed(1));
+    return { averageRating: avg, totalReviews: transactions.length };
+  }, [transactions]);
+
   const handleOrderProduct = (product: Product) => {
     setSelectedProduct(product);
     setIsModalOpen(true);
@@ -98,15 +108,27 @@ export default function HomePage() {
         onExploreClick={scrollToCatalog}
       />
 
-      {/* Navigation */}
-      <Navbar settings={settings} />
+      {/* Navigation with Overall Star Rating */}
+      <Navbar
+        settings={settings}
+        rating={averageRating}
+        totalReviews={totalReviews}
+      />
 
-      {/* Hero Section with Cinematic Singularity Background Image */}
+      {/* Hero Section with Rating Pill & Cinematic Singularity Background */}
       <Hero
         settings={settings}
         totalProducts={products.length}
         promoCount={promoCount}
         totalTransactions={transactions.length + 1240}
+        averageRating={averageRating}
+        totalReviews={totalReviews}
+      />
+
+      {/* Bukti Transaksi Sukses & Testimoni Section (DIPINDAHKAN KE ATAS AGAR DILIHAT TERLEBIH DAHULU) */}
+      <TransactionProofSection
+        transactions={transactions}
+        onTransactionsUpdate={(updated) => setTransactions(updated)}
       />
 
       {/* Pusat Komunikasi Resmi (WhatsApp Hub) - Placed near top, clean & non-overlapping */}
@@ -118,9 +140,6 @@ export default function HomePage() {
         onOrderProduct={handleOrderProduct}
         isRealtimeActive={isRealtimeActive}
       />
-
-      {/* Bukti Transaksi Sukses & Testimoni Section (Horizontal Animated Carousel) */}
-      <TransactionProofSection transactions={transactions} />
 
       {/* How To Order */}
       <HowToOrder />

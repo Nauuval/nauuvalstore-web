@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ArrowDown, Users, ShieldCheck, Zap, Radio, CheckCircle, Award } from 'lucide-react';
+import { ArrowDown, Users, ShieldCheck, Zap, Radio, CheckCircle, Award, Star } from 'lucide-react';
 import { StoreSettings } from '@/types';
 
 interface HeroProps {
@@ -9,6 +9,8 @@ interface HeroProps {
   totalProducts: number;
   promoCount: number;
   totalTransactions?: number;
+  averageRating?: number;
+  totalReviews?: number;
 }
 
 export default function Hero({
@@ -16,6 +18,8 @@ export default function Hero({
   totalProducts,
   promoCount,
   totalTransactions = 1250,
+  averageRating = 5.0,
+  totalReviews = 36,
 }: HeroProps) {
   return (
     <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28 border-b border-zinc-800/80 bg-[#08090d]">
@@ -58,10 +62,32 @@ export default function Hero({
 
         {/* Main Hero Content */}
         <div className="max-w-3xl">
-          {/* Slogan Pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-950/80 border border-zinc-700 text-zinc-300 text-xs font-bold mb-5 tracking-widest uppercase backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-[#ccff00]" />
-            <span>{settings.tagline || 'TERMURAH - TERCEPAT - TERPERCAYA'}</span>
+          {/* Header Star Rating Social Proof (Requested by User) */}
+          <div className="flex flex-wrap items-center gap-3 mb-4">
+            <a
+              href="#bukti-transaksi"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-950/90 border border-zinc-700/80 hover:border-[#ccff00] text-zinc-300 text-xs font-semibold tracking-wide backdrop-blur-md transition-all group shadow-sm"
+              title="Lihat Semua Testimoni & Bukti Transaksi"
+            >
+              <div className="flex items-center gap-0.5 text-[#ccff00]">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <Star key={s} className="w-3.5 h-3.5 fill-[#ccff00] text-[#ccff00]" />
+                ))}
+              </div>
+              <span className="font-bold font-mono text-white text-xs">
+                {averageRating ? averageRating.toFixed(1) : '5.0'} / 5.0
+              </span>
+              <span className="text-zinc-600 font-mono">•</span>
+              <span className="text-zinc-300 group-hover:text-white transition-colors text-[11px] font-mono">
+                {totalReviews} Testimoni Pembeli
+              </span>
+            </a>
+
+            {/* Slogan Pill */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-950/80 border border-zinc-700 text-zinc-300 text-xs font-bold tracking-widest uppercase backdrop-blur-md">
+              <span className="w-2 h-2 rounded-full bg-[#ccff00]" />
+              <span>{settings.tagline || 'TERMURAH - TERCEPAT - TERPERCAYA'}</span>
+            </div>
           </div>
 
           {/* Main Headline */}
@@ -131,9 +157,15 @@ export default function Hero({
             </div>
 
             <div className="metallic-card p-3.5 rounded-xl">
-              <span className="text-[10px] text-zinc-500 uppercase font-mono block">Track Record</span>
-              <p className="text-xl sm:text-2xl font-black text-white font-mono mt-0.5">1,250+</p>
-              <span className="text-[11px] text-zinc-300 font-semibold block">Order Berhasil</span>
+              <span className="text-[10px] text-zinc-500 uppercase font-mono block">Rating Testimoni</span>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <Star className="w-4 h-4 fill-[#ccff00] text-[#ccff00]" />
+                <p className="text-xl sm:text-2xl font-black text-white font-mono">
+                  {averageRating ? averageRating.toFixed(1) : '5.0'}
+                </p>
+                <span className="text-xs text-zinc-400 font-mono">/5.0</span>
+              </div>
+              <span className="text-[11px] text-zinc-300 font-semibold block">{totalReviews}+ Bukti Ulasan</span>
             </div>
           </div>
         </div>

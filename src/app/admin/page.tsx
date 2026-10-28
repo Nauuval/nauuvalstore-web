@@ -25,8 +25,11 @@ import {
   Calendar,
   BarChart3,
   TrendingUp,
+  Award,
+  Star,
+  Check,
 } from 'lucide-react';
-import { Product, ProductCategory, StoreSettings, VisitorAnalytics } from '@/types';
+import { Product, ProductCategory, StoreSettings, VisitorAnalytics, TransactionProof } from '@/types';
 import {
   getProducts,
   getStoreSettings,
@@ -34,11 +37,14 @@ import {
   saveProduct,
   deleteProduct,
   saveStoreSettings,
+  getTransactionProofs,
+  saveTransactionProof,
+  deleteTransactionProof,
   formatRupiah,
 } from '@/lib/store-service';
 import { getVisitorAnalytics } from '@/lib/analytics-service';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { INITIAL_PRODUCTS, INITIAL_SETTINGS } from '@/lib/mock-data';
+import { INITIAL_PRODUCTS, INITIAL_SETTINGS, INITIAL_TRANSACTIONS } from '@/lib/mock-data';
 
 const CATEGORIES: ProductCategory[] = [
   'JOKI FISCH',
@@ -54,6 +60,7 @@ export default function AdminPage() {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [settings, setSettings] = useState<StoreSettings>(INITIAL_SETTINGS);
+  const [transactions, setTransactions] = useState<TransactionProof[]>(INITIAL_TRANSACTIONS);
   const [analytics, setAnalytics] = useState<VisitorAnalytics>({
     today: 0,
     thisWeek: 0,
@@ -62,7 +69,7 @@ export default function AdminPage() {
     dailyHistory: [],
   });
   const [loading, setLoading] = useState<boolean>(true);
-  const [activeTab, setActiveTab] = useState<'analytics' | 'stock' | 'products' | 'settings'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'stock' | 'products' | 'transactions' | 'settings'>('analytics');
 
   // Filter & Search states
   const [selectedCategory, setSelectedCategory] = useState<'ALL' | ProductCategory>('ALL');
@@ -71,6 +78,10 @@ export default function AdminPage() {
   // Product Form Modal state
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null);
+
+  // Transaction Proof Form Modal state
+  const [isTrxModalOpen, setIsTrxModalOpen] = useState(false);
+  const [editingTrx, setEditingTrx] = useState<Partial<TransactionProof> | null>(null);
 
   // Stock edit state
   const [stockInputs, setStockInputs] = useState<Record<string, number>>({});
@@ -92,14 +103,16 @@ export default function AdminPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [prodList, storeConfig, analyticsData] = await Promise.all([
+      const [prodList, storeConfig, analyticsData, proofList] = await Promise.all([
         getProducts(),
         getStoreSettings(),
         getVisitorAnalytics(),
+        getTransactionProofs(),
       ]);
       setProducts(prodList || []);
       if (storeConfig) setSettings(storeConfig);
       if (analyticsData) setAnalytics(analyticsData);
+      if (proofList) setTransactions(proofList);
 
       // Initialize stock inputs
       const initialStockMap: Record<string, number> = {};
@@ -198,7 +211,7 @@ export default function AdminPage() {
 
     const updated = await saveProduct({
       ...editingProduct,
-      description: '', // Simplified, no description needed per user instruction
+      description: '',
       features: [],
     } as any);
 
@@ -220,6 +233,57 @@ export default function AdminPage() {
         showNotify('success', 'Produk berhasil dihapus.');
       } else {
         showNotify('error', 'Gagal menghapus produk.');
+      }
+    }
+  };
+
+  // Open Transaction Proof Modal
+  const openTrxModal = (trx?: TransactionProof) => {
+    if (trx) {
+      setEditingTrx({ ...trx });
+    } else {
+      setEditingTrx({
+        buyer_name: '',
+        service_name: '',
+        category: 'JOKI FISCH',
+        amount: 50000,
+        date: 'Hari ini',
+        rating: 5,
+        image_url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80',
+        notes: '',
+      });
+    }
+    setIsTrxModalOpen(true);
+  };
+
+  // Save Transaction Proof
+  const handleSaveTrx = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTrx?.buyer_name || !editingTrx?.service_name) {
+      showNotify('error', 'Nama Pembeli dan Layanan wajib diisi.');
+      return;
+    }
+
+    const saved = await saveTransactionProof(editingTrx as any);
+    if (saved) {
+      showNotify('success', 'Bukti transaksi berhasil disimpan!');
+      setIsTrxModalOpen(false);
+      const updatedList = await getTransactionProofs();
+      setTransactions(updatedList);
+    } else {
+      showNotify('error', 'Gagal menyimpan bukti transaksi.');
+    }
+  };
+
+  // Delete Transaction Proof
+  const handleDeleteTrx = async (id: string) => {
+    if (confirm('Hapus bukti transaksi ini?')) {
+      const ok = await deleteTransactionProof(id);
+      if (ok) {
+        setTransactions((prev) => prev.filter((t) => t.id !== id));
+        showNotify('success', 'Bukti transaksi berhasil dihapus.');
+      } else {
+        showNotify('error', 'Gagal menghapus bukti.');
       }
     }
   };
@@ -250,12 +314,6 @@ export default function AdminPage() {
     });
   }, [products, selectedCategory, searchQuery]);
 
-  // Statistics
-  const outOfStockCount = products.filter((p) => p.stock <= 0).length;
-  const promoCount = products.filter(
-    (p) => p.is_discount || (p.original_price && p.original_price > p.price)
-  ).length;
-
   // Max visits for visual bar scaling
   const maxDailyVisit = useMemo(() => {
     if (!analytics.dailyHistory.length) return 100;
@@ -265,17 +323,17 @@ export default function AdminPage() {
   // Render Login Screen if not authenticated
   if (!isAuthenticated) {
     return (
-      <main className="min-h-screen bg-black text-white flex items-center justify-center p-4 relative overflow-hidden">
-        <div className="relative w-full max-w-sm rounded-2xl bg-zinc-950 border border-zinc-800 p-8 shadow-2xl">
+      <main className="min-h-screen bg-[#08090d] text-white flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="relative w-full max-w-sm rounded-2xl metallic-card p-8 shadow-2xl">
           <div className="text-center mb-6">
             <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center mx-auto mb-3">
-              <Lock className="w-5 h-5 text-white" />
+              <Lock className="w-5 h-5 text-[#ccff00]" />
             </div>
             <h1 className="text-xl font-black text-white uppercase font-mono tracking-tight">
               Admin nauuvalstore
             </h1>
             <p className="text-xs text-zinc-400 mt-1">
-              Masukkan PIN untuk mengelola stok & analisa toko
+              Masukkan PIN untuk mengelola stok, promo & bukti transaksi
             </p>
           </div>
 
@@ -289,7 +347,7 @@ export default function AdminPage() {
                 value={pinInput}
                 onChange={(e) => setPinInput(e.target.value)}
                 placeholder="Default: singularity2026"
-                className="w-full px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-white font-mono tracking-widest text-center"
+                className="w-full px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#ccff00] font-mono tracking-widest text-center"
                 autoFocus
               />
             </div>
@@ -302,7 +360,7 @@ export default function AdminPage() {
 
             <button
               type="submit"
-              className="w-full py-3 px-4 rounded-xl bg-white text-black hover:bg-zinc-200 font-extrabold text-xs shadow-md transition-all uppercase tracking-wider"
+              className="w-full py-3 px-4 rounded-xl bg-[#ccff00] text-black hover:bg-[#b8e600] font-black text-xs shadow-md transition-all uppercase tracking-wider"
             >
               Masuk Panel Kontrol
             </button>
@@ -329,12 +387,12 @@ export default function AdminPage() {
         <div
           className={`fixed top-5 right-5 z-50 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs font-bold transition-all ${
             notification.type === 'success'
-              ? 'bg-zinc-900 border border-white text-white'
+              ? 'bg-zinc-900 border border-[#ccff00] text-white'
               : 'bg-zinc-900 border border-rose-500 text-rose-300'
           }`}
         >
           {notification.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 text-white" />
+            <CheckCircle2 className="w-4 h-4 text-[#ccff00]" />
           ) : (
             <AlertCircle className="w-4 h-4 text-rose-400" />
           )}
@@ -343,12 +401,12 @@ export default function AdminPage() {
       )}
 
       {/* Admin Navbar */}
-      <header className="sticky top-0 z-30 backdrop-blur-xl bg-black/85 border-b border-zinc-800">
+      <header className="sticky top-0 z-30 backdrop-blur-xl bg-[#08090d]/85 border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="p-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-400 hover:text-white"
+              className="p-2 rounded-xl metallic-card text-zinc-400 hover:text-white"
               title="Lihat Website"
             >
               <Eye className="w-4 h-4" />
@@ -366,22 +424,22 @@ export default function AdminPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsSchemaModalOpen(true)}
-              className="px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-zinc-800 bg-zinc-950 hover:border-white transition-colors"
+              className="px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-zinc-800 metallic-card hover:border-white transition-colors"
             >
-              <Database className="w-3.5 h-3.5 text-zinc-400" />
+              <Database className="w-3.5 h-3.5 text-[#ccff00]" />
               <span className="hidden sm:inline">
                 {isSupabaseConfigured() ? 'Supabase Connected' : 'Setup Database'}
               </span>
               <span
                 className={`w-2 h-2 rounded-full ${
-                  isSupabaseConfigured() ? 'bg-white' : 'bg-zinc-600 animate-pulse'
+                  isSupabaseConfigured() ? 'bg-[#ccff00]' : 'bg-zinc-600 animate-pulse'
                 }`}
               />
             </button>
 
             <button
               onClick={handleLogout}
-              className="px-3 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-900 text-zinc-300 text-xs font-semibold flex items-center gap-1.5 border border-zinc-800"
+              className="px-3 py-1.5 rounded-lg metallic-card hover:bg-zinc-800 text-zinc-300 text-xs font-semibold flex items-center gap-1.5"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Keluar</span>
@@ -421,12 +479,24 @@ export default function AdminPage() {
             onClick={() => setActiveTab('products')}
             className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${
               activeTab === 'products'
-                ? 'bg-white text-black shadow-md'
+                ? 'bg-[#ccff00] text-black font-black shadow-md'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-950 border border-transparent'
             }`}
           >
             <Package className="w-4 h-4" />
             <span>Listing & Produk Promo</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('transactions')}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${
+              activeTab === 'transactions'
+                ? 'bg-white text-black shadow-md'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-950 border border-transparent'
+            }`}
+          >
+            <Award className="w-4 h-4" />
+            <span>Bukti Transaksi ({transactions.length})</span>
           </button>
 
           <button
@@ -443,7 +513,7 @@ export default function AdminPage() {
         </div>
 
         {/* ============================================================== */}
-        {/* TAB 1: VISITOR ANALYTICS DASHBOARD (HARIAN, MINGGUAN, BULANAN) */}
+        {/* TAB 1: VISITOR ANALYTICS DASHBOARD */}
         {/* ============================================================== */}
         {activeTab === 'analytics' && (
           <div>
@@ -459,33 +529,28 @@ export default function AdminPage() {
 
               <button
                 onClick={loadData}
-                className="px-3 py-1.5 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-semibold text-zinc-300 hover:text-white flex items-center gap-1.5 self-start sm:self-auto"
+                className="px-3 py-1.5 rounded-xl metallic-card text-xs font-semibold text-zinc-300 hover:text-white flex items-center gap-1.5 self-start sm:self-auto"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>Refresh Data</span>
               </button>
             </div>
 
-            {/* 4 Visitor Metric Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-              {/* Today */}
-              <div className="bg-zinc-950 rounded-2xl p-5 border border-zinc-800">
+              <div className="metallic-card rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold text-zinc-400 uppercase tracking-wide">
                     Pengunjung Hari Ini
                   </span>
-                  <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-700 flex items-center justify-center text-white">
+                  <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-700 flex items-center justify-center text-[#ccff00]">
                     <Calendar className="w-4 h-4" />
                   </div>
                 </div>
-                <p className="text-3xl font-black text-white font-mono">
-                  {analytics.today}
-                </p>
+                <p className="text-3xl font-black text-white font-mono">{analytics.today}</p>
                 <p className="text-[11px] text-zinc-500 mt-1">Kunjungan unik hari ini</p>
               </div>
 
-              {/* This Week */}
-              <div className="bg-zinc-950 rounded-2xl p-5 border border-zinc-800">
+              <div className="metallic-card rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold text-zinc-400 uppercase tracking-wide">
                     Pengunjung Minggu Ini
@@ -494,14 +559,11 @@ export default function AdminPage() {
                     <TrendingUp className="w-4 h-4" />
                   </div>
                 </div>
-                <p className="text-3xl font-black text-white font-mono">
-                  {analytics.thisWeek}
-                </p>
+                <p className="text-3xl font-black text-white font-mono">{analytics.thisWeek}</p>
                 <p className="text-[11px] text-zinc-500 mt-1">Total 7 hari terakhir</p>
               </div>
 
-              {/* This Month */}
-              <div className="bg-zinc-950 rounded-2xl p-5 border border-zinc-800">
+              <div className="metallic-card rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold text-zinc-400 uppercase tracking-wide">
                     Pengunjung Bulan Ini
@@ -510,14 +572,11 @@ export default function AdminPage() {
                     <BarChart3 className="w-4 h-4" />
                   </div>
                 </div>
-                <p className="text-3xl font-black text-white font-mono">
-                  {analytics.thisMonth}
-                </p>
+                <p className="text-3xl font-black text-white font-mono">{analytics.thisMonth}</p>
                 <p className="text-[11px] text-zinc-500 mt-1">Total 30 hari terakhir</p>
               </div>
 
-              {/* All Time Total */}
-              <div className="bg-zinc-950 rounded-2xl p-5 border border-zinc-800">
+              <div className="metallic-card rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold text-zinc-400 uppercase tracking-wide">
                     Total Kunjungan
@@ -526,17 +585,14 @@ export default function AdminPage() {
                     <Users className="w-4 h-4" />
                   </div>
                 </div>
-                <p className="text-3xl font-black text-white font-mono">
-                  {analytics.total}
-                </p>
+                <p className="text-3xl font-black text-white font-mono">{analytics.total}</p>
                 <p className="text-[11px] text-zinc-500 mt-1">Seluruh waktu kumulatif</p>
               </div>
             </div>
 
-            {/* Daily History Visual Trend Bar Chart */}
-            <div className="bg-zinc-950 rounded-2xl p-6 border border-zinc-800">
+            <div className="metallic-card rounded-2xl p-6">
               <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-white" />
+                <BarChart3 className="w-4 h-4 text-[#ccff00]" />
                 <span>Grafik Tren Kunjungan Harian (14 Hari Terakhir)</span>
               </h3>
 
@@ -566,7 +622,7 @@ export default function AdminPage() {
         )}
 
         {/* ============================================================== */}
-        {/* TAB 2: QUICK STOCK EDITOR (REALTIME) */}
+        {/* TAB 2: QUICK STOCK EDITOR (REALTIME WITH RADAR BLIP) */}
         {/* ============================================================== */}
         {activeTab === 'stock' && (
           <div>
@@ -576,7 +632,7 @@ export default function AdminPage() {
                   Editor Stok Realtime
                 </h2>
                 <p className="text-xs text-zinc-400">
-                  Ubah jumlah stok dan klik tombol Simpan. Pengunjung langsung melihat perubahan seketika.
+                  Ubah jumlah stok dan klik tombol Simpan. Pengunjung langsung melihat perubahan dengan sensor blip seketika.
                 </p>
               </div>
 
@@ -588,7 +644,7 @@ export default function AdminPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Cari produk..."
-                    className="pl-8 pr-3 py-1.5 rounded-xl bg-black border border-zinc-800 text-xs text-white focus:outline-none focus:border-white"
+                    className="pl-8 pr-3 py-1.5 rounded-xl bg-black border border-zinc-800 text-xs text-white focus:outline-none focus:border-[#ccff00]"
                   />
                 </div>
 
@@ -607,15 +663,15 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="bg-zinc-950 rounded-2xl border border-zinc-800 overflow-hidden">
+            <div className="metallic-card rounded-2xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-black text-zinc-400 border-b border-zinc-800 uppercase text-[10px] tracking-wider font-semibold">
+                  <thead className="bg-black/80 text-zinc-400 border-b border-zinc-800 uppercase text-[10px] tracking-wider font-semibold">
                     <tr>
                       <th className="py-3 px-4">Nama Produk & Layanan</th>
                       <th className="py-3 px-4">Kategori</th>
                       <th className="py-3 px-4">Harga Final</th>
-                      <th className="py-3 px-4 text-center">Status</th>
+                      <th className="py-3 px-4 text-center">Status Stok</th>
                       <th className="py-3 px-4 text-center">Atur Jumlah Stok</th>
                       <th className="py-3 px-4 text-right">Aksi</th>
                     </tr>
@@ -631,13 +687,13 @@ export default function AdminPage() {
                           <td className="py-3.5 px-4 font-semibold text-white">
                             <div className="flex items-center gap-2">
                               {p.is_discount && (
-                                <Zap className="w-3.5 h-3.5 text-white fill-white shrink-0" />
+                                <Zap className="w-3.5 h-3.5 text-[#ccff00] fill-[#ccff00] shrink-0" />
                               )}
                               <span>{p.name}</span>
                             </div>
                           </td>
                           <td className="py-3.5 px-4">
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-black border border-zinc-800 text-zinc-300">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-black border border-zinc-800 text-zinc-300 font-mono">
                               {p.category}
                             </span>
                           </td>
@@ -646,19 +702,27 @@ export default function AdminPage() {
                           </td>
                           <td className="py-3.5 px-4 text-center">
                             <span
-                              className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                              className={`px-2.5 py-1 rounded-md text-[10px] font-bold border font-mono inline-flex items-center gap-1.5 ${
                                 currentVal > 5
-                                  ? 'bg-zinc-900 text-zinc-200 border-zinc-700'
+                                  ? 'bg-zinc-900 text-zinc-100 border-zinc-700'
                                   : currentVal > 0
-                                  ? 'bg-zinc-900 text-amber-300 border-zinc-700'
-                                  : 'bg-zinc-900 text-zinc-500 border-zinc-800'
+                                  ? 'bg-amber-950/80 text-amber-300 border-amber-600/70'
+                                  : 'bg-zinc-950 text-zinc-500 border-zinc-800'
                               }`}
                             >
-                              {currentVal > 5
-                                ? 'Ready Stock'
-                                : currentVal > 0
-                                ? 'Sisa Sedikit'
-                                : 'Stok Habis'}
+                              {currentVal > 0 && (
+                                <span className="relative flex h-2 w-2">
+                                  <span className={`animate-radar-blip absolute inline-flex h-full w-full rounded-full opacity-75 ${currentVal <= 3 ? 'bg-amber-400' : 'bg-[#ccff00]'}`} />
+                                  <span className={`relative inline-flex rounded-full h-2 w-2 ${currentVal <= 3 ? 'bg-amber-400' : 'bg-[#ccff00]'}`} />
+                                </span>
+                              )}
+                              <span>
+                                {currentVal > 5
+                                  ? 'Ready Stock'
+                                  : currentVal > 0
+                                  ? 'Sisa Sedikit'
+                                  : 'Stok Habis'}
+                              </span>
                             </span>
                           </td>
                           <td className="py-3.5 px-4">
@@ -680,7 +744,7 @@ export default function AdminPage() {
                                     [p.id]: Math.max(0, parseInt(e.target.value) || 0),
                                   }))
                                 }
-                                className="w-16 py-1 px-2 text-center rounded-lg bg-black border border-zinc-700 text-white font-mono font-bold text-sm focus:outline-none focus:border-white"
+                                className="w-16 py-1 px-2 text-center rounded-lg bg-black border border-zinc-700 text-white font-mono font-bold text-sm focus:outline-none focus:border-[#ccff00]"
                               />
                               <button
                                 type="button"
@@ -698,7 +762,7 @@ export default function AdminPage() {
                               disabled={isSaving}
                               className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 ml-auto transition-all ${
                                 hasChanged
-                                  ? 'bg-white text-black shadow-md'
+                                  ? 'bg-[#ccff00] text-black shadow-md font-black'
                                   : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-300'
                               }`}
                             >
@@ -731,16 +795,16 @@ export default function AdminPage() {
                   Listing & Produk Promo
                 </h2>
                 <p className="text-xs text-zinc-400">
-                  Tambah layanan baru, atur status Produk Promo, dan tentukan harga awal serta harga promo.
+                  Tambah layanan baru, atur status Produk Promo dengan outline hijau neon, dan tentukan harga awal serta promo.
                 </p>
               </div>
 
               <button
                 onClick={() => openProductModal()}
-                className="px-4 py-2.5 rounded-xl bg-white text-black hover:bg-zinc-200 font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all self-start sm:self-auto"
+                className="px-4 py-2.5 rounded-xl bg-[#ccff00] text-black hover:bg-[#bbf000] font-black text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all self-start sm:self-auto"
               >
                 <Plus className="w-4 h-4" />
-                <span>Tambah Layanan / Produk</span>
+                <span>Tambah Layanan Baru</span>
               </button>
             </div>
 
@@ -752,7 +816,9 @@ export default function AdminPage() {
                 return (
                   <div
                     key={p.id}
-                    className="metallic-card rounded-2xl p-5 flex flex-col justify-between"
+                    className={`metallic-card rounded-2xl p-5 flex flex-col justify-between ${
+                      isPromo ? 'promo-lime-border' : ''
+                    }`}
                   >
                     <div>
                       <div className="flex items-start justify-between gap-2 mb-2">
@@ -762,12 +828,12 @@ export default function AdminPage() {
 
                         <div className="flex items-center gap-1.5">
                           {isPromo && (
-                            <span className="promo-badge-glow px-2 py-0.5 rounded text-[10px] font-black">
+                            <span className="promo-lime-badge px-2 py-0.5 rounded text-[10px] font-black">
                               PROMO
                             </span>
                           )}
                           <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold border font-mono ${
                               p.stock > 0
                                 ? 'bg-zinc-900 text-zinc-300 border-zinc-700'
                                 : 'bg-zinc-900 text-zinc-600 border-zinc-800'
@@ -781,7 +847,7 @@ export default function AdminPage() {
                       <h4 className="font-bold text-white text-base leading-snug">{p.name}</h4>
 
                       <div className="mt-3 flex items-baseline gap-2">
-                        <span className="text-lg font-black text-white font-mono">
+                        <span className={`text-lg font-black font-mono ${isPromo ? 'promo-lime-text' : 'text-white'}`}>
                           {formatRupiah(p.price)}
                         </span>
                         {p.original_price && (
@@ -817,7 +883,103 @@ export default function AdminPage() {
         )}
 
         {/* ============================================================== */}
-        {/* TAB 4: STORE SETTINGS & WHATSAPP CHANNELS */}
+        {/* TAB 4: BUKTI TRANSAKSI (MANUAL TRANSACTION PROOF MANAGER) */}
+        {/* ============================================================== */}
+        {activeTab === 'transactions' && (
+          <div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div>
+                <h2 className="text-xl font-bold text-white uppercase font-mono">
+                  Kelola Bukti Transaksi Sukses
+                </h2>
+                <p className="text-xs text-zinc-400">
+                  Tambahkan bukti transaksi baru (screenshot, nama pembeli, rating) yang tampil di carousel web.
+                </p>
+              </div>
+
+              <button
+                onClick={() => openTrxModal()}
+                className="px-4 py-2.5 rounded-xl bg-[#ccff00] text-black hover:bg-[#bbf000] font-black text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all self-start sm:self-auto"
+              >
+                <Plus className="w-4 h-4" />
+                <span>+ Tambah Bukti Transaksi</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {transactions.map((trx) => (
+                <div
+                  key={trx.id}
+                  className="metallic-card rounded-2xl p-5 flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="font-mono font-bold text-white text-sm">
+                        {trx.buyer_name}
+                      </span>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-black border border-zinc-800 text-zinc-400 font-mono uppercase">
+                        {trx.category}
+                      </span>
+                    </div>
+
+                    <p className="font-bold text-zinc-200 text-sm mb-1">{trx.service_name}</p>
+                    <p className="text-base font-black text-white font-mono mb-2">
+                      {formatRupiah(trx.amount)}
+                    </p>
+
+                    <div className="flex items-center gap-1 mb-2">
+                      {[...Array(trx.rating || 5)].map((_, i) => (
+                        <Star key={i} className="w-3.5 h-3.5 fill-[#ccff00] text-[#ccff00]" />
+                      ))}
+                      <span className="text-[11px] font-mono text-zinc-400 ml-1">
+                        {trx.date || 'Hari ini'}
+                      </span>
+                    </div>
+
+                    {trx.notes && (
+                      <p className="text-xs text-zinc-400 italic line-clamp-2 mt-2">
+                        &ldquo;{trx.notes}&rdquo;
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-zinc-900 flex items-center justify-between">
+                    <a
+                      href={trx.image_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-[#ccff00] hover:underline flex items-center gap-1"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Lihat Foto</span>
+                    </a>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => openTrxModal(trx)}
+                        className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold flex items-center gap-1"
+                      >
+                        <Edit2 className="w-3 h-3" />
+                        <span>Edit</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleDeleteTrx(trx.id)}
+                        className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-rose-950 text-zinc-400 hover:text-rose-400 text-xs font-semibold flex items-center gap-1"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>Hapus</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ============================================================== */}
+        {/* TAB 5: STORE SETTINGS & WHATSAPP CHANNELS */}
         {/* ============================================================== */}
         {activeTab === 'settings' && (
           <div className="max-w-2xl">
@@ -828,7 +990,7 @@ export default function AdminPage() {
               Ubah nomor WhatsApp, link saluran resmi, grup komunitas, dan pengumuman promo.
             </p>
 
-            <form onSubmit={handleSaveSettings} className="bg-zinc-950 rounded-2xl p-6 border border-zinc-800 space-y-4">
+            <form onSubmit={handleSaveSettings} className="metallic-card rounded-2xl p-6 space-y-4">
               <div>
                 <label className="block text-xs font-bold text-zinc-300 mb-1 uppercase">
                   Nama Store:
@@ -837,7 +999,7 @@ export default function AdminPage() {
                   type="text"
                   value={settings.store_name}
                   onChange={(e) => setSettings({ ...settings, store_name: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-white font-mono"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#ccff00] font-mono"
                 />
               </div>
 
@@ -850,7 +1012,7 @@ export default function AdminPage() {
                   value={settings.tagline}
                   onChange={(e) => setSettings({ ...settings, tagline: e.target.value })}
                   placeholder="TERMURAH - TERCEPAT - TERPERCAYA"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#ccff00]"
                 />
               </div>
 
@@ -863,11 +1025,8 @@ export default function AdminPage() {
                   value={settings.wa_number}
                   onChange={(e) => setSettings({ ...settings, wa_number: e.target.value })}
                   placeholder="Contoh: 6281234567890"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono text-sm focus:outline-none focus:border-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono text-sm focus:outline-none focus:border-[#ccff00]"
                 />
-                <p className="text-[11px] text-zinc-500 mt-1">
-                  Format angka dengan kode negara (contoh: 6281234567890).
-                </p>
               </div>
 
               <div>
@@ -879,7 +1038,7 @@ export default function AdminPage() {
                   value={settings.wa_channel_url}
                   onChange={(e) => setSettings({ ...settings, wa_channel_url: e.target.value })}
                   placeholder="https://whatsapp.com/channel/..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#ccff00]"
                 />
               </div>
 
@@ -892,7 +1051,7 @@ export default function AdminPage() {
                   value={settings.wa_group_url}
                   onChange={(e) => setSettings({ ...settings, wa_group_url: e.target.value })}
                   placeholder="https://chat.whatsapp.com/..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#ccff00]"
                 />
               </div>
 
@@ -904,7 +1063,7 @@ export default function AdminPage() {
                   rows={2}
                   value={settings.announcement}
                   onChange={(e) => setSettings({ ...settings, announcement: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#ccff00]"
                 />
               </div>
 
@@ -916,14 +1075,14 @@ export default function AdminPage() {
                   type="password"
                   value={settings.admin_pin}
                   onChange={(e) => setSettings({ ...settings, admin_pin: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm font-mono focus:outline-none focus:border-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm font-mono focus:outline-none focus:border-[#ccff00]"
                 />
               </div>
 
               <div className="pt-4">
                 <button
                   type="submit"
-                  className="w-full py-3 px-4 rounded-xl bg-white text-black hover:bg-zinc-200 font-extrabold text-xs uppercase shadow-md flex items-center justify-center gap-2"
+                  className="w-full py-3 px-4 rounded-xl bg-[#ccff00] text-black hover:bg-[#bbf000] font-black text-xs uppercase shadow-md flex items-center justify-center gap-2"
                 >
                   <Save className="w-4 h-4" />
                   <span>Simpan Semua Pengaturan</span>
@@ -935,11 +1094,11 @@ export default function AdminPage() {
       </div>
 
       {/* ============================================================== */}
-      {/* PRODUCT CREATE/EDIT MODAL (STREAMLINED: NO IMAGES / NO LONG DESC) */}
+      {/* PRODUCT CREATE/EDIT MODAL */}
       {/* ============================================================== */}
       {isProductModalOpen && editingProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="relative w-full max-w-lg rounded-2xl bg-zinc-950 border border-zinc-800 p-6 sm:p-7 shadow-2xl">
+          <div className="relative w-full max-w-lg rounded-2xl metallic-card p-6 sm:p-7 shadow-2xl">
             <h3 className="text-lg font-black text-white uppercase font-mono mb-4">
               {editingProduct.id ? 'Edit Layanan' : 'Tambah Layanan Baru'}
             </h3>
@@ -955,7 +1114,7 @@ export default function AdminPage() {
                   value={editingProduct.name || ''}
                   onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
                   placeholder="Contoh: Joki Quest Rod of the Depths"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-white font-semibold"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00] font-semibold"
                 />
               </div>
 
@@ -970,7 +1129,7 @@ export default function AdminPage() {
                         category: e.target.value as ProductCategory,
                       })
                     }
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-white font-semibold"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00] font-semibold"
                   >
                     {CATEGORIES.map((cat) => (
                       <option key={cat} value={cat}>
@@ -993,7 +1152,7 @@ export default function AdminPage() {
                         stock: Math.max(0, parseInt(e.target.value) || 0),
                       })
                     }
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono focus:outline-none focus:border-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono focus:outline-none focus:border-[#ccff00]"
                   />
                 </div>
               </div>
@@ -1001,8 +1160,8 @@ export default function AdminPage() {
               {/* Price & Promo Settings */}
               <div className="p-4 rounded-xl bg-black border border-zinc-800 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-white flex items-center gap-1.5 text-xs uppercase">
-                    <Zap className="w-3.5 h-3.5 fill-white" />
+                  <span className="font-bold text-[#ccff00] flex items-center gap-1.5 text-xs uppercase">
+                    <Zap className="w-3.5 h-3.5 fill-[#ccff00]" />
                     <span>Status Produk Promo</span>
                   </span>
                   <label className="flex items-center gap-2 cursor-pointer text-xs text-zinc-300 font-semibold">
@@ -1015,7 +1174,7 @@ export default function AdminPage() {
                           is_discount: e.target.checked,
                         })
                       }
-                      className="rounded bg-zinc-900 border-zinc-700 text-white focus:ring-0"
+                      className="rounded bg-zinc-900 border-zinc-700 text-[#ccff00] focus:ring-0"
                     />
                     <span>Tandai Sebagai Promo</span>
                   </label>
@@ -1037,11 +1196,8 @@ export default function AdminPage() {
                         })
                       }
                       placeholder="Contoh: 50000"
-                      className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-300 font-mono focus:outline-none focus:border-white"
+                      className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-300 font-mono focus:outline-none focus:border-[#ccff00]"
                     />
-                    <span className="text-[10px] text-zinc-500">
-                      Opsional. Akan dicoret di web.
-                    </span>
                   </div>
 
                   <div>
@@ -1060,11 +1216,8 @@ export default function AdminPage() {
                         })
                       }
                       placeholder="Contoh: 35000"
-                      className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-bold font-mono focus:outline-none focus:border-white"
+                      className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-[#ccff00] font-bold font-mono focus:outline-none focus:border-[#ccff00]"
                     />
-                    <span className="text-[10px] text-zinc-400">
-                      Harga yang dibayar pembeli.
-                    </span>
                   </div>
                 </div>
               </div>
@@ -1079,9 +1232,151 @@ export default function AdminPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-white text-black hover:bg-zinc-200 font-extrabold text-xs shadow-md"
+                  className="px-5 py-2 rounded-xl bg-[#ccff00] text-black hover:bg-[#bbf000] font-black text-xs shadow-md"
                 >
                   Simpan Produk
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* TRANSACTION PROOF CREATE/EDIT MODAL */}
+      {/* ============================================================== */}
+      {isTrxModalOpen && editingTrx && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-lg rounded-2xl metallic-card p-6 sm:p-7 shadow-2xl">
+            <h3 className="text-lg font-black text-white uppercase font-mono mb-4">
+              {editingTrx.id ? 'Edit Bukti Transaksi' : 'Tambah Bukti Transaksi Baru'}
+            </h3>
+
+            <form onSubmit={handleSaveTrx} className="space-y-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-bold text-zinc-300 mb-1 uppercase">
+                    Nama Pembeli (Disamarkan):
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editingTrx.buyer_name || ''}
+                    onChange={(e) => setEditingTrx({ ...editingTrx, buyer_name: e.target.value })}
+                    placeholder="Contoh: Dan***99"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00] font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-zinc-300 mb-1 uppercase">Kategori:</label>
+                  <select
+                    value={editingTrx.category || 'JOKI FISCH'}
+                    onChange={(e) =>
+                      setEditingTrx({
+                        ...editingTrx,
+                        category: e.target.value as ProductCategory,
+                      })
+                    }
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00]"
+                  >
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-zinc-300 mb-1 uppercase">
+                  Nama Layanan / Pesanan:
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editingTrx.service_name || ''}
+                  onChange={(e) => setEditingTrx({ ...editingTrx, service_name: e.target.value })}
+                  placeholder="Contoh: Joki Quest Rod of the Depths"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00]"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-bold text-zinc-300 mb-1 uppercase">
+                    Nominal Transaksi (Rp):
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    required
+                    value={editingTrx.amount ?? 50000}
+                    onChange={(e) =>
+                      setEditingTrx({
+                        ...editingTrx,
+                        amount: parseFloat(e.target.value) || 0,
+                      })
+                    }
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono focus:outline-none focus:border-[#ccff00]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-zinc-300 mb-1 uppercase">
+                    Waktu Transaksi:
+                  </label>
+                  <input
+                    type="text"
+                    value={editingTrx.date || 'Hari ini'}
+                    onChange={(e) => setEditingTrx({ ...editingTrx, date: e.target.value })}
+                    placeholder="Contoh: Hari ini / 28 Okt 2026"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono focus:outline-none focus:border-[#ccff00]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-zinc-300 mb-1 uppercase">
+                  URL Screenshot Bukti (Foto / Resi Transfer):
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editingTrx.image_url || ''}
+                  onChange={(e) => setEditingTrx({ ...editingTrx, image_url: e.target.value })}
+                  placeholder="https://images.unsplash.com/... atau URL foto"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00]"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-zinc-300 mb-1 uppercase">
+                  Catatan / Testimoni Pembeli:
+                </label>
+                <textarea
+                  rows={2}
+                  value={editingTrx.notes || ''}
+                  onChange={(e) => setEditingTrx({ ...editingTrx, notes: e.target.value })}
+                  placeholder="Contoh: Proses kilat 30 menit selesai, amanah banget!"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00]"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-900">
+                <button
+                  type="button"
+                  onClick={() => setIsTrxModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-semibold text-xs"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#ccff00] text-black hover:bg-[#bbf000] font-black text-xs shadow-md"
+                >
+                  Simpan Bukti
                 </button>
               </div>
             </form>
@@ -1094,9 +1389,9 @@ export default function AdminPage() {
       {/* ============================================================== */}
       {isSchemaModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="relative w-full max-w-lg rounded-2xl bg-zinc-950 border border-zinc-800 p-6 sm:p-7 shadow-2xl">
+          <div className="relative w-full max-w-lg rounded-2xl metallic-card p-6 sm:p-7 shadow-2xl">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-white">
+              <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-[#ccff00]">
                 <Database className="w-5 h-5" />
               </div>
               <div>
@@ -1105,7 +1400,7 @@ export default function AdminPage() {
                 </h3>
                 <p className="text-xs text-zinc-400">
                   Status:{' '}
-                  <span className={isSupabaseConfigured() ? 'text-white font-bold' : 'text-zinc-400 font-bold'}>
+                  <span className={isSupabaseConfigured() ? 'text-[#ccff00] font-bold' : 'text-zinc-400 font-bold'}>
                     {isSupabaseConfigured() ? 'Terkoneksi ke Supabase' : 'Mode Offline / Local Storage'}
                   </span>
                 </p>
@@ -1131,7 +1426,7 @@ export default function AdminPage() {
               <button
                 type="button"
                 onClick={() => setIsSchemaModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-white text-black font-extrabold text-xs"
+                className="px-4 py-2 rounded-xl bg-[#ccff00] text-black font-black text-xs"
               >
                 Tutup
               </button>

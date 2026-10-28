@@ -1,4 +1,4 @@
-import { Product, StoreSettings } from '@/types';
+import { Product, StoreSettings, TransactionProof } from '@/types';
 
 export const INITIAL_SETTINGS: StoreSettings = {
   id: 'general',
@@ -172,5 +172,74 @@ export const INITIAL_PRODUCTS: Product[] = [
     stock: 10,
     is_active: true,
     sort_order: 14,
+  },
+];
+
+export const INITIAL_TRANSACTIONS: TransactionProof[] = [
+  {
+    id: 'trx-1',
+    buyer_name: 'Dan***99',
+    service_name: 'Joki Quest Rod of the Depths',
+    category: 'JOKI FISCH',
+    amount: 65000,
+    date: 'Hari ini',
+    image_url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80',
+    rating: 5,
+    notes: 'Proses cuma 45 menit rod langsung dapet! Mantap min nauuvalstore.',
+  },
+  {
+    id: 'trx-2',
+    buyer_name: 'Rey***_BF',
+    service_name: 'Joki Melee Godhuman',
+    category: 'JOKI BLOX FRUIT',
+    amount: 65000,
+    date: 'Hari ini',
+    image_url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80',
+    rating: 5,
+    notes: 'Material lengkap dituntasin semua sama joki pro. Akun aman 100%.',
+  },
+  {
+    id: 'trx-3',
+    buyer_name: 'Fis***Master',
+    service_name: 'Paket C$ Fisch 2.500.000 C$',
+    category: 'KEBUTUHAN FISCH',
+    amount: 25000,
+    date: 'Kemarin',
+    image_url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80',
+    rating: 5,
+    notes: 'Transfer 5 menit langsung masuk koin C$-nya. Rekomen banget!',
+  },
+  {
+    id: 'trx-4',
+    buyer_name: 'Kits***_User',
+    service_name: 'Physical Fruit Kitsune Rework',
+    category: 'KEBUTUHAN BLOX FRUIT',
+    amount: 110000,
+    date: 'Kemarin',
+    image_url: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=600&q=80',
+    rating: 5,
+    notes: 'Trade private server cepet banget, admin ramah & amanah.',
+  },
+  {
+    id: 'trx-5',
+    buyer_name: 'Rob***Player',
+    service_name: 'Joki Max Level (1 - 2550)',
+    category: 'JOKI BLOX FRUIT',
+    amount: 49000,
+    date: '2 hari lalu',
+    image_url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=600&q=80',
+    rating: 5,
+    notes: 'Order kedua kali di sini, selalu fast respon dan bergaransi.',
+  },
+  {
+    id: 'trx-6',
+    buyer_name: 'Ver***_Fish',
+    service_name: 'Bundle 15x Enchant Relic',
+    category: 'KEBUTUHAN FISCH',
+    amount: 40000,
+    date: '3 hari lalu',
+    image_url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80',
+    rating: 5,
+    notes: 'Dapet enchant langka, makasih banyak min nauuvalstore!',
   },
 ];

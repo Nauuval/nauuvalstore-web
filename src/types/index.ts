@@ -45,3 +45,16 @@ export interface VisitorAnalytics {
   total: number;
   dailyHistory: DailyVisit[];
 }
+
+export interface TransactionProof {
+  id: string;
+  buyer_name: string;
+  service_name: string;
+  category: ProductCategory;
+  amount: number;
+  date: string;
+  image_url: string;
+  rating: number;
+  notes?: string;
+  created_at?: string;
+}

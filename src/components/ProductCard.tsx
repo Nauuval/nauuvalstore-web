@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MessageCircle, Zap, Flame, Tag } from 'lucide-react';
+import { MessageCircle, Flame, Tag } from 'lucide-react';
 import { Product } from '@/types';
 import { formatRupiah } from '@/lib/store-service';
 
@@ -31,7 +31,7 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
   return (
     <div
       className={`metallic-card rounded-2xl p-5 flex flex-col justify-between group relative transition-all duration-300 ${
-        isPromo ? 'promo-border-glow' : ''
+        isPromo ? 'promo-lime-border' : ''
       }`}
     >
       <div>
@@ -42,29 +42,49 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
           </span>
 
           <div className="flex items-center gap-1.5 flex-wrap justify-end">
-            {/* Eye-Catching Promo Badge (Vibrant High-Converting Contrast) */}
+            {/* Eye-Catching Neon Lime Promo Badge (Requested from User's Reference) */}
             {isPromo && (
-              <span className="promo-badge-glow px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider flex items-center gap-1 animate-pulse">
-                <Flame className="w-3.5 h-3.5 fill-white text-white shrink-0" />
+              <span className="promo-lime-badge px-2.5 py-0.5 rounded-md text-[10px] uppercase tracking-wider flex items-center gap-1">
+                <Flame className="w-3.5 h-3.5 fill-black text-black shrink-0" />
                 <span>PROMO {discountPercent ? `-${discountPercent}%` : ''}</span>
               </span>
             )}
 
-            {/* Stock Tag */}
+            {/* Radar / Sonar Blip Stock Tag (Requested by User) */}
             <span
-              className={`px-2 py-0.5 rounded text-[10px] font-bold border font-mono ${
+              className={`px-2.5 py-1 rounded-md text-[10px] font-bold border font-mono flex items-center gap-2 ${
                 isOutOfStock
                   ? 'bg-zinc-950 text-zinc-500 border-zinc-800'
                   : isLowStock
-                  ? 'bg-amber-950/80 text-amber-300 border-amber-700/60'
-                  : 'bg-zinc-900 text-zinc-200 border-zinc-700'
+                  ? 'bg-amber-950/80 text-amber-300 border-amber-600/70'
+                  : 'bg-zinc-950 text-zinc-100 border-zinc-700'
               }`}
             >
-              {isOutOfStock
-                ? 'Stok Habis'
-                : isLowStock
-                ? `Sisa ${product.stock}!`
-                : `Ready: ${product.stock}`}
+              {/* Radar Sonar Blip Animation */}
+              {!isOutOfStock ? (
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span
+                    className={`animate-radar-blip absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                      isLowStock ? 'bg-amber-400' : 'bg-[#ccff00]'
+                    }`}
+                  />
+                  <span
+                    className={`relative inline-flex rounded-full h-2 w-2 ${
+                      isLowStock ? 'bg-amber-400' : 'bg-[#ccff00]'
+                    }`}
+                  />
+                </span>
+              ) : (
+                <span className="w-2 h-2 rounded-full bg-zinc-600 shrink-0" />
+              )}
+
+              <span>
+                {isOutOfStock
+                  ? 'Stok Habis'
+                  : isLowStock
+                  ? `Sisa ${product.stock}!`
+                  : `Ready: ${product.stock}`}
+              </span>
             </span>
           </div>
         </div>
@@ -82,7 +102,7 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
             <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-mono">
               <span className="line-through">{formatRupiah(product.original_price)}</span>
               {savingsAmount > 0 && (
-                <span className="text-[10px] font-bold text-amber-400 bg-amber-950/60 border border-amber-800/60 px-1.5 py-0.2 rounded">
+                <span className="text-[10px] font-black text-black bg-[#ccff00] px-1.5 py-0.2 rounded font-mono">
                   Hemat {formatRupiah(savingsAmount)}
                 </span>
               )}
@@ -90,7 +110,7 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
           )}
           <div
             className={`text-xl font-black font-mono tracking-tight ${
-              isPromo ? 'text-amber-400' : 'text-white'
+              isPromo ? 'promo-lime-text drop-shadow-[0_0_8px_rgba(204,255,0,0.3)]' : 'text-white'
             }`}
           >
             {formatRupiah(product.price)}
@@ -104,7 +124,7 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
             isOutOfStock
               ? 'bg-zinc-900 text-zinc-600 cursor-not-allowed border border-zinc-800'
               : isPromo
-              ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-extrabold shadow-amber-950/50 hover:scale-[1.02] active:scale-[0.98]'
+              ? 'bg-[#ccff00] hover:bg-[#bbf000] text-black shadow-[#ccff00]/25 hover:scale-[1.02] active:scale-[0.98]'
               : 'bg-white text-black hover:bg-zinc-200 active:scale-95'
           }`}
         >

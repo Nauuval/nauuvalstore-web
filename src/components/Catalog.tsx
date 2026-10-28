@@ -65,7 +65,6 @@ export default function Catalog({
         return true;
       })
       .sort((a, b) => {
-        // If default sorting, always prioritize promo products first!
         if (sortBy === 'default') {
           const aPromo = a.is_discount || (a.original_price && a.original_price > a.price);
           const bPromo = b.is_discount || (b.original_price && b.original_price > b.price);
@@ -90,42 +89,45 @@ export default function Catalog({
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-700 text-zinc-300 text-xs font-bold mb-3 tracking-widest uppercase">
-              <span className="w-2 h-2 rounded-full bg-white" />
+              <span className="w-2 h-2 rounded-full bg-[#ccff00]" />
               <span>KATALOG PRODUK & LAYANAN</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-tight font-mono">
               Katalog Layanan & Stok Realtime
             </h2>
             <p className="mt-2 text-zinc-400 text-xs sm:text-sm">
-              Semua produk promo otomatis disematkan di bagian atas. Perubahan stok terpantau langsung.
+              Semua produk promo otomatis disematkan di bagian atas. Indikator stok dilengkapi sensor blip realtime.
             </p>
           </div>
 
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl metallic-card text-xs font-semibold self-start md:self-auto">
-            <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+            <span className="relative flex h-2 w-2">
+              <span className="animate-radar-blip-fast absolute inline-flex h-full w-full rounded-full bg-[#ccff00] opacity-80" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#ccff00]" />
+            </span>
             <span className="text-zinc-300 font-mono text-[11px]">
               {isRealtimeActive ? 'Realtime Supabase Sync' : 'Realtime Live Sync'}
             </span>
           </div>
         </div>
 
-        {/* Pinned Promo Banner / Top Pinned Section (Eye-Catching Vibrant Border & Glow) */}
+        {/* Pinned Promo Banner / Top Pinned Section (Electric Neon Lime Outline from User Reference) */}
         {selectedTab === 'ALL' && !searchQuery && pinnedPromoProducts.length > 0 && (
-          <div className="mb-10 p-5 sm:p-6 rounded-2xl bg-gradient-to-b from-zinc-900/90 via-zinc-950 to-black border-2 border-red-500/40 shadow-2xl shadow-red-950/20 relative overflow-hidden">
-            {/* Ambient flame glow in top-right */}
-            <div className="absolute -top-12 -right-12 w-48 h-48 bg-red-600/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="mb-10 p-5 sm:p-6 rounded-2xl bg-gradient-to-b from-zinc-900/90 via-zinc-950 to-black promo-lime-border relative overflow-hidden">
+            {/* Ambient neon lime glow */}
+            <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#ccff00]/10 rounded-full blur-3xl pointer-events-none" />
 
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-800 relative z-10">
               <div className="flex items-center gap-2.5">
-                <span className="promo-badge-glow px-3 py-1 rounded-lg font-black text-xs flex items-center gap-1.5 uppercase tracking-wide">
-                  <Flame className="w-4 h-4 fill-white" />
+                <span className="promo-lime-badge px-3 py-1 rounded-lg font-black text-xs flex items-center gap-1.5 uppercase tracking-wide">
+                  <Flame className="w-4 h-4 fill-black text-black" />
                   <span>⚡ PRODUK PROMO SPESIAL</span>
                 </span>
-                <span className="text-xs text-amber-300/90 font-semibold hidden sm:inline">
+                <span className="text-xs text-zinc-300 font-semibold hidden sm:inline">
                   • Diskon Terbatas Sedang Berlangsung!
                 </span>
               </div>
-              <span className="text-xs font-mono font-bold text-amber-400 bg-amber-950/60 border border-amber-800/60 px-2.5 py-1 rounded-lg">
+              <span className="text-xs font-mono font-bold text-black bg-[#ccff00] px-2.5 py-1 rounded-lg shadow-sm">
                 {pinnedPromoProducts.length} Layanan Promo
               </span>
             </div>
@@ -148,7 +150,7 @@ export default function Catalog({
             const isSelected = selectedTab === tab;
             let label: string = tab;
             if (tab === 'ALL') label = 'SEMUA LAYANAN';
-            if (tab === 'PROMO') label = '🔥 PRODUK PROMO';
+            if (tab === 'PROMO') label = '⚡ PRODUK PROMO';
 
             return (
               <button
@@ -157,7 +159,7 @@ export default function Catalog({
                 className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all whitespace-nowrap flex items-center gap-2 ${
                   isSelected
                     ? tab === 'PROMO'
-                      ? 'promo-badge-glow shadow-md scale-[1.02]'
+                      ? 'promo-lime-badge shadow-md scale-[1.02]'
                       : 'bg-white text-black shadow-md'
                     : 'metallic-card text-zinc-300 hover:text-white'
                 }`}
@@ -177,7 +179,7 @@ export default function Catalog({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari layanan (contoh: 'Depths', 'Godhuman', 'Level 1-2550', 'Fruit')..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/70 border border-zinc-800 text-white placeholder:text-zinc-600 text-xs sm:text-sm focus:outline-none focus:border-white transition-all font-mono"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/70 border border-zinc-800 text-white placeholder:text-zinc-600 text-xs sm:text-sm focus:outline-none focus:border-[#ccff00] transition-all font-mono"
             />
             {searchQuery && (
               <button
@@ -198,7 +200,7 @@ export default function Catalog({
                   : 'bg-black/60 text-zinc-400 border-zinc-800 hover:text-white'
               }`}
             >
-              <span className={`w-2 h-2 rounded-full ${onlyReadyStock ? 'bg-black' : 'bg-white'}`} />
+              <span className={`w-2 h-2 rounded-full ${onlyReadyStock ? 'bg-black' : 'bg-[#ccff00]'}`} />
               <span>Hanya Ready Stok</span>
             </button>
 

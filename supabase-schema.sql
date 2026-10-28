@@ -50,26 +50,43 @@ CREATE TABLE IF NOT EXISTS public.site_visits (
 
 CREATE INDEX IF NOT EXISTS idx_site_visits_date ON public.site_visits(visited_date);
 
--- 4. Aktifkan Realtime Replication untuk sinkronisasi live stock & produk
+-- 4. Tabel Bukti Transaksi Sukses
+CREATE TABLE IF NOT EXISTS public.transaction_proofs (
+  id TEXT PRIMARY KEY,
+  buyer_name TEXT NOT NULL,
+  service_name TEXT NOT NULL,
+  category TEXT NOT NULL,
+  amount NUMERIC DEFAULT 0,
+  date TEXT DEFAULT 'Hari ini',
+  image_url TEXT,
+  rating INTEGER DEFAULT 5,
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- 5. Aktifkan Realtime Replication untuk sinkronisasi live
 ALTER PUBLICATION supabase_realtime ADD TABLE public.products;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.store_settings;
 
--- 5. Row Level Security (RLS)
+-- 6. Row Level Security (RLS)
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.store_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.site_visits ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.transaction_proofs ENABLE ROW LEVEL SECURITY;
 
--- Policy untuk read publik (Semua pengunjung bisa melihat katalog)
+-- Policy untuk read publik (Semua pengunjung bisa melihat katalog & bukti transaksi)
 CREATE POLICY "Allow public read products" ON public.products FOR SELECT USING (true);
 CREATE POLICY "Allow public read settings" ON public.store_settings FOR SELECT USING (true);
 CREATE POLICY "Allow public insert visits" ON public.site_visits FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow public read visits" ON public.site_visits FOR SELECT USING (true);
+CREATE POLICY "Allow public read transactions" ON public.transaction_proofs FOR SELECT USING (true);
 
--- Policy untuk modifikasi (Admin / Anon untuk kemudahan web pribadi)
+-- Policy untuk modifikasi
 CREATE POLICY "Allow anon update products" ON public.products FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow anon update settings" ON public.store_settings FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow anon update transactions" ON public.transaction_proofs FOR ALL USING (true) WITH CHECK (true);
 
--- 6. Seed Data Awal (Settings)
+-- 7. Seed Data Awal (Settings)
 INSERT INTO public.store_settings (id, store_name, tagline, wa_number, wa_channel_url, wa_group_url, announcement, admin_pin)
 VALUES (
   'general',
@@ -85,7 +102,7 @@ ON CONFLICT (id) DO UPDATE SET
   store_name = EXCLUDED.store_name,
   tagline = EXCLUDED.tagline;
 
--- 7. Seed Data Awal (Katalog Produk & Layanan)
+-- 8. Seed Data Awal (Katalog Produk & Layanan)
 INSERT INTO public.products (id, name, category, description, price, original_price, is_discount, stock, is_active, sort_order)
 VALUES
   ('fisch-joki-1', 'Joki Level Fisch (1 - 100 Express)', 'JOKI FISCH', '', 35000, 50000, true, 8, true, 1),

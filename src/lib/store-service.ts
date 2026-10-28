@@ -1,10 +1,11 @@
-import { Product, StoreSettings } from '@/types';
+import { Product, StoreSettings, TransactionProof } from '@/types';
 import { getSupabaseClient, isSupabaseConfigured } from './supabase';
-import { INITIAL_PRODUCTS, INITIAL_SETTINGS } from './mock-data';
+import { INITIAL_PRODUCTS, INITIAL_SETTINGS, INITIAL_TRANSACTIONS } from './mock-data';
 
-const LOCAL_PRODUCTS_KEY = 'singularity_products_v1';
-const LOCAL_SETTINGS_KEY = 'singularity_settings_v1';
-const LOCAL_EVENT_NAME = 'singularity_store_update';
+const LOCAL_PRODUCTS_KEY = 'nauuvalstore_products_v2';
+const LOCAL_SETTINGS_KEY = 'nauuvalstore_settings_v2';
+const LOCAL_TRANSACTIONS_KEY = 'nauuvalstore_transactions_v2';
+const LOCAL_EVENT_NAME = 'nauuvalstore_store_update';
 
 // Format angka ke format Rupiah
 export function formatRupiah(amount: number): string {
@@ -61,6 +62,30 @@ function setLocalSettings(settings: StoreSettings): void {
     window.dispatchEvent(new CustomEvent(LOCAL_EVENT_NAME, { detail: { type: 'settings', data: settings } }));
   } catch (e) {
     console.error('Error saving local settings', e);
+  }
+}
+
+function getLocalTransactions(): TransactionProof[] {
+  if (typeof window === 'undefined') return INITIAL_TRANSACTIONS;
+  try {
+    const raw = localStorage.getItem(LOCAL_TRANSACTIONS_KEY);
+    if (!raw) {
+      localStorage.setItem(LOCAL_TRANSACTIONS_KEY, JSON.stringify(INITIAL_TRANSACTIONS));
+      return INITIAL_TRANSACTIONS;
+    }
+    return JSON.parse(raw);
+  } catch {
+    return INITIAL_TRANSACTIONS;
+  }
+}
+
+function setLocalTransactions(transactions: TransactionProof[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(LOCAL_TRANSACTIONS_KEY, JSON.stringify(transactions));
+    window.dispatchEvent(new CustomEvent(LOCAL_EVENT_NAME, { detail: { type: 'transactions', data: transactions } }));
+  } catch (e) {
+    console.error('Error saving local transactions', e);
   }
 }
 
@@ -124,7 +149,6 @@ export async function updateProductStock(id: string, newStock: number): Promise<
 export async function saveProduct(product: Partial<Product> & { name: string }): Promise<Product | null> {
   const supabase = getSupabaseClient();
 
-  // If is_discount is true or original_price is greater than price, mark is_discount
   const isDiscount = product.original_price && product.original_price > (product.price ?? 0)
     ? true
     : Boolean(product.is_discount);
@@ -198,6 +222,71 @@ export async function saveStoreSettings(settings: StoreSettings): Promise<boolea
   return true;
 }
 
+// --- TRANSACTION PROOFS SERVICE ---
+
+export async function getTransactionProofs(): Promise<TransactionProof[]> {
+  const supabase = getSupabaseClient();
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('transaction_proofs')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (!error && data && data.length > 0) {
+      return data as TransactionProof[];
+    }
+  }
+
+  return getLocalTransactions();
+}
+
+export async function saveTransactionProof(proof: Partial<TransactionProof> & { buyer_name: string; service_name: string }): Promise<TransactionProof | null> {
+  const supabase = getSupabaseClient();
+  const payload: TransactionProof = {
+    id: proof.id || `trx_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+    buyer_name: proof.buyer_name,
+    service_name: proof.service_name,
+    category: proof.category || 'JOKI FISCH',
+    amount: proof.amount ?? 0,
+    date: proof.date || 'Hari ini',
+    image_url: proof.image_url || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80',
+    rating: proof.rating ?? 5,
+    notes: proof.notes || '',
+    created_at: new Date().toISOString(),
+  };
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('transaction_proofs')
+      .upsert(payload)
+      .select()
+      .single();
+
+    if (!error && data) {
+      return data as TransactionProof;
+    }
+  }
+
+  const current = getLocalTransactions();
+  const exists = current.some((t) => t.id === payload.id);
+  const updated = exists ? current.map((t) => (t.id === payload.id ? payload : t)) : [payload, ...current];
+  setLocalTransactions(updated);
+  return payload;
+}
+
+export async function deleteTransactionProof(id: string): Promise<boolean> {
+  const supabase = getSupabaseClient();
+  if (supabase) {
+    const { error } = await supabase.from('transaction_proofs').delete().eq('id', id);
+    if (!error) return true;
+  }
+
+  const current = getLocalTransactions();
+  const updated = current.filter((t) => t.id !== id);
+  setLocalTransactions(updated);
+  return true;
+}
+
 // Realtime subscription handler
 export function subscribeToProducts(onUpdate: (products: Product[]) => void): () => void {
   const supabase = getSupabaseClient();
@@ -257,12 +346,10 @@ export function buildWhatsAppOrderUrl(
   product: Product,
   details?: { username?: string; notes?: string }
 ): string {
-  // Clean phone number (replace + and - and spaces)
   const cleanPhone = waNumber.replace(/[^0-9]/g, '');
-
   const finalPrice = formatRupiah(product.price);
   const discountText = product.is_discount && product.original_price
-    ? ` (🔥 Diskon dari ${formatRupiah(product.original_price)})`
+    ? ` (🔥 Promo Diskon dari ${formatRupiah(product.original_price)})`
     : '';
 
   const message = [
@@ -288,6 +375,6 @@ export function buildWhatsAppConsultUrl(waNumber: string, context?: string): str
   const cleanPhone = waNumber.replace(/[^0-9]/g, '');
   const message = context
     ? `Halo Admin, saya ingin konsultasi mengenai: ${context}`
-    : `Halo Admin Singularity Store, saya mau tanya-tanya seputar layanan Joki Fisch / Blox Fruit & kebutuhan akun.`;
+    : `Halo Admin nauuvalstore, saya mau tanya-tanya seputar layanan Joki Fisch / Blox Fruit & kebutuhan akun.`;
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 }

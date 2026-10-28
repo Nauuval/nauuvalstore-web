@@ -6,24 +6,27 @@ import AnnouncementBar from '@/components/AnnouncementBar';
 import Hero from '@/components/Hero';
 import WhatsAppHub from '@/components/WhatsAppHub';
 import Catalog from '@/components/Catalog';
+import TransactionProofSection from '@/components/TransactionProofSection';
 import HowToOrder from '@/components/HowToOrder';
 import WhyUs from '@/components/WhyUs';
 import Footer from '@/components/Footer';
 import FloatingWhatsApp from '@/components/FloatingWhatsApp';
 import OrderModal from '@/components/OrderModal';
-import { Product, StoreSettings } from '@/types';
+import { Product, StoreSettings, TransactionProof } from '@/types';
 import {
   getProducts,
   getStoreSettings,
+  getTransactionProofs,
   subscribeToProducts,
 } from '@/lib/store-service';
 import { recordVisit } from '@/lib/analytics-service';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { INITIAL_PRODUCTS, INITIAL_SETTINGS } from '@/lib/mock-data';
+import { INITIAL_PRODUCTS, INITIAL_SETTINGS, INITIAL_TRANSACTIONS } from '@/lib/mock-data';
 
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [settings, setSettings] = useState<StoreSettings>(INITIAL_SETTINGS);
+  const [transactions, setTransactions] = useState<TransactionProof[]>(INITIAL_TRANSACTIONS);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRealtimeActive, setIsRealtimeActive] = useState(false);
@@ -34,16 +37,18 @@ export default function HomePage() {
     // 1. Record visitor analytics (daily, weekly, monthly tracking)
     recordVisit('/');
 
-    // 2. Fetch initial products & settings
+    // 2. Fetch initial products, settings & transaction proofs
     async function loadData() {
       try {
-        const [prodList, storeConfig] = await Promise.all([
+        const [prodList, storeConfig, proofList] = await Promise.all([
           getProducts(),
           getStoreSettings(),
+          getTransactionProofs(),
         ]);
         if (isMounted) {
           if (prodList && prodList.length > 0) setProducts(prodList);
           if (storeConfig) setSettings(storeConfig);
+          if (proofList && proofList.length > 0) setTransactions(proofList);
           setIsRealtimeActive(isSupabaseConfigured());
         }
       } catch (err) {
@@ -53,7 +58,7 @@ export default function HomePage() {
 
     loadData();
 
-    // 3. Subscribe to real-time changes
+    // 3. Subscribe to real-time product changes
     const unsubscribe = subscribeToProducts((updatedProducts) => {
       if (isMounted && updatedProducts) {
         setProducts(updatedProducts);
@@ -96,22 +101,26 @@ export default function HomePage() {
       {/* Navigation */}
       <Navbar settings={settings} />
 
-      {/* Hero Section with Singularity Artwork & Game Logos */}
+      {/* Hero Section with Cinematic Singularity Background Image */}
       <Hero
         settings={settings}
         totalProducts={products.length}
         promoCount={promoCount}
+        totalTransactions={transactions.length + 1240}
       />
 
-      {/* Pusat Komunikasi Resmi (WhatsApp Hub) - Placed prominent at top, clean & non-overlapping */}
+      {/* Pusat Komunikasi Resmi (WhatsApp Hub) - Placed near top, clean & non-overlapping */}
       <WhatsAppHub settings={settings} />
 
-      {/* Unified Catalog with Pinned Promo Products at top */}
+      {/* Unified Catalog with Neon Lime Promo Outline and Radar Blip Stock */}
       <Catalog
         products={products}
         onOrderProduct={handleOrderProduct}
         isRealtimeActive={isRealtimeActive}
       />
+
+      {/* Bukti Transaksi Sukses & Testimoni Section (Horizontal Animated Carousel) */}
+      <TransactionProofSection transactions={transactions} />
 
       {/* How To Order */}
       <HowToOrder />

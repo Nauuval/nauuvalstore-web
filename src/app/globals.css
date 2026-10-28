@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap');
+@import url('https://fonts.cdnfonts.com/css/minecraft-4');
 @import "tailwindcss";
 
 :root {
@@ -116,4 +118,11 @@ body {
 
 .animate-radar-blip-fast {
   animation: radar-blip-fast 1.3s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+/* Minecraft / Retro Pixel Gaming Typography (Requested by User) */
+.font-minecraft {
+  font-family: 'Minecraft', 'Silkscreen', 'Press Start 2P', monospace;
+  letter-spacing: 0.04em;
+  text-rendering: pixelated;
 }

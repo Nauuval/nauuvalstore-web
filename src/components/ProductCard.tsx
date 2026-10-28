@@ -37,22 +37,22 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
       <div>
         {/* Top Meta Bar (Category + Badges) */}
         <div className="flex items-start justify-between gap-2 mb-3">
-          <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-black/60 border border-zinc-700/80 text-zinc-300 font-mono">
+          <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-black/60 border border-zinc-700/80 text-zinc-300 font-minecraft">
             {product.category}
           </span>
 
           <div className="flex items-center gap-1.5 flex-wrap justify-end">
-            {/* Eye-Catching Neon Lime Promo Badge (Requested from User's Reference) */}
+            {/* Eye-Catching Neon Lime Promo Badge (Minecraft Gaming Font) */}
             {isPromo && (
-              <span className="promo-lime-badge px-2.5 py-0.5 rounded-md text-[10px] uppercase tracking-wider flex items-center gap-1">
-                <Flame className="w-3.5 h-3.5 fill-black text-black shrink-0" />
+              <span className="promo-lime-badge px-2.5 py-0.5 rounded-md text-[10px] uppercase tracking-wider flex items-center gap-1 font-minecraft">
+                <Flame className="w-3 h-3 fill-black text-black shrink-0" />
                 <span>PROMO {discountPercent ? `-${discountPercent}%` : ''}</span>
               </span>
             )}
 
-            {/* Radar / Sonar Blip Stock Tag (Requested by User) */}
+            {/* Radar / Sonar Blip Stock Tag (Minecraft Gaming Font) */}
             <span
-              className={`px-2.5 py-1 rounded-md text-[10px] font-bold border font-mono flex items-center gap-2 ${
+              className={`px-2.5 py-1 rounded-md text-[10px] font-bold border font-minecraft flex items-center gap-2 ${
                 isOutOfStock
                   ? 'bg-zinc-950 text-zinc-500 border-zinc-800'
                   : isLowStock
@@ -80,10 +80,10 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
 
               <span>
                 {isOutOfStock
-                  ? 'Stok Habis'
+                  ? 'HABIS'
                   : isLowStock
-                  ? `Sisa ${product.stock}!`
-                  : `Ready: ${product.stock}`}
+                  ? `SISA ${product.stock}!`
+                  : `READY: ${product.stock}`}
               </span>
             </span>
           </div>
@@ -99,11 +99,11 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
       <div className="mt-5 pt-4 border-t border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           {isPromo && product.original_price && (
-            <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-mono">
+            <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-mono mb-0.5">
               <span className="line-through">{formatRupiah(product.original_price)}</span>
               {savingsAmount > 0 && (
-                <span className="text-[10px] font-black text-black bg-[#ccff00] px-1.5 py-0.2 rounded font-mono">
-                  Hemat {formatRupiah(savingsAmount)}
+                <span className="text-[9px] font-bold text-black bg-[#ccff00] px-1.5 py-0.5 rounded font-minecraft">
+                  HEMAT {formatRupiah(savingsAmount)}
                 </span>
               )}
             </div>

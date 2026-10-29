@@ -46,9 +46,9 @@ export default function HomePage() {
           getTransactionProofs(),
         ]);
         if (isMounted) {
-          if (prodList && prodList.length > 0) setProducts(prodList);
+          if (prodList) setProducts(prodList);
           if (storeConfig) setSettings(storeConfig);
-          if (proofList && proofList.length > 0) setTransactions(proofList);
+          if (proofList) setTransactions(proofList);
           setIsRealtimeActive(isSupabaseConfigured());
         }
       } catch (err) {

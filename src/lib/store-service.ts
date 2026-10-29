@@ -103,7 +103,8 @@ export async function getProducts(): Promise<Product[]> {
       .select('*')
       .order('sort_order', { ascending: true });
 
-    if (!error && data && data.length > 0) {
+    if (!error && data) {
+      setLocalProducts(data as Product[]);
       return data as Product[];
     }
   }
@@ -132,6 +133,7 @@ export async function getStoreSettings(): Promise<StoreSettings> {
 export async function updateProductStock(id: string, newStock: number): Promise<boolean> {
   const stockVal = Math.max(0, Math.floor(newStock));
   const supabase = getSupabaseClient();
+  let success = true;
 
   if (supabase) {
     const { error } = await supabase
@@ -139,15 +141,17 @@ export async function updateProductStock(id: string, newStock: number): Promise<
       .update({ stock: stockVal, updated_at: new Date().toISOString() })
       .eq('id', id);
 
-    if (!error) return true;
-    console.error('Supabase stock update error:', error);
+    if (error) {
+      console.error('Supabase stock update error:', error);
+      success = false;
+    }
   }
 
-  // Local fallback
+  // Always update local cache
   const products = getLocalProducts();
   const updated = products.map((p) => (p.id === id ? { ...p, stock: stockVal } : p));
   setLocalProducts(updated);
-  return true;
+  return success;
 }
 
 export async function saveProduct(product: Partial<Product> & { name: string }): Promise<Product | null> {
@@ -173,6 +177,8 @@ export async function saveProduct(product: Partial<Product> & { name: string }):
     updated_at: new Date().toISOString(),
   };
 
+  let savedData = payload;
+
   if (supabase) {
     const { data, error } = await supabase
       .from('products')
@@ -181,34 +187,41 @@ export async function saveProduct(product: Partial<Product> & { name: string }):
       .single();
 
     if (!error && data) {
-      return data as Product;
+      savedData = data as Product;
+    } else if (error) {
+      console.error('Supabase upsert product error:', error);
     }
-    console.error('Supabase upsert product error:', error);
   }
 
-  // Local fallback
+  // Always keep local storage updated in sync
   const products = getLocalProducts();
-  const exists = products.some((p) => p.id === payload.id);
+  const exists = products.some((p) => p.id === savedData.id);
   const updated = exists
-    ? products.map((p) => (p.id === payload.id ? payload : p))
-    : [payload, ...products];
+    ? products.map((p) => (p.id === savedData.id ? savedData : p))
+    : [savedData, ...products];
 
   setLocalProducts(updated);
-  return payload;
+  return savedData;
 }
 
 export async function deleteProduct(id: string): Promise<boolean> {
   const supabase = getSupabaseClient();
+  let success = true;
+
   if (supabase) {
     const { error } = await supabase.from('products').delete().eq('id', id);
-    if (!error) return true;
-    console.error('Supabase delete error:', error);
+    if (error) {
+      console.error('Supabase delete error:', error);
+      success = false;
+    }
   }
 
+  // Always keep local cache updated in sync
   const products = getLocalProducts();
   const updated = products.filter((p) => p.id !== id);
   setLocalProducts(updated);
-  return true;
+
+  return success;
 }
 
 export async function saveStoreSettings(settings: StoreSettings): Promise<boolean> {
@@ -280,15 +293,20 @@ export async function saveTransactionProof(proof: Partial<TransactionProof> & { 
 
 export async function deleteTransactionProof(id: string): Promise<boolean> {
   const supabase = getSupabaseClient();
+  let success = true;
+
   if (supabase) {
     const { error } = await supabase.from('transaction_proofs').delete().eq('id', id);
-    if (!error) return true;
+    if (error) {
+      console.error('Supabase delete trx error:', error);
+      success = false;
+    }
   }
 
   const current = getLocalTransactions();
   const updated = current.filter((t) => t.id !== id);
   setLocalTransactions(updated);
-  return true;
+  return success;
 }
 
 // Realtime subscription handler

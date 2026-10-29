@@ -155,7 +155,7 @@ export default function AdminPage() {
       setIsAuthenticated(true);
       setAuthError('');
     } else {
-      setAuthError('PIN Admin salah. Default: singularity2026');
+      setAuthError('PIN Admin salah. Silakan coba lagi.');
     }
   };
 
@@ -380,7 +380,7 @@ export default function AdminPage() {
                 type="password"
                 value={pinInput}
                 onChange={(e) => setPinInput(e.target.value)}
-                placeholder="Default: singularity2026"
+                placeholder="Masukkan PIN Admin..."
                 className="w-full px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#ccff00] font-mono tracking-widest text-center"
                 autoFocus
               />

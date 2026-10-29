@@ -58,23 +58,49 @@ CREATE TABLE IF NOT EXISTS public.transaction_proofs (
 ALTER PUBLICATION supabase_realtime ADD TABLE public.products;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.store_settings;
 
--- 6. Row Level Security (RLS)
+-- 6. Grant Permissions & Row Level Security (RLS)
+GRANT ALL ON TABLE public.products TO anon, authenticated, service_role;
+GRANT ALL ON TABLE public.store_settings TO anon, authenticated, service_role;
+GRANT ALL ON TABLE public.transaction_proofs TO anon, authenticated, service_role;
+GRANT ALL ON TABLE public.site_visits TO anon, authenticated, service_role;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
+
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.store_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.site_visits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.transaction_proofs ENABLE ROW LEVEL SECURITY;
 
--- Policy untuk read publik (Semua pengunjung bisa melihat katalog & bukti transaksi)
-CREATE POLICY "Allow public read products" ON public.products FOR SELECT USING (true);
-CREATE POLICY "Allow public read settings" ON public.store_settings FOR SELECT USING (true);
-CREATE POLICY "Allow public insert visits" ON public.site_visits FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow public read visits" ON public.site_visits FOR SELECT USING (true);
-CREATE POLICY "Allow public read transactions" ON public.transaction_proofs FOR SELECT USING (true);
+-- Policy untuk Products (SELECT, INSERT, UPDATE, DELETE)
+DROP POLICY IF EXISTS "Allow public read products" ON public.products;
+DROP POLICY IF EXISTS "Allow anon update products" ON public.products;
+DROP POLICY IF EXISTS "Allow public all products" ON public.products;
+DROP POLICY IF EXISTS "Allow public delete products" ON public.products;
+CREATE POLICY "Allow public select products" ON public.products FOR SELECT USING (true);
+CREATE POLICY "Allow public insert products" ON public.products FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update products" ON public.products FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public delete products" ON public.products FOR DELETE USING (true);
 
--- Policy untuk modifikasi
-CREATE POLICY "Allow anon update products" ON public.products FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow anon update settings" ON public.store_settings FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow anon update transactions" ON public.transaction_proofs FOR ALL USING (true) WITH CHECK (true);
+-- Policy untuk Store Settings
+DROP POLICY IF EXISTS "Allow public read settings" ON public.store_settings;
+DROP POLICY IF EXISTS "Allow anon update settings" ON public.store_settings;
+CREATE POLICY "Allow public select settings" ON public.store_settings FOR SELECT USING (true);
+CREATE POLICY "Allow public update settings" ON public.store_settings FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public insert settings" ON public.store_settings FOR INSERT WITH CHECK (true);
+
+-- Policy untuk Site Visits
+DROP POLICY IF EXISTS "Allow public insert visits" ON public.site_visits;
+DROP POLICY IF EXISTS "Allow public read visits" ON public.site_visits;
+CREATE POLICY "Allow public select visits" ON public.site_visits FOR SELECT USING (true);
+CREATE POLICY "Allow public insert visits" ON public.site_visits FOR INSERT WITH CHECK (true);
+
+-- Policy untuk Transaction Proofs (SELECT, INSERT, UPDATE, DELETE)
+DROP POLICY IF EXISTS "Allow public read transactions" ON public.transaction_proofs;
+DROP POLICY IF EXISTS "Allow anon update transactions" ON public.transaction_proofs;
+DROP POLICY IF EXISTS "Allow public delete transactions" ON public.transaction_proofs;
+CREATE POLICY "Allow public select transactions" ON public.transaction_proofs FOR SELECT USING (true);
+CREATE POLICY "Allow public insert transactions" ON public.transaction_proofs FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update transactions" ON public.transaction_proofs FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public delete transactions" ON public.transaction_proofs FOR DELETE USING (true);
 
 -- 7. Seed Data Awal (Settings)
 INSERT INTO public.store_settings (id, store_name, tagline, wa_number, wa_channel_url, wa_group_url, announcement, admin_pin)

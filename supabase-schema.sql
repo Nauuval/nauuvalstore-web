@@ -1,13 +1,3 @@
--- =========================================================================
--- NAUUVALSTORE - SUPABASE SCHEMA & INITIAL SEED (FREE TIER)
--- =========================================================================
--- Cara pakai:
--- 1. Buka dashboard Supabase (https://supabase.com/dashboard)
--- 2. Pilih Project Anda -> Masuk ke menu "SQL Editor"
--- 3. Copy semua isi file ini, paste ke SQL Editor, lalu klik tombol "RUN"
--- 4. Buka Project Settings -> API -> Salin URL dan anon key ke Environment Variables Vercel
--- =========================================================================
-
 -- 1. Tabel Products (Katalog Joki & Kebutuhan)
 CREATE TABLE IF NOT EXISTS public.products (
   id TEXT PRIMARY KEY,

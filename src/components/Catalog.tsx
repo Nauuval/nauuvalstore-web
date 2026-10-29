@@ -193,7 +193,7 @@ export default function Catalog({
 
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-800 relative z-10">
               <div className="flex items-center gap-2.5">
-                <span className="promo-lime-badge px-3 py-1 rounded-lg font-bold text-xs flex items-center gap-1.5 uppercase tracking-wide font-minecraft">
+                <span className="promo-lime-badge px-3 py-1 rounded-lg font-black text-xs flex items-center gap-1.5 uppercase tracking-wide">
                   <Flame className="w-4 h-4 fill-black text-black" />
                   <span>⚡ PRODUK PROMO SPESIAL</span>
                 </span>
@@ -201,8 +201,8 @@ export default function Catalog({
                   • Diskon Terbatas Sedang Berlangsung!
                 </span>
               </div>
-              <span className="text-xs font-minecraft font-bold text-black bg-[#ccff00] px-2.5 py-1 rounded-lg shadow-sm">
-                {pinnedPromoProducts.length} PROMO
+              <span className="text-xs font-mono font-bold text-black bg-[#ccff00] px-2.5 py-1 rounded-lg shadow-sm">
+                {pinnedPromoProducts.length} Layanan Promo
               </span>
             </div>
 
@@ -242,7 +242,7 @@ export default function Catalog({
               >
                 <span>{label}</span>
                 <span
-                  className={`text-[10px] font-minecraft px-1.5 py-0.5 rounded-md ${
+                  className={`text-[10px] font-mono px-1.5 py-0.5 rounded-md ${
                     isSelected
                       ? tab === 'PROMO'
                         ? 'bg-black text-[#ccff00]'

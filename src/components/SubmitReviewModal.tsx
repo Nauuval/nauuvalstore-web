@@ -76,11 +76,6 @@ export default function SubmitReviewModal({
       return;
     }
 
-    if (!imagePreview) {
-      alert('Mohon upload bukti screenshot pembayaran atau layanan.');
-      return;
-    }
-
     setIsSubmitting(true);
 
     // Format masked buyer name if checked
@@ -99,7 +94,7 @@ export default function SubmitReviewModal({
       date: 'Hari ini',
       rating,
       notes: notes.trim(),
-      image_url: imagePreview,
+      image_url: imagePreview || '',
     };
 
     const ok = await onSubmit(payload);
@@ -286,11 +281,11 @@ export default function SubmitReviewModal({
                 />
               </div>
 
-              {/* Upload Screenshot Bukti Transaksi Langsung dari HP / Laptop */}
+              {/* Upload Screenshot Bukti Transaksi Langsung dari HP / Laptop (Opsional) */}
               <div>
                 <label className="block font-bold text-zinc-300 mb-1.5 uppercase flex items-center justify-between">
-                  <span>Upload Bukti Screenshot (Dari Perangkat):</span>
-                  <span className="text-[10px] text-zinc-500 font-normal">PNG / JPG / WEBP</span>
+                  <span>Upload Bukti Screenshot (Opsional):</span>
+                  <span className="text-[10px] text-zinc-500 font-normal">Boleh Dikosongkan</span>
                 </label>
 
                 {imagePreview ? (
@@ -387,7 +382,7 @@ export default function SubmitReviewModal({
                   ) : (
                     <>
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>Kirim Testimoni & Bukti</span>
+                      <span>Kirim Testimoni & Ulasan</span>
                     </>
                   )}
                 </button>

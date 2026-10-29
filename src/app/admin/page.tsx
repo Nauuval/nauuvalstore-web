@@ -307,12 +307,10 @@ export default function AdminPage() {
       return;
     }
 
-    if (!editingTrx?.image_url) {
-      showNotify('error', 'Mohon upload foto bukti transaksi atau masukkan URL gambar.');
-      return;
-    }
-
-    const saved = await saveTransactionProof(editingTrx as any);
+    const saved = await saveTransactionProof({
+      ...editingTrx,
+      image_url: editingTrx?.image_url || '',
+    } as any);
     if (saved) {
       showNotify('success', 'Bukti transaksi berhasil disimpan!');
       setIsTrxModalOpen(false);

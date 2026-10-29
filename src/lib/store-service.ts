@@ -266,7 +266,7 @@ export async function saveTransactionProof(proof: Partial<TransactionProof> & { 
     category: proof.category || 'JOKI FISCH',
     amount: proof.amount ?? 0,
     date: proof.date || 'Hari ini',
-    image_url: proof.image_url || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80',
+    image_url: proof.image_url || '',
     rating: proof.rating ?? 5,
     notes: proof.notes || '',
     created_at: new Date().toISOString(),

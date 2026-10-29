@@ -18,7 +18,7 @@ export default function Footer({ settings }: FooterProps) {
   return (
     <footer className="relative border-t border-zinc-800/80 bg-[#08090d] pt-14 pb-12 text-zinc-400 text-xs sm:text-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 mb-12">
           {/* Brand Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
@@ -39,7 +39,7 @@ export default function Footer({ settings }: FooterProps) {
               </div>
             </div>
 
-            <p className="text-zinc-400 text-xs leading-relaxed">
+            <p className="text-zinc-400 text-xs leading-relaxed max-w-sm">
               Penyedia jasa joki Roblox Fisch, Blox Fruit serta kebutuhan akun & koin terpercaya dengan pantauan stok realtime.
             </p>
 
@@ -54,35 +54,6 @@ export default function Footer({ settings }: FooterProps) {
                 <span>Chat Admin: +{settings.wa_number}</span>
               </a>
             </div>
-          </div>
-
-          {/* Kategori Layanan */}
-          <div>
-            <h4 className="font-bold text-white text-xs mb-3 uppercase tracking-wider">
-              Kategori Layanan
-            </h4>
-            <ul className="space-y-2 text-xs">
-              <li>
-                <a href="#catalog" className="hover:text-white transition-colors">
-                  • Joki Fisch (Level 1-100, Rod Quests)
-                </a>
-              </li>
-              <li>
-                <a href="#catalog" className="hover:text-white transition-colors">
-                  • Joki Blox Fruit (Max Level, Godhuman, CDK)
-                </a>
-              </li>
-              <li>
-                <a href="#catalog" className="hover:text-white transition-colors">
-                  • Kebutuhan Fisch (Koin C$, Relics, Totems)
-                </a>
-              </li>
-              <li>
-                <a href="#catalog" className="hover:text-white transition-colors">
-                  • Kebutuhan Blox Fruit (Beli, Fruit, Carry)
-                </a>
-              </li>
-            </ul>
           </div>
 
           {/* Saluran & Komunitas */}

@@ -344,32 +344,32 @@ export function subscribeToProducts(onUpdate: (products: Product[]) => void): ()
   return () => {};
 }
 
-// WhatsApp Link Generator with Pre-filled message
+// WhatsApp Link Generator with Pre-filled message (Clean, Professional, No Emoji Clutter)
 export function buildWhatsAppOrderUrl(
   waNumber: string,
   product: Product,
-  details?: { username?: string; notes?: string }
+  details?: { quantity?: number; username?: string; notes?: string }
 ): string {
   const cleanPhone = waNumber.replace(/[^0-9]/g, '');
-  const finalPrice = formatRupiah(product.price);
+  const qty = details?.quantity && details.quantity > 0 ? details.quantity : 1;
+  const totalPrice = product.price * qty;
+  const finalSinglePrice = formatRupiah(product.price);
   const discountText = product.is_discount && product.original_price
-    ? ` (🔥 Promo Diskon dari ${formatRupiah(product.original_price)})`
+    ? ` (Diskon Promo dari ${formatRupiah(product.original_price)})`
     : '';
 
   const message = [
-    `Halo Admin ${INITIAL_SETTINGS.store_name}, saya ingin order layanan/produk ini:`,
+    `Halo Admin Nauuvalstore, saya ingin order:`,
     ``,
-    `📦 *Nama Produk*: ${product.name}`,
-    `🏷️ *Kategori*: ${product.category}`,
-    `💰 *Harga*: ${finalPrice}${discountText}`,
-    `📊 *Stok Saat Dilihat*: ${product.stock > 0 ? `${product.stock} Tersedia` : 'Habis (Pre-Order)'}`,
-    details?.username ? `🎮 *Username Roblox*: ${details.username}` : `🎮 *Username Roblox*: (Tolong infokan formatnya min)`,
-    details?.notes ? `📝 *Catatan / Request*: ${details.notes}` : ``,
+    `*Detail Pesanan:*`,
+    `- Layanan / Produk: ${product.name}`,
+    `- Kategori: ${product.category}`,
+    `- Harga Satuan: ${finalSinglePrice}${discountText}`,
+    `- Jumlah Pembelian: ${qty}x`,
+    `- Total Pembayaran: ${formatRupiah(totalPrice)}`,
     ``,
-    `Apakah slot masih tersedia untuk diproses sekarang? Terima kasih!`,
-  ]
-    .filter(Boolean)
-    .join('\n');
+    `Apakah pesanan ini bisa diproses sekarang? Terima kasih.`,
+  ].join('\n');
 
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 }
@@ -378,7 +378,7 @@ export function buildWhatsAppOrderUrl(
 export function buildWhatsAppConsultUrl(waNumber: string, context?: string): string {
   const cleanPhone = waNumber.replace(/[^0-9]/g, '');
   const message = context
-    ? `Halo Admin, saya ingin konsultasi mengenai: ${context}`
-    : `Halo Admin nauuvalstore, saya mau tanya-tanya seputar layanan Joki Fisch / Blox Fruit & kebutuhan akun.`;
+    ? `Halo Admin Nauuvalstore, saya ingin konsultasi mengenai: ${context}`
+    : `Halo Admin Nauuvalstore, saya mau tanya-tanya seputar layanan Joki Fisch / Blox Fruit & kebutuhan akun.`;
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 }

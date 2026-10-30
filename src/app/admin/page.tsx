@@ -115,6 +115,8 @@ export default function AdminPage() {
 
   // Check auth session & immediately load latest settings for PIN accuracy
   useEffect(() => {
+    setPinInput('');
+    setAuthError('');
     const session = sessionStorage.getItem('nauuval_admin_auth');
     if (session === 'true') {
       setIsAuthenticated(true);
@@ -176,6 +178,7 @@ export default function AdminPage() {
 
       if (pinInput.trim() === correctPin) {
         sessionStorage.setItem('nauuval_admin_auth', 'true');
+        setPinInput('');
         setIsAuthenticated(true);
         setAuthError('');
       } else {
@@ -185,6 +188,7 @@ export default function AdminPage() {
       const fallbackPin = (settings.admin_pin || 'singularity2026').trim();
       if (pinInput.trim() === fallbackPin) {
         sessionStorage.setItem('nauuval_admin_auth', 'true');
+        setPinInput('');
         setIsAuthenticated(true);
         setAuthError('');
       } else {
@@ -195,6 +199,8 @@ export default function AdminPage() {
 
   const handleLogout = () => {
     sessionStorage.removeItem('nauuval_admin_auth');
+    setPinInput('');
+    setAuthError('');
     setIsAuthenticated(false);
   };
 
@@ -502,13 +508,19 @@ export default function AdminPage() {
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4" autoComplete="off">
             <div>
               <label className="block text-xs font-bold text-zinc-400 mb-1.5 uppercase">
                 PIN Akses Admin:
               </label>
               <input
                 type="password"
+                name="admin_security_token_field"
+                id="admin_security_token_field"
+                autoComplete="new-password"
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-form-type="other"
                 value={pinInput}
                 onChange={(e) => setPinInput(e.target.value)}
                 placeholder="Masukkan PIN Admin..."

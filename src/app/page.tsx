@@ -16,16 +16,17 @@ import OrderModal from '@/components/OrderModal';
 import { Product, StoreSettings, TransactionProof } from '@/types';
 import {
   getProducts,
+  getLocalProducts,
   getStoreSettings,
   getTransactionProofs,
   subscribeToProducts,
 } from '@/lib/store-service';
 import { recordVisit } from '@/lib/analytics-service';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { INITIAL_PRODUCTS, INITIAL_SETTINGS, INITIAL_TRANSACTIONS } from '@/lib/mock-data';
+import { INITIAL_SETTINGS, INITIAL_TRANSACTIONS } from '@/lib/mock-data';
 
 export default function HomePage() {
-  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+  const [products, setProducts] = useState<Product[]>([]);
   const [settings, setSettings] = useState<StoreSettings>(INITIAL_SETTINGS);
   const [transactions, setTransactions] = useState<TransactionProof[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -34,6 +35,12 @@ export default function HomePage() {
 
   useEffect(() => {
     let isMounted = true;
+
+    // Fast local storage cache read so the screen renders the saved product immediately
+    const cachedProducts = getLocalProducts();
+    if (cachedProducts && cachedProducts.length > 0) {
+      setProducts(cachedProducts);
+    }
 
     // 1. Record visitor analytics (daily, weekly, monthly tracking)
     recordVisit('/');

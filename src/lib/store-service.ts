@@ -2,7 +2,8 @@ import { Product, StoreSettings, TransactionProof } from '@/types';
 import { getSupabaseClient, isSupabaseConfigured } from './supabase';
 import { INITIAL_PRODUCTS, INITIAL_SETTINGS, INITIAL_TRANSACTIONS } from './mock-data';
 
-const LOCAL_PRODUCTS_KEY = 'nauuvalstore_products_v2';
+const LOCAL_PRODUCTS_KEY = 'nauuvalstore_products_v3';
+const LOCAL_PRODUCTS_INITIALIZED_KEY = 'nauuvalstore_prod_init_flag_v3';
 const LOCAL_SETTINGS_KEY = 'nauuvalstore_settings_v2';
 const LOCAL_TRANSACTIONS_KEY = 'nauuvalstore_transactions_v2';
 const LOCAL_TRANSACTIONS_INITIALIZED_KEY = 'nauuvalstore_trx_init_flag_v3';
@@ -17,28 +18,39 @@ export function formatRupiah(amount: number): string {
   }).format(amount);
 }
 
-const PRODUCT_DATA_VERSION = 'v2_catalog_36';
-
 // Helper local storage
-function getLocalProducts(): Product[] {
-  if (typeof window === 'undefined') return INITIAL_PRODUCTS;
+export function getLocalProducts(): Product[] {
+  if (typeof window === 'undefined') return [];
   try {
+    const initialized = localStorage.getItem(LOCAL_PRODUCTS_INITIALIZED_KEY);
     const raw = localStorage.getItem(LOCAL_PRODUCTS_KEY);
-    const version = localStorage.getItem('nauuval_product_version');
-    if (!raw || version !== PRODUCT_DATA_VERSION) {
+
+    // Smooth migration: if user previously modified/saved products in v2, preserve it!
+    if (!initialized) {
+      const v2Raw = localStorage.getItem('nauuvalstore_products_v2');
+      if (v2Raw) {
+        localStorage.setItem(LOCAL_PRODUCTS_INITIALIZED_KEY, 'true');
+        localStorage.setItem(LOCAL_PRODUCTS_KEY, v2Raw);
+        return JSON.parse(v2Raw);
+      }
+      localStorage.setItem(LOCAL_PRODUCTS_INITIALIZED_KEY, 'true');
       localStorage.setItem(LOCAL_PRODUCTS_KEY, JSON.stringify(INITIAL_PRODUCTS));
-      localStorage.setItem('nauuval_product_version', PRODUCT_DATA_VERSION);
       return INITIAL_PRODUCTS;
     }
-    return JSON.parse(raw);
+
+    if (raw !== null) {
+      return JSON.parse(raw);
+    }
+    return [];
   } catch {
-    return INITIAL_PRODUCTS;
+    return [];
   }
 }
 
-function setLocalProducts(products: Product[]): void {
+export function setLocalProducts(products: Product[]): void {
   if (typeof window === 'undefined') return;
   try {
+    localStorage.setItem(LOCAL_PRODUCTS_INITIALIZED_KEY, 'true');
     localStorage.setItem(LOCAL_PRODUCTS_KEY, JSON.stringify(products));
     window.dispatchEvent(new CustomEvent(LOCAL_EVENT_NAME, { detail: { type: 'products', data: products } }));
   } catch (e) {

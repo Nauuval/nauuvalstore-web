@@ -2,12 +2,14 @@
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { Product, CartItem } from '@/types';
+import AddToCartModal from '@/components/AddToCartModal';
 
 const LOCAL_CART_KEY = 'nauuvalstore_cart_v1';
 
 interface CartContextType {
   cart: CartItem[];
   addToCart: (product: Product, quantity?: number) => void;
+  promptAddToCart: (product: Product) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   removeFromCart: (productId: string) => void;
   clearCart: () => void;
@@ -26,6 +28,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Add to cart quantity confirmation modal state
+  const [modalProduct, setModalProduct] = useState<Product | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // Load cart from localStorage on client mount
   useEffect(() => {
@@ -56,6 +62,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }, 2800);
   };
 
+  const promptAddToCart = (product: Product) => {
+    setModalProduct(product);
+    setIsAddModalOpen(true);
+  };
+
   const addToCart = (product: Product, quantity = 1) => {
     const qty = Math.max(1, quantity);
     const existingIndex = cart.findIndex((item) => item.product.id === product.id);
@@ -76,7 +87,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
 
     saveCart(updated);
-    showToast(`✓ "${product.name}" ditambahkan ke keranjang!`);
+    showToast(`✓ ${qty}x "${product.name}" dimasukkan ke keranjang!`);
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
@@ -121,6 +132,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       value={{
         cart,
         addToCart,
+        promptAddToCart,
         updateQuantity,
         removeFromCart,
         clearCart,
@@ -134,6 +146,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }}
     >
       {children}
+
+      {/* Quantity Confirmation Modal before adding to cart */}
+      <AddToCartModal
+        product={modalProduct}
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onConfirm={addToCart}
+      />
 
       {/* Floating Animated Toast Notification when item added */}
       {toastMessage && (

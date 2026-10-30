@@ -12,7 +12,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, onOrder }: ProductCardProps) {
-  const { addToCart } = useCart();
+  const { promptAddToCart } = useCart();
   const isOutOfStock = product.stock <= 0;
   const isLowStock = product.stock > 0 && product.stock <= 3;
 
@@ -123,11 +123,11 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
         {/* Action Buttons: Dual Action Grid (Add to Cart + Direct Buy) */}
         <div className="grid grid-cols-2 gap-2">
           <button
-            onClick={() => addToCart(product, 1)}
+            onClick={() => promptAddToCart(product)}
             disabled={isOutOfStock}
             type="button"
             className="py-2.5 px-2 rounded-xl border border-[#1b4332] bg-[#071911] hover:bg-[#0e2c1e] hover:border-[#00df82]/60 text-zinc-200 hover:text-white font-tech text-xs font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95 disabled:opacity-35 disabled:pointer-events-none"
-            title="Tambah ke Keranjang Pesanan"
+            title="Tentukan jumlah & tambah ke keranjang"
           >
             <ShoppingCart className="w-3.5 h-3.5 text-[#00df82]" />
             <span className="truncate">+ Keranjang</span>

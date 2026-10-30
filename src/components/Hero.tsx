@@ -95,13 +95,16 @@ export default function Hero({
             {settings.store_name?.toUpperCase() || 'NAUUVALSTORE'}
           </h1>
 
-          <p className="mt-4 text-lg sm:text-xl font-bold tracking-wide text-zinc-200 uppercase">
-            Joki & Kebutuhan Roblox Fisch & Blox Fruit
+          <p className="mt-4 text-base sm:text-lg font-bold tracking-wider text-zinc-200 uppercase font-tech">
+            Joki &amp; Kebutuhan Roblox Fisch &amp; Blox Fruit
           </p>
 
-          <p className="mt-3 text-xs sm:text-sm text-zinc-300 font-normal leading-relaxed max-w-2xl drop-shadow">
-            Pilihan tepat untuk leveling kilat, quest rod fisch, hunting melee bloxfruit, buah fisik, dan koin fisch. 100% aman tanpa cheat script, transparan, dan stok terpantau realtime.
-          </p>
+          {/* Subtitle in clean, polished high-tech font with emerald left-accent line */}
+          <div className="mt-3.5 max-w-2xl border-l-2 border-[#00df82] pl-3.5 sm:pl-4 py-1.5 bg-[#06140d]/40 backdrop-blur-xs rounded-r-xl">
+            <p className="text-[11px] sm:text-xs md:text-[13px] text-zinc-200 font-tech font-semibold uppercase tracking-wider leading-relaxed drop-shadow">
+              PILIHAN TEPAT UNTUK LEVELING KILAT, QUEST ROD FISCH, HUNTING MELEE BLOXFRUIT, BUAH FISIK, DAN KOIN FISCH. <span className="text-[#00df82] font-bold">100% AMAN TANPA CHEAT SCRIPT</span>, TRANSPARAN, DAN STOK TERPANTAU REALTIME.
+            </p>
+          </div>
 
           {/* Action Buttons */}
           <div className="mt-8 flex flex-wrap items-center gap-3.5">

@@ -83,7 +83,7 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'analytics' | 'stock' | 'products' | 'transactions' | 'settings'>('analytics');
 
   // Filter & Search states
-  const [selectedCategory, setSelectedCategory] = useState<'ALL' | ProductCategory>('ALL');
+  const [selectedCategory, setSelectedCategory] = useState<'ALL' | 'PROMO' | ProductCategory>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Product Form Modal state
@@ -374,7 +374,13 @@ export default function AdminPage() {
   // Filtered list
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
-      if (selectedCategory !== 'ALL' && p.category !== selectedCategory) return false;
+      if (selectedCategory === 'PROMO') {
+        const isPromo = p.is_discount || (p.original_price && p.original_price > p.price);
+        if (!isPromo) return false;
+      } else if (selectedCategory !== 'ALL' && p.category !== selectedCategory) {
+        return false;
+      }
+
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         return (
@@ -385,6 +391,20 @@ export default function AdminPage() {
       return true;
     });
   }, [products, selectedCategory, searchQuery]);
+
+  // Product counts by category for admin badges
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      ALL: products.length,
+      PROMO: products.filter(
+        (p) => p.is_discount || (p.original_price && p.original_price > p.price)
+      ).length,
+    };
+    CATEGORIES.forEach((cat) => {
+      counts[cat] = products.filter((p) => p.category === cat).length;
+    });
+    return counts;
+  }, [products]);
 
   // Max visits for visual bar scaling
   const maxDailyVisit = useMemo(() => {
@@ -1234,6 +1254,7 @@ export default function AdminPage() {
                   className="px-3 py-1.5 rounded-xl bg-black border border-zinc-800 text-xs text-white font-semibold focus:outline-none"
                 >
                   <option value="ALL">Semua Kategori</option>
+                  <option value="PROMO">Produk Promo</option>
                   {CATEGORIES.map((cat) => (
                     <option key={cat} value={cat}>
                       {cat}
@@ -1388,77 +1409,227 @@ export default function AdminPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredProducts.map((p) => {
-                const isPromo =
-                  p.is_discount || (p.original_price && p.original_price > p.price);
-
-                return (
-                  <div
-                    key={p.id}
-                    className={`metallic-card rounded-2xl p-5 flex flex-col justify-between ${
-                      isPromo ? 'promo-lime-border' : ''
+            {/* Search Box & Category Filter Controls */}
+            <div className="mb-6 space-y-3.5">
+              {/* Category Filter Pills with Live Badges */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-none">
+                <button
+                  type="button"
+                  onClick={() => setSelectedCategory('ALL')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 font-mono ${
+                    selectedCategory === 'ALL'
+                      ? 'bg-[#00df82] text-black shadow-md shadow-[#00df82]/20 font-black'
+                      : 'bg-[#06120c] border border-[#143d2c] text-zinc-400 hover:text-white hover:border-zinc-700'
+                  }`}
+                >
+                  <span>SEMUA LAYANAN</span>
+                  <span
+                    className={`px-1.5 py-0.5 rounded-full text-[10px] font-price font-bold ${
+                      selectedCategory === 'ALL'
+                        ? 'bg-black/20 text-black'
+                        : 'bg-zinc-900 text-zinc-300 border border-zinc-800'
                     }`}
                   >
-                    <div>
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-black border border-zinc-800 text-zinc-300 uppercase font-mono">
-                          {p.category}
-                        </span>
+                    {categoryCounts['ALL'] ?? 0}
+                  </span>
+                </button>
 
-                        <div className="flex items-center gap-1.5">
-                          {isPromo && (
-                            <span className="promo-lime-badge px-2 py-0.5 rounded text-[10px] font-black">
-                              PROMO
+                <button
+                  type="button"
+                  onClick={() => setSelectedCategory('PROMO')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 font-mono ${
+                    selectedCategory === 'PROMO'
+                      ? 'bg-[#00df82] text-black shadow-md shadow-[#00df82]/20 font-black'
+                      : 'bg-[#06120c] border border-[#143d2c] text-zinc-400 hover:text-white hover:border-zinc-700'
+                  }`}
+                >
+                  <Flame
+                    className={`w-3.5 h-3.5 ${
+                      selectedCategory === 'PROMO' ? 'text-black' : 'text-[#00df82]'
+                    }`}
+                  />
+                  <span>PRODUK PROMO</span>
+                  <span
+                    className={`px-1.5 py-0.5 rounded-full text-[10px] font-price font-bold ${
+                      selectedCategory === 'PROMO'
+                        ? 'bg-black/20 text-black'
+                        : 'bg-zinc-900 text-zinc-300 border border-zinc-800'
+                    }`}
+                  >
+                    {categoryCounts['PROMO'] ?? 0}
+                  </span>
+                </button>
+
+                {CATEGORIES.map((cat) => {
+                  const count = categoryCounts[cat] ?? 0;
+                  const isActive = selectedCategory === cat;
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setSelectedCategory(cat)}
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 font-mono ${
+                        isActive
+                          ? 'bg-[#00df82] text-black shadow-md shadow-[#00df82]/20 font-black'
+                          : 'bg-[#06120c] border border-[#143d2c] text-zinc-400 hover:text-white hover:border-zinc-700'
+                      }`}
+                    >
+                      <span>{cat}</span>
+                      <span
+                        className={`px-1.5 py-0.5 rounded-full text-[10px] font-price font-bold ${
+                          isActive
+                            ? 'bg-black/20 text-black'
+                            : 'bg-zinc-900 text-zinc-300 border border-zinc-800'
+                        }`}
+                      >
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Search Bar & Result Summary */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded-2xl bg-[#06100c] border border-[#143a29]">
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Cari nama layanan, kategori, atau keyword di listing..."
+                    className="w-full pl-10 pr-9 py-2 rounded-xl bg-black border border-[#143d2c] text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#00df82] font-mono transition-all"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-0.5 rounded transition-colors"
+                      title="Hapus kata kunci pencarian"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between sm:justify-end gap-3 text-xs font-mono">
+                  <span className="text-zinc-400">
+                    Menampilkan{' '}
+                    <strong className="text-white font-price">{filteredProducts.length}</strong>{' '}
+                    dari{' '}
+                    <strong className="text-white font-price">{products.length}</strong> Layanan
+                  </span>
+
+                  {(searchQuery || selectedCategory !== 'ALL') && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSelectedCategory('ALL');
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-[#00df82] hover:text-white border border-[#143d2c] text-[11px] font-bold transition-all"
+                    >
+                      Reset Filter
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Empty State */}
+            {filteredProducts.length === 0 ? (
+              <div className="py-16 text-center metallic-card rounded-2xl max-w-md mx-auto p-8 border border-zinc-800">
+                <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 flex items-center justify-center mx-auto mb-3">
+                  <Search className="w-6 h-6 opacity-60 text-zinc-400" />
+                </div>
+                <h4 className="text-base font-bold text-white font-mono">Tidak Ada Layanan Ditemukan</h4>
+                <p className="mt-1 text-xs text-zinc-400 max-w-xs mx-auto leading-relaxed">
+                  Tidak ada layanan yang cocok dengan kata kunci &quot;{searchQuery}&quot; atau kategori yang dipilih.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedCategory('ALL');
+                  }}
+                  className="mt-4 px-4 py-2 rounded-xl bg-[#00df82] text-black font-bold text-xs font-tech hover:bg-[#00c774] transition-all"
+                >
+                  Reset Filter &amp; Tampilkan Semua
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredProducts.map((p) => {
+                  const isPromo =
+                    p.is_discount || (p.original_price && p.original_price > p.price);
+
+                  return (
+                    <div
+                      key={p.id}
+                      className={`metallic-card rounded-2xl p-5 flex flex-col justify-between ${
+                        isPromo ? 'promo-lime-border' : ''
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-black border border-zinc-800 text-zinc-300 uppercase font-mono">
+                            {p.category}
+                          </span>
+
+                          <div className="flex items-center gap-1.5">
+                            {isPromo && (
+                              <span className="promo-lime-badge px-2 py-0.5 rounded text-[10px] font-black">
+                                PROMO
+                              </span>
+                            )}
+                            <span
+                              className={`px-2 py-0.5 rounded text-[10px] font-bold border font-mono ${
+                                p.stock > 0
+                                  ? 'bg-zinc-900 text-zinc-300 border-zinc-700'
+                                  : 'bg-zinc-900 text-zinc-600 border-zinc-800'
+                              }`}
+                            >
+                              Stok: {p.stock}
+                            </span>
+                          </div>
+                        </div>
+
+                        <h4 className="font-bold text-white text-base leading-snug">{p.name}</h4>
+
+                        <div className="mt-3 flex items-baseline gap-2">
+                          <span className={`text-lg font-black font-mono ${isPromo ? 'promo-lime-text' : 'text-white'}`}>
+                            {formatRupiah(p.price)}
+                          </span>
+                          {p.original_price && (
+                            <span className="text-xs text-zinc-500 line-through font-mono">
+                              {formatRupiah(p.original_price)}
                             </span>
                           )}
-                          <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-bold border font-mono ${
-                              p.stock > 0
-                                ? 'bg-zinc-900 text-zinc-300 border-zinc-700'
-                                : 'bg-zinc-900 text-zinc-600 border-zinc-800'
-                            }`}
-                          >
-                            Stok: {p.stock}
-                          </span>
                         </div>
                       </div>
 
-                      <h4 className="font-bold text-white text-base leading-snug">{p.name}</h4>
+                      <div className="mt-5 pt-3 border-t border-zinc-900 flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => openProductModal(p)}
+                          className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                          <span>Edit</span>
+                        </button>
 
-                      <div className="mt-3 flex items-baseline gap-2">
-                        <span className={`text-lg font-black font-mono ${isPromo ? 'promo-lime-text' : 'text-white'}`}>
-                          {formatRupiah(p.price)}
-                        </span>
-                        {p.original_price && (
-                          <span className="text-xs text-zinc-500 line-through font-mono">
-                            {formatRupiah(p.original_price)}
-                          </span>
-                        )}
+                        <button
+                          onClick={() => handleDeleteProduct(p.id)}
+                          className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-rose-950 text-zinc-400 hover:text-rose-400 text-xs font-semibold flex items-center gap-1.5 border border-zinc-800 transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Hapus</span>
+                        </button>
                       </div>
                     </div>
-
-                    <div className="mt-5 pt-3 border-t border-zinc-900 flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => openProductModal(p)}
-                        className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                        <span>Edit</span>
-                      </button>
-
-                      <button
-                        onClick={() => handleDeleteProduct(p.id)}
-                        className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-rose-950 text-zinc-400 hover:text-rose-400 text-xs font-semibold flex items-center gap-1.5 border border-zinc-800 transition-colors"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        <span>Hapus</span>
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 

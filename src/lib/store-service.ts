@@ -427,8 +427,7 @@ export function buildWhatsAppConsultUrl(waNumber: string, context?: string): str
 // Multi-item Cart WhatsApp Checkout Link Generator
 export function buildWhatsAppCartOrderUrl(
   waNumber: string,
-  items: CartItem[],
-  details?: { username?: string; notes?: string }
+  items: CartItem[]
 ): string {
   const cleanPhone = waNumber.replace(/[^0-9]/g, '');
   const totalPrice = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
@@ -440,16 +439,13 @@ export function buildWhatsAppCartOrderUrl(
     })
     .join('\n\n');
 
-  const usernameLine = details?.username?.trim() ? `\n👤 *Username Roblox:* ${details.username.trim()}` : '';
-  const notesLine = details?.notes?.trim() ? `\n📝 *Catatan:* ${details.notes.trim()}` : '';
-
   const message = [
     `Halo Admin Nauuvalstore, saya ingin checkout beberapa pesanan sekaligus dari Keranjang Belanja:`,
     ``,
     `📋 *DAFTAR ITEM PESANAN:*`,
     itemsListText,
     ``,
-    `💰 *TOTAL PEMBAYARAN: ${formatRupiah(totalPrice)}*${usernameLine}${notesLine}`,
+    `💰 *TOTAL PEMBAYARAN: ${formatRupiah(totalPrice)}*`,
     ``,
     `Mohon info ketersediaan antrean dan instruksi pembayaran via QRIS / Bank / E-Wallet. Terima kasih!`,
   ].join('\n');

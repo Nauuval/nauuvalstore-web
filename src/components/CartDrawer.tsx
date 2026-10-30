@@ -12,8 +12,6 @@ import {
   Check,
   ArrowRight,
   ShieldCheck,
-  User,
-  FileText,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { StoreSettings } from '@/types';
@@ -35,8 +33,6 @@ export default function CartDrawer({ settings }: CartDrawerProps) {
     totalPrice,
   } = useCart();
 
-  const [username, setUsername] = useState('');
-  const [notes, setNotes] = useState('');
   const [copied, setCopied] = useState(false);
 
   // Close on Escape key press
@@ -62,13 +58,9 @@ export default function CartDrawer({ settings }: CartDrawerProps) {
     };
   }, [isCartOpen]);
 
-  const checkoutUrl = buildWhatsAppCartOrderUrl(settings.wa_number, cart, {
-    username,
-    notes,
-  });
+  const checkoutUrl = buildWhatsAppCartOrderUrl(settings.wa_number, cart);
 
   const handleCopyOrder = () => {
-    const cleanPhone = settings.wa_number.replace(/[^0-9]/g, '');
     const itemsListText = cart
       .map((item, index) => {
         const subtotal = item.product.price * item.quantity;
@@ -76,16 +68,13 @@ export default function CartDrawer({ settings }: CartDrawerProps) {
       })
       .join('\n\n');
 
-    const usernameLine = username.trim() ? `\n👤 *Username Roblox:* ${username.trim()}` : '';
-    const notesLine = notes.trim() ? `\n📝 *Catatan:* ${notes.trim()}` : '';
-
     const text = [
       `Halo Admin Nauuvalstore, saya ingin memesan beberapa produk sekaligus dari Keranjang Belanja:`,
       ``,
       `📋 *DAFTAR ITEM PESANAN:*`,
       itemsListText,
       ``,
-      `💰 *TOTAL PEMBAYARAN: ${formatRupiah(totalPrice)}*${usernameLine}${notesLine}`,
+      `💰 *TOTAL PEMBAYARAN: ${formatRupiah(totalPrice)}*`,
       ``,
       `Mohon info ketersediaan antrean dan instruksi pembayaran via QRIS / Bank / E-Wallet. Terima kasih!`,
     ].join('\n');
@@ -247,37 +236,6 @@ export default function CartDrawer({ settings }: CartDrawerProps) {
           {/* Checkout Footer */}
           {cart.length > 0 && (
             <div className="p-4 sm:p-5 border-t border-[#143e2d] bg-[#050a07] space-y-3.5">
-              {/* Optional Buyer Metadata Inputs */}
-              <div className="space-y-2">
-                <div>
-                  <label className="text-[11px] font-bold text-zinc-300 mb-1 flex items-center gap-1.5 uppercase font-mono">
-                    <User className="w-3 h-3 text-[#00df82]" />
-                    <span>Username Roblox (Disarankan):</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Contoh: NauuvalPro_99"
-                    className="w-full px-3 py-2 rounded-xl bg-[#08140f] border border-[#163a2a] text-white text-xs focus:outline-none focus:border-[#00df82] font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-bold text-zinc-300 mb-1 flex items-center gap-1.5 uppercase font-mono">
-                    <FileText className="w-3 h-3 text-[#00df82]" />
-                    <span>Catatan Pesanan (Opsional):</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Contoh: Tolong dikerjakan malam jam 8 ya min..."
-                    className="w-full px-3 py-2 rounded-xl bg-[#08140f] border border-[#163a2a] text-white text-xs focus:outline-none focus:border-[#00df82]"
-                  />
-                </div>
-              </div>
-
               {/* Total Summary */}
               <div className="p-3.5 rounded-xl bg-[#06100c] border border-[#143928] flex items-center justify-between">
                 <div>

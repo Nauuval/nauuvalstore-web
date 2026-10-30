@@ -70,6 +70,15 @@ export default function Catalog({
     return counts;
   }, [products]);
 
+  // Pinned Promo Products (Highlighted at the top to notify visitors of special offers)
+  const pinnedPromoProducts = useMemo(() => {
+    return products.filter(
+      (p) =>
+        p.is_active &&
+        (p.is_discount || (p.original_price && p.original_price > p.price))
+    );
+  }, [products]);
+
   // Main filtered products
   const filteredProducts = useMemo(() => {
     return products
@@ -175,6 +184,47 @@ export default function Catalog({
             </span>
           </div>
         </div>
+
+        {/* Pinned Promo Banner / Top Pinned Section */}
+        {selectedTab === 'ALL' && !searchQuery && pinnedPromoProducts.length > 0 && (
+          <div className="mb-10 p-5 sm:p-6 rounded-2xl bg-gradient-to-b from-zinc-900/90 via-zinc-950 to-black promo-lime-border relative overflow-hidden">
+            {/* Ambient neon lime glow */}
+            <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#00df82]/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-800 relative z-10">
+              <div className="flex items-center gap-2.5">
+                <span className="promo-lime-badge px-3 py-1 rounded-lg font-black text-xs flex items-center gap-1.5 uppercase tracking-wide font-tech">
+                  <Flame className="w-4 h-4 fill-black text-black" />
+                  <span>⚡ PRODUK PROMO SPESIAL</span>
+                </span>
+                <span className="text-xs text-zinc-300 font-semibold hidden sm:inline">
+                  • Diskon Terbatas Sedang Berlangsung!
+                </span>
+              </div>
+              <span className="text-xs font-mono font-bold text-black bg-[#00df82] px-2.5 py-1 rounded-lg shadow-sm">
+                {pinnedPromoProducts.length} Layanan Promo
+              </span>
+            </div>
+
+            <div
+              className={`grid gap-4 relative z-10 ${
+                pinnedPromoProducts.length === 1
+                  ? 'grid-cols-1 max-w-sm sm:max-w-md'
+                  : pinnedPromoProducts.length === 2
+                  ? 'grid-cols-1 sm:grid-cols-2 max-w-3xl'
+                  : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+              }`}
+            >
+              {pinnedPromoProducts.slice(0, 3).map((product) => (
+                <ProductCard
+                  key={`pinned-${product.id}`}
+                  product={product}
+                  onOrder={onOrderProduct}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Category Tabs with Dynamic Count Pills */}
         <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none no-scrollbar">

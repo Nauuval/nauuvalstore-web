@@ -30,7 +30,7 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
 
   return (
     <div
-      className={`metallic-card rounded-2xl p-5 flex flex-col justify-between group relative transition-all duration-300 ${
+      className={`metallic-card rounded-2xl p-5 flex flex-col justify-between group relative transition-all duration-300 overflow-hidden ${
         isPromo ? 'promo-lime-border' : ''
       }`}
     >
@@ -95,11 +95,11 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
         </h4>
       </div>
 
-      {/* Price & Action Section (With Pixel Font Styling) */}
-      <div className="mt-5 pt-4 border-t border-[#143225] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      {/* Price & Action Section */}
+      <div className="mt-5 pt-4 border-t border-[#143225] flex flex-col gap-3">
         <div>
           {isPromo && product.original_price && (
-            <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-mono mb-0.5">
+            <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-mono mb-1">
               <span className="line-through">{formatRupiah(product.original_price)}</span>
               {savingsAmount > 0 && (
                 <span className="text-[11px] font-bold text-[#03140d] bg-[#00df82] px-1.5 py-0.5 rounded font-tech">
@@ -110,7 +110,7 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
           )}
           {/* Price displayed in crisp precision font (JetBrains Mono) */}
           <div
-            className={`text-xl sm:text-2xl font-bold font-price tracking-tight ${
+            className={`text-2xl sm:text-3xl font-bold font-price tracking-tight ${
               isPromo ? 'text-[#00df82] drop-shadow-[0_0_10px_rgba(0,223,130,0.35)]' : 'text-white'
             }`}
           >
@@ -122,12 +122,12 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
         <button
           onClick={() => onOrder(product)}
           disabled={isOutOfStock}
-          className={`py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md font-tech tracking-wider uppercase ${
+          className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md font-tech tracking-wider uppercase ${
             isOutOfStock
               ? 'bg-zinc-900 text-zinc-600 cursor-not-allowed border border-zinc-800'
               : isPromo
-              ? 'bg-[#00df82] hover:bg-[#00c774] text-[#03140d] shadow-[#00df82]/30 hover:scale-[1.02] active:scale-[0.98]'
-              : 'bg-[#00df82] text-[#03140d] hover:bg-[#00c774] hover:scale-[1.02] active:scale-95'
+              ? 'bg-[#00df82] hover:bg-[#00c774] text-[#03140d] shadow-[#00df82]/30 hover:scale-[1.01] active:scale-[0.98]'
+              : 'bg-[#00df82] text-[#03140d] hover:bg-[#00c774] hover:scale-[1.01] active:scale-95'
           }`}
         >
           <span>{isOutOfStock ? 'Stok Habis' : 'Order Sekarang'}</span>

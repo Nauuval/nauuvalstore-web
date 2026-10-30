@@ -10,8 +10,6 @@ import {
   Zap,
   ChevronLeft,
   ChevronRight,
-  ChevronsDown,
-  Layers,
   ArrowUpDown,
 } from 'lucide-react';
 import { Product, ProductCategory } from '@/types';
@@ -44,10 +42,8 @@ export default function Catalog({
   const [onlyReadyStock, setOnlyReadyStock] = useState(false);
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'stock'>('default');
 
-  // Progressive Disclosure & Mobile Pagination state
-  const [viewMode, setViewMode] = useState<'load-more' | 'pagination'>('load-more');
-  const [pageSize, setPageSize] = useState<number>(8); // 8 items default (ideal for mobile thumbs)
-  const [visibleCount, setVisibleCount] = useState<number>(8);
+  // Page mode pagination state
+  const [pageSize, setPageSize] = useState<number>(8); // 8 items default per batch/page
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   const catalogGridRef = useRef<HTMLDivElement>(null);
@@ -117,41 +113,48 @@ export default function Catalog({
       });
   }, [products, selectedTab, searchQuery, onlyReadyStock, sortBy]);
 
-  // Reset pagination / load more when filters change
+  // Reset pagination when filters change
   useEffect(() => {
     setCurrentPage(1);
-    setVisibleCount(pageSize);
   }, [selectedTab, searchQuery, onlyReadyStock, sortBy, pageSize]);
 
-  // Total pages calculation for pagination mode
-  const totalPages = Math.ceil(filteredProducts.length / pageSize) || 1;
+  // Total pages calculation
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize));
 
-  // Sliced products for current view
+  // Sliced products for current page
   const displayedProducts = useMemo(() => {
-    if (viewMode === 'load-more') {
-      return filteredProducts.slice(0, visibleCount);
-    } else {
-      const start = (currentPage - 1) * pageSize;
-      return filteredProducts.slice(start, start + pageSize);
-    }
-  }, [filteredProducts, viewMode, visibleCount, currentPage, pageSize]);
-
-  const hasMore = visibleCount < filteredProducts.length;
+    const start = (currentPage - 1) * pageSize;
+    return filteredProducts.slice(start, start + pageSize);
+  }, [filteredProducts, currentPage, pageSize]);
 
   const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
+    const target = Math.max(1, Math.min(newPage, totalPages));
+    setCurrentPage(target);
     if (catalogGridRef.current) {
       catalogGridRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
-  const handleLoadMore = () => {
-    setVisibleCount((prev) => Math.min(prev + pageSize, filteredProducts.length));
-  };
+  const startItemIndex = filteredProducts.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+  const endItemIndex = Math.min(currentPage * pageSize, filteredProducts.length);
+  const progressPercent =
+    filteredProducts.length > 0
+      ? Math.min(100, Math.round((endItemIndex / filteredProducts.length) * 100))
+      : 0;
 
-  const handleShowAll = () => {
-    setVisibleCount(filteredProducts.length);
-  };
+  // Smart page numbers array for desktop view (supports ellipsis if pages > 7)
+  const pageNumbers = useMemo(() => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    if (currentPage <= 4) {
+      return [1, 2, 3, 4, 5, '...', totalPages];
+    }
+    if (currentPage >= totalPages - 3) {
+      return [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+    }
+    return [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+  }, [currentPage, totalPages]);
 
   return (
     <section id="catalog" className="py-14 sm:py-20 relative bg-[#08090d] scroll-mt-20">
@@ -328,143 +331,149 @@ export default function Catalog({
               ))}
             </div>
 
-            {/* Smart Progressive Load More & Pagination Controls (Solusi Ramah Mobile) */}
+            {/* Pagination Controls & Per Batch Option */}
             {filteredProducts.length > pageSize && (
-              <div className="mt-10 pt-8 border-t border-zinc-800/80 flex flex-col items-center gap-5">
+              <div className="mt-10 pt-8 border-t border-[#133d2c]/60 flex flex-col items-center gap-4">
                 {/* Progress Bar & Indikator Jumlah Produk */}
                 <div className="w-full max-w-md text-center">
-                  <div className="flex items-center justify-between text-xs font-mono text-zinc-400 mb-2">
+                  <div className="flex items-center justify-between text-xs font-mono text-zinc-400 mb-2 px-1">
                     <span>
-                      Menampilkan <strong className="text-white">{displayedProducts.length}</strong> dari{' '}
-                      <strong className="text-white">{filteredProducts.length}</strong> Layanan
+                      Menampilkan <strong className="text-white font-price">{startItemIndex} - {endItemIndex}</strong> dari{' '}
+                      <strong className="text-white font-price">{filteredProducts.length}</strong> Layanan
                     </span>
-                    <span className="text-[#00df82] font-bold">
-                      {Math.round((displayedProducts.length / filteredProducts.length) * 100)}%
+                    <span className="text-[#00df82] font-bold font-price">
+                      {progressPercent}%
                     </span>
                   </div>
-                  <div className="w-full h-1.5 rounded-full bg-zinc-900 overflow-hidden border border-zinc-800">
+                  <div className="w-full h-1.5 rounded-full bg-zinc-950 overflow-hidden border border-[#143e2d]">
                     <div
-                      className="h-full bg-gradient-to-r from-zinc-600 via-zinc-400 to-[#00df82] transition-all duration-300 rounded-full"
+                      className="h-full bg-gradient-to-r from-zinc-600 via-[#00df82]/60 to-[#00df82] transition-all duration-300 rounded-full"
                       style={{
-                        width: `${Math.min(
-                          100,
-                          (displayedProducts.length / filteredProducts.length) * 100
-                        )}%`,
+                        width: `${progressPercent}%`,
                       }}
                     />
                   </div>
                 </div>
 
-                {/* Primary Action Buttons based on View Mode */}
-                {viewMode === 'load-more' ? (
-                  <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-                    {hasMore ? (
-                      <button
-                        onClick={handleLoadMore}
-                        className="w-full sm:w-auto px-7 py-3 rounded-xl bg-white text-black hover:bg-zinc-200 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95"
-                      >
-                        <ChevronsDown className="w-4 h-4 text-black" />
-                        <span>
-                          + Muat {Math.min(pageSize, filteredProducts.length - visibleCount)} Layanan Lagi
-                        </span>
-                      </button>
-                    ) : (
-                      <div className="px-4 py-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800 text-zinc-400 text-xs font-mono">
-                        ✓ Seluruh {filteredProducts.length} layanan telah ditampilkan
-                      </div>
-                    )}
+                {/* Mobile View (< sm): Compact, No-Overflow Pagination */}
+                <div className="flex sm:hidden items-center justify-between w-full max-w-xs px-1 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="flex-1 py-2 px-3 rounded-xl bg-[#071610] border border-[#143d2c] text-xs font-bold text-zinc-300 hover:text-white disabled:opacity-30 disabled:pointer-events-none active:scale-95 transition-all flex items-center justify-center gap-1 font-tech"
+                    aria-label="Halaman Sebelumnya"
+                  >
+                    <ChevronLeft className="w-4 h-4 text-[#00df82]" />
+                    <span>Sebelumnya</span>
+                  </button>
 
-                    {hasMore && (
-                      <button
-                        onClick={handleShowAll}
-                        className="w-full sm:w-auto px-5 py-3 rounded-xl metallic-card text-zinc-300 hover:text-white text-xs font-bold transition-colors"
-                      >
-                        Tampilkan Semua Sekaligus
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  /* Numbered Pagination Mode */
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="px-4 py-2.5 rounded-xl metallic-card text-xs font-bold text-zinc-300 hover:text-white disabled:opacity-40 disabled:pointer-events-none flex items-center gap-1.5"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                      <span>Sebelumnya</span>
-                    </button>
-
-                    <div className="flex items-center gap-1 px-1">
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                        <button
-                          key={page}
-                          onClick={() => handlePageChange(page)}
-                          className={`w-9 h-9 rounded-xl text-xs font-mono font-bold transition-all ${
-                            currentPage === page
-                              ? 'bg-[#00df82] text-black shadow-md'
-                              : 'metallic-card text-zinc-400 hover:text-white'
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      ))}
-                    </div>
-
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="px-4 py-2.5 rounded-xl metallic-card text-xs font-bold text-zinc-300 hover:text-white disabled:opacity-40 disabled:pointer-events-none flex items-center gap-1.5"
-                    >
-                      <span>Selanjutnya</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                )}
-
-                {/* Sub Controls: Switch Mode & Batch Size */}
-                <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-zinc-400 pt-2">
-                  <div className="flex items-center gap-1 bg-zinc-950/80 p-1 rounded-xl border border-zinc-800">
-                    <button
-                      onClick={() => setViewMode('load-more')}
-                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-                        viewMode === 'load-more'
-                          ? 'bg-zinc-800 text-white'
-                          : 'text-zinc-500 hover:text-zinc-300'
-                      }`}
-                    >
-                      Mode Muat Bertahap
-                    </button>
-                    <button
-                      onClick={() => setViewMode('pagination')}
-                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-                        viewMode === 'pagination'
-                          ? 'bg-zinc-800 text-white'
-                          : 'text-zinc-500 hover:text-zinc-300'
-                      }`}
-                    >
-                      Mode Halaman (Page)
-                    </button>
-                  </div>
-
-                  <div className="flex items-center gap-2 bg-zinc-950/80 px-3 py-1 rounded-xl border border-zinc-800">
-                    <span className="text-[11px] text-zinc-400">Per Batch:</span>
+                  {/* Interactive Page Indicator with direct page picker */}
+                  <div className="relative px-3.5 py-2 rounded-xl bg-[#091a13] border border-[#174e35] text-center shrink-0 shadow-inner flex items-center justify-center gap-1.5 cursor-pointer hover:border-[#00df82]/60 transition-colors">
+                    <span className="text-xs font-mono font-bold text-[#00df82] font-price">
+                      Hal {currentPage}
+                    </span>
+                    <span className="text-[11px] text-zinc-500 font-mono">/</span>
+                    <span className="text-xs font-mono font-bold text-zinc-300 font-price">
+                      {totalPages}
+                    </span>
                     <select
-                      value={pageSize}
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value, 10);
-                        setPageSize(val);
-                        setVisibleCount(val);
-                        setCurrentPage(1);
-                      }}
-                      className="bg-transparent border-0 text-[#00df82] font-mono text-xs font-bold focus:outline-none cursor-pointer"
+                      value={currentPage}
+                      onChange={(e) => handlePageChange(parseInt(e.target.value, 10))}
+                      className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                      aria-label="Pilih Halaman Langsung"
                     >
-                      <option value="8" className="bg-black text-white">8 Item</option>
-                      <option value="12" className="bg-black text-white">12 Item</option>
-                      <option value="16" className="bg-black text-white">16 Item</option>
-                      <option value="24" className="bg-black text-white">24 Item</option>
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                        <option key={p} value={p} className="bg-[#050a07] text-white">
+                          Halaman {p} dari {totalPages}
+                        </option>
+                      ))}
                     </select>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="flex-1 py-2 px-3 rounded-xl bg-[#071610] border border-[#143d2c] text-xs font-bold text-zinc-300 hover:text-white disabled:opacity-30 disabled:pointer-events-none active:scale-95 transition-all flex items-center justify-center gap-1 font-tech"
+                    aria-label="Halaman Selanjutnya"
+                  >
+                    <span>Selanjutnya</span>
+                    <ChevronRight className="w-4 h-4 text-[#00df82]" />
+                  </button>
+                </div>
+
+                {/* Desktop View (>= sm): Numbered Pagination with Smart Ellipsis */}
+                <div className="hidden sm:flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2.5 rounded-xl bg-[#071610] border border-[#143d2c] text-xs font-bold text-zinc-300 hover:text-white hover:border-[#00df82]/50 disabled:opacity-30 disabled:pointer-events-none flex items-center gap-1.5 transition-all font-tech active:scale-95"
+                  >
+                    <ChevronLeft className="w-4 h-4 text-[#00df82]" />
+                    <span>Sebelumnya</span>
+                  </button>
+
+                  <div className="flex items-center gap-1 px-1">
+                    {pageNumbers.map((page, idx) => {
+                      if (page === '...') {
+                        return (
+                          <span
+                            key={`ellipsis-${idx}`}
+                            className="w-8 text-center text-zinc-600 font-mono text-xs select-none"
+                          >
+                            ...
+                          </span>
+                        );
+                      }
+                      const pageNum = page as number;
+                      const isActive = currentPage === pageNum;
+                      return (
+                        <button
+                          key={pageNum}
+                          type="button"
+                          onClick={() => handlePageChange(pageNum)}
+                          className={`w-9 h-9 rounded-xl text-xs font-mono font-bold transition-all ${
+                            isActive
+                              ? 'bg-[#00df82] text-[#03140d] font-bold shadow-[0_0_12px_rgba(0,223,130,0.4)] scale-105'
+                              : 'bg-[#071610] border border-[#143d2c] text-zinc-400 hover:text-white hover:border-zinc-600'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2.5 rounded-xl bg-[#071610] border border-[#143d2c] text-xs font-bold text-zinc-300 hover:text-white hover:border-[#00df82]/50 disabled:opacity-30 disabled:pointer-events-none flex items-center gap-1.5 transition-all font-tech active:scale-95"
+                  >
+                    <span>Selanjutnya</span>
+                    <ChevronRight className="w-4 h-4 text-[#00df82]" />
+                  </button>
+                </div>
+
+                {/* Per Batch Size Option (Preserved per user request) */}
+                <div className="flex items-center gap-2 bg-[#06120c] px-3.5 py-1.5 rounded-xl border border-[#143d2c] shadow-sm">
+                  <span className="text-[11px] text-zinc-400 font-mono uppercase tracking-wider">Per Batch:</span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10);
+                      setPageSize(val);
+                      setCurrentPage(1);
+                    }}
+                    className="bg-transparent border-0 text-[#00df82] font-mono text-xs font-bold focus:outline-none cursor-pointer"
+                  >
+                    <option value="8" className="bg-[#050a07] text-white">8 Item</option>
+                    <option value="12" className="bg-[#050a07] text-white">12 Item</option>
+                    <option value="16" className="bg-[#050a07] text-white">16 Item</option>
+                    <option value="24" className="bg-[#050a07] text-white">24 Item</option>
+                  </select>
                 </div>
               </div>
             )}

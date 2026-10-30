@@ -3,9 +3,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { MessageCircle, Shield, Menu, X, ArrowUpRight } from 'lucide-react';
+import { MessageCircle, Shield, Menu, X, ArrowUpRight, ShoppingCart } from 'lucide-react';
 import { StoreSettings } from '@/types';
 import { buildWhatsAppConsultUrl } from '@/lib/store-service';
+import { useCart } from '@/context/CartContext';
 
 interface NavbarProps {
   settings: StoreSettings;
@@ -13,6 +14,7 @@ interface NavbarProps {
 
 export default function Navbar({ settings }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { totalItems, openCart } = useCart();
 
   const navLinks = [
     { name: 'Bukti & Ulasan', href: '#bukti-transaksi' },
@@ -67,6 +69,22 @@ export default function Navbar({ settings }: NavbarProps) {
 
           {/* Action Buttons */}
           <div className="hidden sm:flex items-center gap-3">
+            {/* Shopping Cart Button */}
+            <button
+              onClick={openCart}
+              type="button"
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold text-white bg-[#071911] border border-[#143d2c] hover:border-[#00df82] transition-all flex items-center gap-2 relative group"
+              title="Buka Keranjang Pesanan"
+            >
+              <ShoppingCart className="w-4 h-4 text-[#00df82] group-hover:scale-110 transition-transform" />
+              <span className="font-tech uppercase tracking-wide">Keranjang</span>
+              {totalItems > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full bg-[#00df82] text-[#03140d] font-bold font-price text-[10px] animate-pulse">
+                  {totalItems}
+                </span>
+              )}
+            </button>
+
             <Link
               href="/admin"
               className="px-3 py-2 rounded-xl text-xs font-semibold text-zinc-400 hover:text-white bg-[#081711] border border-[#143929] hover:border-[#00df82]/50 transition-all flex items-center gap-1.5"
@@ -89,6 +107,21 @@ export default function Navbar({ settings }: NavbarProps) {
 
           {/* Mobile Header Elements */}
           <div className="flex md:hidden items-center gap-2">
+            {/* Mobile Cart Trigger */}
+            <button
+              onClick={openCart}
+              type="button"
+              className="p-2 rounded-xl text-white bg-[#071911] border border-[#143d2c] relative"
+              aria-label="Buka Keranjang"
+            >
+              <ShoppingCart className="w-4 h-4 text-[#00df82]" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-[#00df82] text-[#03140d] font-bold font-price text-[9px] flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </button>
+
             <Link
               href="/admin"
               className="p-2 rounded-xl text-zinc-400 hover:text-white bg-zinc-900 border border-zinc-800 text-xs"

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import JsonLd from '@/components/JsonLd';
+import { CartProvider } from '@/context/CartContext';
 
 export const metadata: Metadata = {
   title: 'Nauuvalstore | Joki & Kebutuhan Roblox Fisch & Blox Fruit Terpercaya',
@@ -91,7 +92,7 @@ export default function RootLayout({
     <html lang="id" className="dark scroll-smooth">
       <body className="min-h-screen bg-[#060b08] text-zinc-100 antialiased selection:bg-[#00df82] selection:text-[#03140d]">
         <JsonLd />
-        {children}
+        <CartProvider>{children}</CartProvider>
       </body>
     </html>
   );

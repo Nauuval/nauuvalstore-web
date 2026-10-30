@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import { MessageCircle, Flame, ArrowRight } from 'lucide-react';
+import { MessageCircle, Flame, ArrowRight, ShoppingCart } from 'lucide-react';
 import { Product } from '@/types';
 import { formatRupiah } from '@/lib/store-service';
+import { useCart } from '@/context/CartContext';
 
 interface ProductCardProps {
   product: Product;
@@ -11,6 +12,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, onOrder }: ProductCardProps) {
+  const { addToCart } = useCart();
   const isOutOfStock = product.stock <= 0;
   const isLowStock = product.stock > 0 && product.stock <= 3;
 
@@ -118,21 +120,35 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
           </div>
         </div>
 
-        {/* Action Button: Matches "Beli Sekarang →" from user's reference image */}
-        <button
-          onClick={() => onOrder(product)}
-          disabled={isOutOfStock}
-          className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md font-tech tracking-wider uppercase ${
-            isOutOfStock
-              ? 'bg-zinc-900 text-zinc-600 cursor-not-allowed border border-zinc-800'
-              : isPromo
-              ? 'bg-[#00df82] hover:bg-[#00c774] text-[#03140d] shadow-[#00df82]/30 hover:scale-[1.01] active:scale-[0.98]'
-              : 'bg-[#00df82] text-[#03140d] hover:bg-[#00c774] hover:scale-[1.01] active:scale-95'
-          }`}
-        >
-          <span>{isOutOfStock ? 'Stok Habis' : 'Order Sekarang'}</span>
-          <ArrowRight className="w-3.5 h-3.5" />
-        </button>
+        {/* Action Buttons: Dual Action Grid (Add to Cart + Direct Buy) */}
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => addToCart(product, 1)}
+            disabled={isOutOfStock}
+            type="button"
+            className="py-2.5 px-2 rounded-xl border border-[#1b4332] bg-[#071911] hover:bg-[#0e2c1e] hover:border-[#00df82]/60 text-zinc-200 hover:text-white font-tech text-xs font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95 disabled:opacity-35 disabled:pointer-events-none"
+            title="Tambah ke Keranjang Pesanan"
+          >
+            <ShoppingCart className="w-3.5 h-3.5 text-[#00df82]" />
+            <span className="truncate">+ Keranjang</span>
+          </button>
+
+          <button
+            onClick={() => onOrder(product)}
+            disabled={isOutOfStock}
+            type="button"
+            className={`py-2.5 px-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md font-tech tracking-wider uppercase active:scale-95 ${
+              isOutOfStock
+                ? 'bg-zinc-900 text-zinc-600 cursor-not-allowed border border-zinc-800'
+                : isPromo
+                ? 'bg-[#00df82] hover:bg-[#00c774] text-[#03140d] shadow-[#00df82]/30 hover:scale-[1.01]'
+                : 'bg-[#00df82] text-[#03140d] hover:bg-[#00c774] hover:scale-[1.01]'
+            }`}
+          >
+            <span className="truncate">Beli Langsung</span>
+            <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+          </button>
+        </div>
       </div>
     </div>
   );

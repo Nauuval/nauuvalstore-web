@@ -58,3 +58,8 @@ export interface TransactionProof {
   notes?: string;
   created_at?: string;
 }
+
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}

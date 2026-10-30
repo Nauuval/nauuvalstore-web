@@ -13,6 +13,7 @@ import FaqSection from '@/components/FaqSection';
 import Footer from '@/components/Footer';
 import FloatingWhatsApp from '@/components/FloatingWhatsApp';
 import OrderModal from '@/components/OrderModal';
+import CartDrawer from '@/components/CartDrawer';
 import { Product, StoreSettings, TransactionProof } from '@/types';
 import {
   getProducts,
@@ -170,6 +171,9 @@ export default function HomePage() {
           setSelectedProduct(null);
         }}
       />
+
+      {/* Multi-item Shopping Cart Drawer */}
+      <CartDrawer settings={settings} />
     </main>
   );
 }

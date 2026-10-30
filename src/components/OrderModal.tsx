@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { X, MessageCircle, Copy, Check, Zap, ShoppingCart, Plus, Minus } from 'lucide-react';
 import { Product, StoreSettings } from '@/types';
 import { buildWhatsAppOrderUrl, formatRupiah } from '@/lib/store-service';
+import { useCart } from '@/context/CartContext';
 
 interface OrderModalProps {
   product: Product | null;
@@ -13,6 +14,7 @@ interface OrderModalProps {
 }
 
 export default function OrderModal({ product, settings, isOpen, onClose }: OrderModalProps) {
+  const { addToCart } = useCart();
   const [quantity, setQuantity] = useState<number>(1);
   const [copied, setCopied] = useState(false);
 
@@ -209,35 +211,53 @@ export default function OrderModal({ product, settings, isOpen, onClose }: Order
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          <a
-            href={orderUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={onClose}
-            className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-[#00df82] text-[#03140d] hover:bg-[#00c774] font-bold font-tech text-sm text-center flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,223,130,0.35)] transition-all active:scale-[0.98] uppercase tracking-wide"
-          >
-            <MessageCircle className="w-4 h-4 text-[#03140d]" />
-            <span>Kirim Pesanan ke WhatsApp</span>
-          </a>
+        <div className="space-y-2.5">
+          <div className="flex flex-col sm:flex-row items-center gap-2.5">
+            <a
+              href={orderUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={onClose}
+              className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-[#00df82] text-[#03140d] hover:bg-[#00c774] font-bold font-tech text-xs sm:text-sm text-center flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,223,130,0.35)] transition-all active:scale-[0.98] uppercase tracking-wide"
+            >
+              <MessageCircle className="w-4 h-4 text-[#03140d]" />
+              <span>Kirim Pesanan ke WhatsApp</span>
+            </a>
 
-          <button
-            onClick={handleCopy}
-            type="button"
-            className="w-full sm:w-auto py-3 px-4 rounded-xl bg-[#071911] hover:bg-[#0e271c] border border-[#143e2d] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all font-tech"
-          >
-            {copied ? (
-              <>
-                <Check className="w-4 h-4 text-[#00df82]" />
-                <span className="text-[#00df82]">Tersalin!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="w-4 h-4" />
-                <span>Salin Teks</span>
-              </>
-            )}
-          </button>
+            <button
+              onClick={() => {
+                if (product) {
+                  addToCart(product, quantity);
+                  onClose();
+                }
+              }}
+              type="button"
+              className="w-full sm:w-auto py-3 px-4 rounded-xl bg-[#092218] hover:bg-[#103425] border border-[#174e36] text-[#00df82] text-xs font-bold flex items-center justify-center gap-1.5 transition-all font-tech"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              <span>+ Keranjang ({quantity}x)</span>
+            </button>
+          </div>
+
+          <div className="text-center pt-1">
+            <button
+              onClick={handleCopy}
+              type="button"
+              className="text-zinc-400 hover:text-white text-[11px] font-mono inline-flex items-center gap-1 transition-colors underline underline-offset-4"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-3 h-3 text-[#00df82]" />
+                  <span className="text-[#00df82]">Teks format berhasil tersalin ke clipboard!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3 h-3" />
+                  <span>Salin format teks pemesanan saja</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -83,7 +83,7 @@ export default function TransactionProofSection({
             {/* Customer Review Button */}
             <button
               onClick={() => setIsReviewModalOpen(true)}
-              className="px-4 py-2.5 rounded-xl bg-[#00df82] text-[#03140d] hover:bg-[#00c774] font-black text-xs flex items-center gap-2 shadow-lg shadow-[#00df82]/20 transition-all hover:scale-[1.02] active:scale-[0.98] font-pixel"
+              className="px-4 py-2.5 rounded-xl bg-[#00df82] text-[#03140d] hover:bg-[#00c774] font-black text-xs flex items-center gap-2 shadow-lg shadow-[#00df82]/20 transition-all hover:scale-[1.02] active:scale-[0.98] font-tech uppercase tracking-wide"
             >
               <MessageSquarePlus className="w-4 h-4" />
               <span>+ Tulis Testimoni & Ulasan</span>
@@ -125,7 +125,7 @@ export default function TransactionProofSection({
             </p>
             <button
               onClick={() => setIsReviewModalOpen(true)}
-              className="px-5 py-2.5 rounded-xl bg-[#00df82] text-[#03140d] font-bold text-xs inline-flex items-center gap-2 hover:bg-[#00c774] transition-all shadow-md shadow-[#00df82]/25 font-pixel"
+              className="px-5 py-2.5 rounded-xl bg-[#00df82] text-[#03140d] font-bold text-xs inline-flex items-center gap-2 hover:bg-[#00c774] transition-all shadow-md shadow-[#00df82]/25 font-tech uppercase tracking-wide"
             >
               <MessageSquarePlus className="w-4 h-4" />
               <span>+ Berikan Testimoni Sekarang</span>
@@ -170,7 +170,7 @@ export default function TransactionProofSection({
                       {trx.service_name}
                     </p>
                     {trx.amount > 0 && (
-                      <p className="text-sm font-bold text-[#00df82] font-pixel mt-1">
+                      <p className="text-sm font-bold text-[#00df82] font-price mt-1">
                         {formatRupiah(trx.amount)}
                       </p>
                     )}

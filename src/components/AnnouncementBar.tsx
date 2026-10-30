@@ -25,7 +25,7 @@ export default function AnnouncementBar({ text, onExploreClick }: AnnouncementBa
         {onExploreClick && (
           <button
             onClick={onExploreClick}
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-[#00df82] hover:text-[#00c774] transition-colors shrink-0 underline underline-offset-4 font-pixel"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-[#00df82] hover:text-[#00c774] transition-colors shrink-0 underline underline-offset-4 font-tech uppercase tracking-wider"
           >
             <span>Lihat Promo</span>
             <ArrowRight className="w-3.5 h-3.5" />

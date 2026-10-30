@@ -41,7 +41,7 @@ export default function Navbar({ settings }: NavbarProps) {
                 <span className="font-black text-lg sm:text-xl tracking-tight text-white font-mono uppercase group-hover:text-emerald-300 transition-colors">
                   {settings.store_name || 'nauuvalstore'}
                 </span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#061d14] border border-[#14422e] text-[#00df82] font-bold font-pixel uppercase tracking-wider hidden sm:inline-block">
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#061d14] border border-[#14422e] text-[#00df82] font-bold font-tech uppercase tracking-wider hidden sm:inline-block">
                   OFFICIAL
                 </span>
               </div>
@@ -80,7 +80,7 @@ export default function Navbar({ settings }: NavbarProps) {
               href={buildWhatsAppConsultUrl(settings.wa_number)}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 rounded-xl bg-[#00df82] text-[#03140d] hover:bg-[#00c774] font-bold text-xs flex items-center gap-1.5 shadow-md shadow-[#00df82]/20 transition-all hover:scale-[1.02] active:scale-[0.98] font-pixel"
+              className="px-4 py-2 rounded-xl bg-[#00df82] text-[#03140d] hover:bg-[#00c774] font-bold text-xs flex items-center gap-1.5 shadow-md shadow-[#00df82]/20 transition-all hover:scale-[1.02] active:scale-[0.98] font-tech uppercase tracking-wide"
             >
               <MessageCircle className="w-3.5 h-3.5 text-[#03140d]" />
               <span>Chat Admin WA</span>

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Silkscreen:wght@400;700&family=Orbitron:wght@800;900&family=Russo+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@500;600;700;800&family=Orbitron:wght@800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Russo+One&family=Space+Grotesk:wght@500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -130,11 +130,17 @@ body {
   letter-spacing: 0.06em;
 }
 
-/* Retro-Modern Pixel Fonts for Catalog & Order Modal (Requested by User) */
-.font-pixel {
-  font-family: 'Pixelify Sans', monospace, sans-serif;
+/* Modern High-Tech Gaming & Esport Font: Chakra Petch + Space Grotesk (Sleek, sharp, clean tech aesthetics) */
+.font-tech,
+.font-pixel,
+.font-pixel-retro {
+  font-family: 'Chakra Petch', 'Space Grotesk', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: 0.02em;
 }
 
-.font-pixel-retro {
-  font-family: 'Silkscreen', monospace, cursive;
+/* Precision High-Tech Monospace: JetBrains Mono (Crisp, Beautiful Numbers, Pricing & Badges) */
+.font-price,
+.font-mono-clean {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-feature-settings: 'tnum' on, 'zero' on;
 }

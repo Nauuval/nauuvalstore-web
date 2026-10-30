@@ -22,18 +22,18 @@ export default function Hero({
   totalReviews = 36,
 }: HeroProps) {
   return (
-    <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28 border-b border-zinc-800/80 bg-[#08090d]">
-      {/* 1. Full-Bleed Singularity Cinematic Background Image (Vivid & Striking) */}
+    <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28 border-b border-zinc-800/80 bg-[#060b08]">
+      {/* 1. Full-Bleed Singularity Cinematic Background Image (Vivid on Mobile & Desktop) */}
       <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
         <img
           src="/singularity-hero.jpg"
           alt="Singularity Event Horizon Background"
-          className="w-full h-full object-cover object-right sm:object-center opacity-85 sm:opacity-95 contrast-125 brightness-115"
+          className="w-full h-full object-cover object-[50%_20%] sm:object-right md:object-center opacity-95 contrast-125 brightness-125 sm:brightness-115"
         />
 
-        {/* Directional Vignette: Left side shadowed for 100% text legibility, right side crystal clear for black hole */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#08090d] via-[#08090d]/80 via-45% to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#08090d] via-transparent to-[#08090d]/40 pointer-events-none" />
+        {/* Directional Vignette: On mobile top remains translucent so singularity shines vibrantly; on desktop left-to-right vignette */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#060b08]/20 via-[#060b08]/75 to-[#060b08] sm:bg-gradient-to-r sm:from-[#060b08] sm:via-[#060b08]/85 sm:via-45% sm:to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#060b08] via-transparent to-black/20 pointer-events-none" />
 
         {/* Subtle Topo Grid Overlay */}
         <div className="absolute inset-0 bg-topo-grid opacity-15 pointer-events-none" />
@@ -100,14 +100,14 @@ export default function Hero({
           </p>
 
           <p className="mt-3 text-xs sm:text-sm text-zinc-300 font-normal leading-relaxed max-w-2xl drop-shadow">
-            Pilihan tepat untuk leveling kilat, quest rod mythic fisch, hunting melee godhuman, buah fisik, dan koin akun. 100% aman tanpa cheat script, transparan, dan stok terpantau realtime.
+            Pilihan tepat untuk leveling kilat, quest rod fisch, hunting melee bloxfruit, buah fisik, dan koin fisch. 100% aman tanpa cheat script, transparan, dan stok terpantau realtime.
           </p>
 
           {/* Action Buttons */}
           <div className="mt-8 flex flex-wrap items-center gap-3.5">
             <a
               href="#catalog"
-              className="px-6 py-3.5 rounded-xl bg-[#00df82] text-[#03140d] hover:bg-[#00c774] font-bold text-xs sm:text-sm transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#00df82]/25 flex items-center gap-2 font-pixel tracking-wide"
+              className="px-6 py-3.5 rounded-xl bg-[#00df82] text-[#03140d] hover:bg-[#00c774] font-bold text-xs sm:text-sm transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#00df82]/25 flex items-center gap-2 font-tech uppercase tracking-wider"
             >
               <span>Cek Katalog & Promo</span>
               <ArrowDown className="w-4 h-4" />

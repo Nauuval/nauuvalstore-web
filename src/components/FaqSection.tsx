@@ -129,7 +129,7 @@ export default function FaqSection() {
           </div>
           <a
             href="#whatsapp-hub"
-            className="px-5 py-2.5 rounded-xl bg-[#00df82] text-[#03140d] hover:bg-[#00c774] font-bold text-xs font-pixel tracking-wide flex items-center gap-2 shadow-md shadow-[#00df82]/20 transition-all shrink-0"
+            className="px-5 py-2.5 rounded-xl bg-[#00df82] text-[#03140d] hover:bg-[#00c774] font-bold text-xs font-tech uppercase tracking-wide flex items-center gap-2 shadow-md shadow-[#00df82]/20 transition-all shrink-0"
           >
             <span>Tanya Admin Langsung</span>
             <ChevronDown className="w-3.5 h-3.5 -rotate-90" />

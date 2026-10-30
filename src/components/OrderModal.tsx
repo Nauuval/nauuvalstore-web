@@ -93,7 +93,7 @@ export default function OrderModal({ product, settings, isOpen, onClose }: Order
                   {product.category}
                 </span>
                 {isPromo && (
-                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-[#00df82] text-[#03140d] font-pixel flex items-center gap-1">
+                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-[#00df82] text-[#03140d] font-tech flex items-center gap-1">
                     <Zap className="w-3 h-3 fill-[#03140d] text-[#03140d]" />
                     <span>PROMO</span>
                   </span>
@@ -116,7 +116,7 @@ export default function OrderModal({ product, settings, isOpen, onClose }: Order
           </div>
 
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-[#00df82] font-pixel tracking-tight">
+            <span className="text-2xl font-bold text-[#00df82] font-price tracking-tight">
               {formatRupiah(product.price)}
             </span>
             {isPromo && product.original_price && (
@@ -158,7 +158,7 @@ export default function OrderModal({ product, settings, isOpen, onClose }: Order
                   min="1"
                   value={quantity}
                   onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                  className="w-16 text-center bg-transparent text-[#00df82] font-pixel font-bold text-lg focus:outline-none"
+                  className="w-16 text-center bg-transparent text-[#00df82] font-price font-bold text-lg focus:outline-none"
                 />
                 <button
                   type="button"
@@ -170,14 +170,14 @@ export default function OrderModal({ product, settings, isOpen, onClose }: Order
                 </button>
               </div>
 
-              {/* Quick Preset Buttons (Pixel Font) */}
+              {/* Quick Preset Buttons */}
               <div className="flex items-center gap-1.5 flex-wrap">
                 {[1, 2, 3, 5, 10].map((num) => (
                   <button
                     key={num}
                     type="button"
                     onClick={() => setQuantity(num)}
-                    className={`px-3 py-2 rounded-xl font-pixel text-xs font-bold transition-all ${
+                    className={`px-3 py-2 rounded-xl font-tech text-xs font-bold transition-all ${
                       quantity === num
                         ? 'bg-[#00df82] text-[#03140d] shadow-md shadow-[#00df82]/30'
                         : 'bg-[#071911] border border-[#143d2c] text-zinc-300 hover:text-white hover:border-[#00df82]/50'
@@ -190,7 +190,7 @@ export default function OrderModal({ product, settings, isOpen, onClose }: Order
             </div>
           </div>
 
-          {/* Subtotal & Total Pembayaran Box (Pixel Font) */}
+          {/* Subtotal & Total Pembayaran Box */}
           <div className="p-4 rounded-xl bg-[#060e0a] border border-[#143928] flex items-center justify-between">
             <div>
               <span className="text-[10px] text-zinc-400 uppercase font-mono block">
@@ -201,7 +201,7 @@ export default function OrderModal({ product, settings, isOpen, onClose }: Order
               </span>
             </div>
             <div className="text-right">
-              <span className="text-2xl sm:text-3xl font-bold text-[#00df82] font-pixel block tracking-tight drop-shadow-[0_0_12px_rgba(0,223,130,0.3)]">
+              <span className="text-2xl sm:text-3xl font-bold text-[#00df82] font-price block tracking-tight drop-shadow-[0_0_12px_rgba(0,223,130,0.3)]">
                 {formatRupiah(totalPrice)}
               </span>
             </div>
@@ -215,7 +215,7 @@ export default function OrderModal({ product, settings, isOpen, onClose }: Order
             target="_blank"
             rel="noopener noreferrer"
             onClick={onClose}
-            className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-[#00df82] text-[#03140d] hover:bg-[#00c774] font-bold font-pixel text-sm text-center flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,223,130,0.35)] transition-all active:scale-[0.98]"
+            className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-[#00df82] text-[#03140d] hover:bg-[#00c774] font-bold font-tech text-sm text-center flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,223,130,0.35)] transition-all active:scale-[0.98] uppercase tracking-wide"
           >
             <MessageCircle className="w-4 h-4 text-[#03140d]" />
             <span>Kirim Pesanan ke WhatsApp</span>
@@ -224,7 +224,7 @@ export default function OrderModal({ product, settings, isOpen, onClose }: Order
           <button
             onClick={handleCopy}
             type="button"
-            className="w-full sm:w-auto py-3 px-4 rounded-xl bg-[#071911] hover:bg-[#0e271c] border border-[#143e2d] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all font-pixel"
+            className="w-full sm:w-auto py-3 px-4 rounded-xl bg-[#071911] hover:bg-[#0e271c] border border-[#143e2d] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all font-tech"
           >
             {copied ? (
               <>

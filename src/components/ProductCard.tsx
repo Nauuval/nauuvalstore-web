@@ -42,9 +42,9 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
           </span>
 
           <div className="flex items-center gap-1.5 flex-wrap justify-end">
-            {/* Eye-Catching Cyber Mint Promo Badge (Pixel Font) */}
+            {/* Eye-Catching Cyber Mint Promo Badge */}
             {isPromo && (
-              <span className="promo-lime-badge px-2.5 py-0.5 rounded-md text-[11px] font-pixel font-bold uppercase tracking-wide flex items-center gap-1">
+              <span className="promo-lime-badge px-2.5 py-0.5 rounded-md text-[11px] font-tech font-bold uppercase tracking-wide flex items-center gap-1">
                 <Flame className="w-3.5 h-3.5 fill-[#03140d] text-[#03140d] shrink-0" />
                 <span>PROMO {discountPercent ? `-${discountPercent}%` : ''}</span>
               </span>
@@ -102,15 +102,15 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
             <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-mono mb-0.5">
               <span className="line-through">{formatRupiah(product.original_price)}</span>
               {savingsAmount > 0 && (
-                <span className="text-[11px] font-bold text-[#03140d] bg-[#00df82] px-1.5 py-0.5 rounded font-pixel">
+                <span className="text-[11px] font-bold text-[#03140d] bg-[#00df82] px-1.5 py-0.5 rounded font-tech">
                   Hemat {formatRupiah(savingsAmount)}
                 </span>
               )}
             </div>
           )}
-          {/* Price displayed in Pixel Font for retro gaming aesthetic */}
+          {/* Price displayed in crisp precision font (JetBrains Mono) */}
           <div
-            className={`text-xl sm:text-2xl font-bold font-pixel tracking-tight ${
+            className={`text-xl sm:text-2xl font-bold font-price tracking-tight ${
               isPromo ? 'text-[#00df82] drop-shadow-[0_0_10px_rgba(0,223,130,0.35)]' : 'text-white'
             }`}
           >
@@ -122,7 +122,7 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
         <button
           onClick={() => onOrder(product)}
           disabled={isOutOfStock}
-          className={`py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md font-pixel tracking-wide ${
+          className={`py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md font-tech tracking-wider uppercase ${
             isOutOfStock
               ? 'bg-zinc-900 text-zinc-600 cursor-not-allowed border border-zinc-800'
               : isPromo

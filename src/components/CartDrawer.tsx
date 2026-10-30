@@ -34,6 +34,13 @@ export default function CartDrawer({ settings }: CartDrawerProps) {
   } = useCart();
 
   const [copied, setCopied] = useState(false);
+  const [orderId, setOrderId] = useState<string>('');
+
+  // Generate order id on client only (prevent SSR hydration mismatch)
+  useEffect(() => {
+    const randomCode = Math.floor(100000 + Math.random() * 900000);
+    setOrderId(`NVL-${randomCode}`);
+  }, [cart.length]);
 
   // Close on Escape key press
   useEffect(() => {
@@ -58,9 +65,10 @@ export default function CartDrawer({ settings }: CartDrawerProps) {
     };
   }, [isCartOpen]);
 
-  const checkoutUrl = buildWhatsAppCartOrderUrl(settings.wa_number, cart);
+  const checkoutUrl = buildWhatsAppCartOrderUrl(settings.wa_number, cart, orderId);
 
   const handleCopyOrder = () => {
+    const currentOrderId = orderId || `NVL-${Math.floor(100000 + Math.random() * 900000)}`;
     const itemsListText = cart
       .map((item, index) => {
         const subtotal = item.product.price * item.quantity;
@@ -69,7 +77,9 @@ export default function CartDrawer({ settings }: CartDrawerProps) {
       .join('\n\n');
 
     const text = [
-      `Halo Admin Nauuvalstore, saya ingin memesan beberapa produk sekaligus dari Keranjang Belanja:`,
+      `Halo Admin Nauuvalstore, saya ingin checkout pesanan dari Keranjang Belanja:`,
+      ``,
+      `🔖 *KODE PESANAN:* #${currentOrderId}`,
       ``,
       `📋 *DAFTAR ITEM PESANAN:*`,
       itemsListText,

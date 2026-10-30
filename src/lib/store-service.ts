@@ -427,7 +427,8 @@ export function buildWhatsAppConsultUrl(waNumber: string, context?: string): str
 // Multi-item Cart WhatsApp Checkout Link Generator
 export function buildWhatsAppCartOrderUrl(
   waNumber: string,
-  items: CartItem[]
+  items: CartItem[],
+  orderId?: string
 ): string {
   const cleanPhone = waNumber.replace(/[^0-9]/g, '');
   const totalPrice = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
@@ -440,7 +441,8 @@ export function buildWhatsAppCartOrderUrl(
     .join('\n\n');
 
   const message = [
-    `Halo Admin Nauuvalstore, saya ingin checkout beberapa pesanan sekaligus dari Keranjang Belanja:`,
+    `Halo Admin Nauuvalstore, saya ingin checkout pesanan dari Keranjang Belanja:`,
+    ...(orderId ? [``, `🔖 *KODE PESANAN:* #${orderId}`] : []),
     ``,
     `📋 *DAFTAR ITEM PESANAN:*`,
     itemsListText,

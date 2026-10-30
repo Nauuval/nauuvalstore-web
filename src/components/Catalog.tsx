@@ -163,7 +163,7 @@ export default function Catalog({
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-700 text-zinc-300 text-xs font-bold mb-3 tracking-widest uppercase">
-              <span className="w-2 h-2 rounded-full bg-[#ccff00]" />
+              <span className="w-2 h-2 rounded-full bg-[#00df82]" />
               <span>KATALOG PRODUK & LAYANAN</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-tight font-mono">
@@ -176,8 +176,8 @@ export default function Catalog({
 
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl metallic-card text-xs font-semibold self-start md:self-auto">
             <span className="relative flex h-2 w-2">
-              <span className="animate-radar-blip-fast absolute inline-flex h-full w-full rounded-full bg-[#ccff00] opacity-80" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#ccff00]" />
+              <span className="animate-radar-blip-fast absolute inline-flex h-full w-full rounded-full bg-[#00df82] opacity-80" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00df82]" />
             </span>
             <span className="text-zinc-300 font-mono text-[11px]">
               {isRealtimeActive ? 'Realtime Supabase Sync' : 'Realtime Live Sync'}
@@ -189,7 +189,7 @@ export default function Catalog({
         {selectedTab === 'ALL' && !searchQuery && pinnedPromoProducts.length > 0 && (
           <div className="mb-10 p-5 sm:p-6 rounded-2xl bg-gradient-to-b from-zinc-900/90 via-zinc-950 to-black promo-lime-border relative overflow-hidden">
             {/* Ambient neon lime glow */}
-            <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#ccff00]/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#00df82]/10 rounded-full blur-3xl pointer-events-none" />
 
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-800 relative z-10">
               <div className="flex items-center gap-2.5">
@@ -201,7 +201,7 @@ export default function Catalog({
                   • Diskon Terbatas Sedang Berlangsung!
                 </span>
               </div>
-              <span className="text-xs font-mono font-bold text-black bg-[#ccff00] px-2.5 py-1 rounded-lg shadow-sm">
+              <span className="text-xs font-mono font-bold text-black bg-[#00df82] px-2.5 py-1 rounded-lg shadow-sm">
                 {pinnedPromoProducts.length} Layanan Promo
               </span>
             </div>
@@ -245,7 +245,7 @@ export default function Catalog({
                   className={`text-[10px] font-mono px-1.5 py-0.5 rounded-md ${
                     isSelected
                       ? tab === 'PROMO'
-                        ? 'bg-black text-[#ccff00]'
+                        ? 'bg-black text-[#00df82]'
                         : 'bg-zinc-800 text-white'
                       : 'bg-zinc-900 border border-zinc-800 text-zinc-400'
                   }`}
@@ -266,7 +266,7 @@ export default function Catalog({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari layanan (contoh: 'Depths', 'Godhuman', 'Level 1-2550', 'Fruit')..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/70 border border-zinc-800 text-white placeholder:text-zinc-600 text-xs sm:text-sm focus:outline-none focus:border-[#ccff00] transition-all font-mono"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/70 border border-zinc-800 text-white placeholder:text-zinc-600 text-xs sm:text-sm focus:outline-none focus:border-[#00df82] transition-all font-mono"
             />
             {searchQuery && (
               <button
@@ -287,7 +287,7 @@ export default function Catalog({
                   : 'bg-black/60 text-zinc-400 border-zinc-800 hover:text-white'
               }`}
             >
-              <span className={`w-2 h-2 rounded-full ${onlyReadyStock ? 'bg-black' : 'bg-[#ccff00]'}`} />
+              <span className={`w-2 h-2 rounded-full ${onlyReadyStock ? 'bg-black' : 'bg-[#00df82]'}`} />
               <span>Hanya Ready Stok</span>
             </button>
 
@@ -330,13 +330,13 @@ export default function Catalog({
                       Menampilkan <strong className="text-white">{displayedProducts.length}</strong> dari{' '}
                       <strong className="text-white">{filteredProducts.length}</strong> Layanan
                     </span>
-                    <span className="text-[#ccff00] font-bold">
+                    <span className="text-[#00df82] font-bold">
                       {Math.round((displayedProducts.length / filteredProducts.length) * 100)}%
                     </span>
                   </div>
                   <div className="w-full h-1.5 rounded-full bg-zinc-900 overflow-hidden border border-zinc-800">
                     <div
-                      className="h-full bg-gradient-to-r from-zinc-600 via-zinc-400 to-[#ccff00] transition-all duration-300 rounded-full"
+                      className="h-full bg-gradient-to-r from-zinc-600 via-zinc-400 to-[#00df82] transition-all duration-300 rounded-full"
                       style={{
                         width: `${Math.min(
                           100,
@@ -394,7 +394,7 @@ export default function Catalog({
                           onClick={() => handlePageChange(page)}
                           className={`w-9 h-9 rounded-xl text-xs font-mono font-bold transition-all ${
                             currentPage === page
-                              ? 'bg-[#ccff00] text-black shadow-md'
+                              ? 'bg-[#00df82] text-black shadow-md'
                               : 'metallic-card text-zinc-400 hover:text-white'
                           }`}
                         >
@@ -449,7 +449,7 @@ export default function Catalog({
                         setVisibleCount(val);
                         setCurrentPage(1);
                       }}
-                      className="bg-transparent border-0 text-[#ccff00] font-mono text-xs font-bold focus:outline-none cursor-pointer"
+                      className="bg-transparent border-0 text-[#00df82] font-mono text-xs font-bold focus:outline-none cursor-pointer"
                     >
                       <option value="8" className="bg-black text-white">8 Item</option>
                       <option value="12" className="bg-black text-white">12 Item</option>

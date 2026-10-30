@@ -113,12 +113,16 @@ export default function AdminPage() {
     y: number;
   } | null>(null);
 
-  // Check auth session
+  // Check auth session & immediately load latest settings for PIN accuracy
   useEffect(() => {
     const session = sessionStorage.getItem('nauuval_admin_auth');
     if (session === 'true') {
       setIsAuthenticated(true);
     }
+    // Always load settings immediately on mount so custom admin PIN is up to date
+    getStoreSettings().then((storeConfig) => {
+      if (storeConfig) setSettings(storeConfig);
+    });
   }, []);
 
   // Load data & analytics
@@ -161,15 +165,31 @@ export default function AdminPage() {
   };
 
   // Handle Login
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const correctPin = settings.admin_pin || 'singularity2026';
-    if (pinInput === correctPin || pinInput === 'admin123' || pinInput === 'singularity2026') {
-      sessionStorage.setItem('nauuval_admin_auth', 'true');
-      setIsAuthenticated(true);
-      setAuthError('');
-    } else {
-      setAuthError('PIN Admin salah. Silakan coba lagi.');
+    setAuthError('');
+    try {
+      // Fetch fresh settings in real-time to check against the latest updated PIN
+      const freshSettings = await getStoreSettings();
+      const activeSettings = freshSettings || settings;
+      const correctPin = (activeSettings.admin_pin || 'singularity2026').trim();
+
+      if (pinInput.trim() === correctPin) {
+        sessionStorage.setItem('nauuval_admin_auth', 'true');
+        setIsAuthenticated(true);
+        setAuthError('');
+      } else {
+        setAuthError('PIN Admin salah. Silakan coba lagi.');
+      }
+    } catch {
+      const fallbackPin = (settings.admin_pin || 'singularity2026').trim();
+      if (pinInput.trim() === fallbackPin) {
+        sessionStorage.setItem('nauuval_admin_auth', 'true');
+        setIsAuthenticated(true);
+        setAuthError('');
+      } else {
+        setAuthError('PIN Admin salah. Silakan coba lagi.');
+      }
     }
   };
 
@@ -472,7 +492,7 @@ export default function AdminPage() {
         <div className="relative w-full max-w-sm rounded-2xl metallic-card p-8 shadow-2xl">
           <div className="text-center mb-6">
             <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center mx-auto mb-3">
-              <Lock className="w-5 h-5 text-[#ccff00]" />
+              <Lock className="w-5 h-5 text-[#00df82]" />
             </div>
             <h1 className="text-xl font-black text-white uppercase font-mono tracking-tight">
               Admin nauuvalstore
@@ -492,7 +512,7 @@ export default function AdminPage() {
                 value={pinInput}
                 onChange={(e) => setPinInput(e.target.value)}
                 placeholder="Masukkan PIN Admin..."
-                className="w-full px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#ccff00] font-mono tracking-widest text-center"
+                className="w-full px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#00df82] font-mono tracking-widest text-center"
                 autoFocus
               />
             </div>
@@ -505,7 +525,7 @@ export default function AdminPage() {
 
             <button
               type="submit"
-              className="w-full py-3 px-4 rounded-xl bg-[#ccff00] text-black hover:bg-[#b8e600] font-black text-xs shadow-md transition-all uppercase tracking-wider"
+              className="w-full py-3 px-4 rounded-xl bg-[#00df82] text-black hover:bg-[#00c774] font-black text-xs shadow-md transition-all uppercase tracking-wider"
             >
               Masuk Panel Kontrol
             </button>
@@ -532,12 +552,12 @@ export default function AdminPage() {
         <div
           className={`fixed top-5 right-5 z-50 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs font-bold transition-all ${
             notification.type === 'success'
-              ? 'bg-zinc-900 border border-[#ccff00] text-white'
+              ? 'bg-zinc-900 border border-[#00df82] text-white'
               : 'bg-zinc-900 border border-rose-500 text-rose-300'
           }`}
         >
           {notification.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 text-[#ccff00]" />
+            <CheckCircle2 className="w-4 h-4 text-[#00df82]" />
           ) : (
             <AlertCircle className="w-4 h-4 text-rose-400" />
           )}
@@ -571,13 +591,13 @@ export default function AdminPage() {
               onClick={() => setIsSchemaModalOpen(true)}
               className="px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-zinc-800 metallic-card hover:border-white transition-colors"
             >
-              <Database className="w-3.5 h-3.5 text-[#ccff00]" />
+              <Database className="w-3.5 h-3.5 text-[#00df82]" />
               <span className="hidden sm:inline">
                 {isSupabaseConfigured() ? 'Supabase Connected' : 'Setup Database'}
               </span>
               <span
                 className={`w-2 h-2 rounded-full ${
-                  isSupabaseConfigured() ? 'bg-[#ccff00]' : 'bg-zinc-600 animate-pulse'
+                  isSupabaseConfigured() ? 'bg-[#00df82]' : 'bg-zinc-600 animate-pulse'
                 }`}
               />
             </button>
@@ -624,7 +644,7 @@ export default function AdminPage() {
             onClick={() => setActiveTab('products')}
             className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${
               activeTab === 'products'
-                ? 'bg-[#ccff00] text-black font-black shadow-md'
+                ? 'bg-[#00df82] text-black font-black shadow-md'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-950 border border-transparent'
             }`}
           >
@@ -1192,7 +1212,7 @@ export default function AdminPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Cari produk..."
-                    className="pl-8 pr-3 py-1.5 rounded-xl bg-black border border-zinc-800 text-xs text-white focus:outline-none focus:border-[#ccff00]"
+                    className="pl-8 pr-3 py-1.5 rounded-xl bg-black border border-zinc-800 text-xs text-white focus:outline-none focus:border-[#00df82]"
                   />
                 </div>
 
@@ -1235,7 +1255,7 @@ export default function AdminPage() {
                           <td className="py-3.5 px-4 font-semibold text-white">
                             <div className="flex items-center gap-2">
                               {p.is_discount && (
-                                <Zap className="w-3.5 h-3.5 text-[#ccff00] fill-[#ccff00] shrink-0" />
+                                <Zap className="w-3.5 h-3.5 text-[#00df82] fill-[#00df82] shrink-0" />
                               )}
                               <span>{p.name}</span>
                             </div>
@@ -1260,8 +1280,8 @@ export default function AdminPage() {
                             >
                               {currentVal > 0 && (
                                 <span className="relative flex h-2 w-2">
-                                  <span className={`animate-radar-blip absolute inline-flex h-full w-full rounded-full opacity-75 ${currentVal <= 3 ? 'bg-amber-400' : 'bg-[#ccff00]'}`} />
-                                  <span className={`relative inline-flex rounded-full h-2 w-2 ${currentVal <= 3 ? 'bg-amber-400' : 'bg-[#ccff00]'}`} />
+                                  <span className={`animate-radar-blip absolute inline-flex h-full w-full rounded-full opacity-75 ${currentVal <= 3 ? 'bg-amber-400' : 'bg-[#00df82]'}`} />
+                                  <span className={`relative inline-flex rounded-full h-2 w-2 ${currentVal <= 3 ? 'bg-amber-400' : 'bg-[#00df82]'}`} />
                                 </span>
                               )}
                               <span>
@@ -1292,7 +1312,7 @@ export default function AdminPage() {
                                     [p.id]: Math.max(0, parseInt(e.target.value) || 0),
                                   }))
                                 }
-                                className="w-16 py-1 px-2 text-center rounded-lg bg-black border border-zinc-700 text-white font-mono font-bold text-sm focus:outline-none focus:border-[#ccff00]"
+                                className="w-16 py-1 px-2 text-center rounded-lg bg-black border border-zinc-700 text-white font-mono font-bold text-sm focus:outline-none focus:border-[#00df82]"
                               />
                               <button
                                 type="button"
@@ -1310,7 +1330,7 @@ export default function AdminPage() {
                               disabled={isSaving}
                               className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 ml-auto transition-all ${
                                 hasChanged
-                                  ? 'bg-[#ccff00] text-black shadow-md font-black'
+                                  ? 'bg-[#00df82] text-black shadow-md font-black'
                                   : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-300'
                               }`}
                             >
@@ -1349,7 +1369,7 @@ export default function AdminPage() {
 
               <button
                 onClick={() => openProductModal()}
-                className="px-4 py-2.5 rounded-xl bg-[#ccff00] text-black hover:bg-[#bbf000] font-black text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all self-start sm:self-auto"
+                className="px-4 py-2.5 rounded-xl bg-[#00df82] text-black hover:bg-[#00c774] font-black text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all self-start sm:self-auto"
               >
                 <Plus className="w-4 h-4" />
                 <span>Tambah Layanan Baru</span>
@@ -1447,7 +1467,7 @@ export default function AdminPage() {
 
               <button
                 onClick={() => openTrxModal()}
-                className="px-4 py-2.5 rounded-xl bg-[#ccff00] text-black hover:bg-[#bbf000] font-black text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all self-start sm:self-auto"
+                className="px-4 py-2.5 rounded-xl bg-[#00df82] text-black hover:bg-[#00c774] font-black text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all self-start sm:self-auto"
               >
                 <Plus className="w-4 h-4" />
                 <span>+ Tambah Bukti Transaksi</span>
@@ -1477,7 +1497,7 @@ export default function AdminPage() {
 
                     <div className="flex items-center gap-1 mb-2">
                       {[...Array(trx.rating || 5)].map((_, i) => (
-                        <Star key={i} className="w-3.5 h-3.5 fill-[#ccff00] text-[#ccff00]" />
+                        <Star key={i} className="w-3.5 h-3.5 fill-[#00df82] text-[#00df82]" />
                       ))}
                       <span className="text-[11px] font-mono text-zinc-400 ml-1">
                         {trx.date || 'Hari ini'}
@@ -1506,7 +1526,7 @@ export default function AdminPage() {
                       href={trx.image_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-[#ccff00] hover:underline flex items-center gap-1 font-semibold"
+                      className="text-xs text-[#00df82] hover:underline flex items-center gap-1 font-semibold"
                     >
                       <Eye className="w-3.5 h-3.5" />
                       <span>Lihat Foto Full</span>
@@ -1557,7 +1577,7 @@ export default function AdminPage() {
                   type="text"
                   value={settings.store_name}
                   onChange={(e) => setSettings({ ...settings, store_name: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#ccff00] font-mono"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#00df82] font-mono"
                 />
               </div>
 
@@ -1570,7 +1590,7 @@ export default function AdminPage() {
                   value={settings.tagline}
                   onChange={(e) => setSettings({ ...settings, tagline: e.target.value })}
                   placeholder="TERMURAH - TERCEPAT - TERPERCAYA"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#ccff00]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#00df82]"
                 />
               </div>
 
@@ -1583,7 +1603,7 @@ export default function AdminPage() {
                   value={settings.wa_number}
                   onChange={(e) => setSettings({ ...settings, wa_number: e.target.value })}
                   placeholder="Contoh: 6281234567890"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono text-sm focus:outline-none focus:border-[#ccff00]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono text-sm focus:outline-none focus:border-[#00df82]"
                 />
               </div>
 
@@ -1596,7 +1616,7 @@ export default function AdminPage() {
                   value={settings.wa_channel_url}
                   onChange={(e) => setSettings({ ...settings, wa_channel_url: e.target.value })}
                   placeholder="https://whatsapp.com/channel/..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#ccff00]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#00df82]"
                 />
               </div>
 
@@ -1609,7 +1629,7 @@ export default function AdminPage() {
                   value={settings.wa_group_url}
                   onChange={(e) => setSettings({ ...settings, wa_group_url: e.target.value })}
                   placeholder="https://chat.whatsapp.com/..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#ccff00]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#00df82]"
                 />
               </div>
 
@@ -1621,7 +1641,7 @@ export default function AdminPage() {
                   rows={2}
                   value={settings.announcement}
                   onChange={(e) => setSettings({ ...settings, announcement: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#ccff00]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm focus:outline-none focus:border-[#00df82]"
                 />
               </div>
 
@@ -1633,14 +1653,14 @@ export default function AdminPage() {
                   type="password"
                   value={settings.admin_pin}
                   onChange={(e) => setSettings({ ...settings, admin_pin: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm font-mono focus:outline-none focus:border-[#ccff00]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white text-sm font-mono focus:outline-none focus:border-[#00df82]"
                 />
               </div>
 
               <div className="pt-4">
                 <button
                   type="submit"
-                  className="w-full py-3 px-4 rounded-xl bg-[#ccff00] text-black hover:bg-[#bbf000] font-black text-xs uppercase shadow-md flex items-center justify-center gap-2"
+                  className="w-full py-3 px-4 rounded-xl bg-[#00df82] text-black hover:bg-[#00c774] font-black text-xs uppercase shadow-md flex items-center justify-center gap-2"
                 >
                   <Save className="w-4 h-4" />
                   <span>Simpan Semua Pengaturan</span>
@@ -1672,7 +1692,7 @@ export default function AdminPage() {
                   value={editingProduct.name || ''}
                   onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
                   placeholder="Contoh: Joki Quest Rod of the Depths"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00] font-semibold"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#00df82] font-semibold"
                 />
               </div>
 
@@ -1687,7 +1707,7 @@ export default function AdminPage() {
                         category: e.target.value as ProductCategory,
                       })
                     }
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00] font-semibold"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#00df82] font-semibold"
                   >
                     {CATEGORIES.map((cat) => (
                       <option key={cat} value={cat}>
@@ -1710,7 +1730,7 @@ export default function AdminPage() {
                         stock: Math.max(0, parseInt(e.target.value) || 0),
                       })
                     }
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono focus:outline-none focus:border-[#ccff00]"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono focus:outline-none focus:border-[#00df82]"
                   />
                 </div>
               </div>
@@ -1718,8 +1738,8 @@ export default function AdminPage() {
               {/* Price & Promo Settings */}
               <div className="p-4 rounded-xl bg-black border border-zinc-800 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-[#ccff00] flex items-center gap-1.5 text-xs uppercase">
-                    <Zap className="w-3.5 h-3.5 fill-[#ccff00]" />
+                  <span className="font-bold text-[#00df82] flex items-center gap-1.5 text-xs uppercase">
+                    <Zap className="w-3.5 h-3.5 fill-[#00df82]" />
                     <span>Status Produk Promo</span>
                   </span>
                   <label className="flex items-center gap-2 cursor-pointer text-xs text-zinc-300 font-semibold">
@@ -1732,7 +1752,7 @@ export default function AdminPage() {
                           is_discount: e.target.checked,
                         })
                       }
-                      className="rounded bg-zinc-900 border-zinc-700 text-[#ccff00] focus:ring-0"
+                      className="rounded bg-zinc-900 border-zinc-700 text-[#00df82] focus:ring-0"
                     />
                     <span>Tandai Sebagai Promo</span>
                   </label>
@@ -1754,7 +1774,7 @@ export default function AdminPage() {
                         })
                       }
                       placeholder="Contoh: 50000"
-                      className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-300 font-mono focus:outline-none focus:border-[#ccff00]"
+                      className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-300 font-mono focus:outline-none focus:border-[#00df82]"
                     />
                   </div>
 
@@ -1774,7 +1794,7 @@ export default function AdminPage() {
                         })
                       }
                       placeholder="Contoh: 35000"
-                      className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-[#ccff00] font-bold font-mono focus:outline-none focus:border-[#ccff00]"
+                      className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-[#00df82] font-bold font-mono focus:outline-none focus:border-[#00df82]"
                     />
                   </div>
                 </div>
@@ -1790,7 +1810,7 @@ export default function AdminPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#ccff00] text-black hover:bg-[#bbf000] font-black text-xs shadow-md"
+                  className="px-5 py-2 rounded-xl bg-[#00df82] text-black hover:bg-[#00c774] font-black text-xs shadow-md"
                 >
                   Simpan Produk
                 </button>
@@ -1831,7 +1851,7 @@ export default function AdminPage() {
                     value={editingTrx.buyer_name || ''}
                     onChange={(e) => setEditingTrx({ ...editingTrx, buyer_name: e.target.value })}
                     placeholder="Contoh: Dan***99"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00] font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#00df82] font-mono"
                   />
                 </div>
 
@@ -1845,7 +1865,7 @@ export default function AdminPage() {
                         category: e.target.value as ProductCategory,
                       })
                     }
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00]"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#00df82]"
                   >
                     {CATEGORIES.map((cat) => (
                       <option key={cat} value={cat}>
@@ -1866,7 +1886,7 @@ export default function AdminPage() {
                   value={editingTrx.service_name || ''}
                   onChange={(e) => setEditingTrx({ ...editingTrx, service_name: e.target.value })}
                   placeholder="Contoh: Joki Quest Rod of the Depths"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#00df82]"
                 />
               </div>
 
@@ -1886,7 +1906,7 @@ export default function AdminPage() {
                         amount: parseFloat(e.target.value) || 0,
                       })
                     }
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono focus:outline-none focus:border-[#ccff00]"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono focus:outline-none focus:border-[#00df82]"
                   />
                 </div>
 
@@ -1899,7 +1919,7 @@ export default function AdminPage() {
                     value={editingTrx.date || 'Hari ini'}
                     onChange={(e) => setEditingTrx({ ...editingTrx, date: e.target.value })}
                     placeholder="Contoh: Hari ini / 28 Okt 2026"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono focus:outline-none focus:border-[#ccff00]"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono focus:outline-none focus:border-[#00df82]"
                   />
                 </div>
               </div>
@@ -1960,7 +1980,7 @@ export default function AdminPage() {
                         onClick={() => trxFileInputRef.current?.click()}
                         className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[11px] font-bold flex items-center gap-1.5"
                       >
-                        <Upload className="w-3.5 h-3.5 text-[#ccff00]" />
+                        <Upload className="w-3.5 h-3.5 text-[#00df82]" />
                         <span>Ganti Gambar</span>
                       </button>
                       <button
@@ -1976,17 +1996,17 @@ export default function AdminPage() {
                 ) : (
                   <div
                     onClick={() => trxFileInputRef.current?.click()}
-                    className="border-2 border-dashed border-zinc-800 hover:border-[#ccff00] rounded-xl p-5 text-center cursor-pointer bg-zinc-950/60 hover:bg-zinc-900/40 transition-all flex flex-col items-center justify-center gap-2"
+                    className="border-2 border-dashed border-zinc-800 hover:border-[#00df82] rounded-xl p-5 text-center cursor-pointer bg-zinc-950/60 hover:bg-zinc-900/40 transition-all flex flex-col items-center justify-center gap-2"
                   >
                     {isProcessingTrxImage ? (
                       <>
-                        <Loader2 className="w-6 h-6 text-[#ccff00] animate-spin" />
+                        <Loader2 className="w-6 h-6 text-[#00df82] animate-spin" />
                         <span className="text-zinc-400">Mengompres & memproses gambar...</span>
                       </>
                     ) : (
                       <>
                         <div className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300">
-                          <Upload className="w-5 h-5 text-[#ccff00]" />
+                          <Upload className="w-5 h-5 text-[#00df82]" />
                         </div>
                         <div className="text-zinc-200 font-bold">Pilih Gambar dari Perangkat</div>
                         <div className="text-zinc-500 text-[11px]">
@@ -2011,7 +2031,7 @@ export default function AdminPage() {
                       value={editingTrx.image_url || ''}
                       onChange={(e) => setEditingTrx({ ...editingTrx, image_url: e.target.value })}
                       placeholder="https://..."
-                      className="mt-1.5 w-full px-3 py-2 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00]"
+                      className="mt-1.5 w-full px-3 py-2 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#00df82]"
                     />
                   </details>
                 </div>
@@ -2026,7 +2046,7 @@ export default function AdminPage() {
                   value={editingTrx.notes || ''}
                   onChange={(e) => setEditingTrx({ ...editingTrx, notes: e.target.value })}
                   placeholder="Contoh: Proses kilat 30 menit selesai, rod mythic langsung dapat!"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#00df82]"
                 />
               </div>
 
@@ -2041,7 +2061,7 @@ export default function AdminPage() {
                 <button
                   type="submit"
                   disabled={isProcessingTrxImage}
-                  className="px-5 py-2 rounded-xl bg-[#ccff00] text-black hover:bg-[#bbf000] font-black text-xs shadow-md disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-[#00df82] text-black hover:bg-[#00c774] font-black text-xs shadow-md disabled:opacity-50"
                 >
                   Simpan Bukti
                 </button>
@@ -2058,7 +2078,7 @@ export default function AdminPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
           <div className="relative w-full max-w-lg rounded-2xl metallic-card p-6 sm:p-7 shadow-2xl">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-[#ccff00]">
+              <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-[#00df82]">
                 <Database className="w-5 h-5" />
               </div>
               <div>
@@ -2067,7 +2087,7 @@ export default function AdminPage() {
                 </h3>
                 <p className="text-xs text-zinc-400">
                   Status:{' '}
-                  <span className={isSupabaseConfigured() ? 'text-[#ccff00] font-bold' : 'text-zinc-400 font-bold'}>
+                  <span className={isSupabaseConfigured() ? 'text-[#00df82] font-bold' : 'text-zinc-400 font-bold'}>
                     {isSupabaseConfigured() ? 'Terkoneksi ke Supabase' : 'Mode Offline / Local Storage'}
                   </span>
                 </p>
@@ -2093,7 +2113,7 @@ export default function AdminPage() {
               <button
                 type="button"
                 onClick={() => setIsSchemaModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-[#ccff00] text-black font-black text-xs"
+                className="px-4 py-2 rounded-xl bg-[#00df82] text-black font-black text-xs"
               >
                 Tutup
               </button>

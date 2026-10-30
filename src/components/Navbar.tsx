@@ -19,16 +19,16 @@ export default function Navbar({ settings }: NavbarProps) {
     { name: 'Pusat WhatsApp', href: '#whatsapp-hub' },
     { name: 'Katalog & Promo', href: '#catalog' },
     { name: 'Cara Order', href: '#how-to-order' },
-    { name: 'Keunggulan', href: '#why-us' },
+    { name: 'FAQ', href: '#faq' },
   ];
 
   return (
-    <nav className="sticky top-0 z-40 w-full backdrop-blur-xl bg-black/85 border-b border-zinc-800/80">
+    <nav className="sticky top-0 z-40 w-full backdrop-blur-xl bg-[#060b08]/90 border-b border-[#143224]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo & Brand */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-zinc-900 border border-zinc-700/80 p-1 flex items-center justify-center overflow-hidden group-hover:border-white transition-colors">
+            <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#081711] border border-[#14402d] p-1 flex items-center justify-center overflow-hidden group-hover:border-[#00df82] transition-colors">
               <img
                 src="/logo-store.png"
                 alt="nauuvalstore logo"
@@ -38,10 +38,10 @@ export default function Navbar({ settings }: NavbarProps) {
 
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-black text-lg sm:text-xl tracking-tight text-white font-mono uppercase">
+                <span className="font-black text-lg sm:text-xl tracking-tight text-white font-mono uppercase group-hover:text-emerald-300 transition-colors">
                   {settings.store_name || 'nauuvalstore'}
                 </span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-700 text-zinc-300 font-bold uppercase tracking-wider hidden sm:inline-block">
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#061d14] border border-[#14422e] text-[#00df82] font-bold font-pixel uppercase tracking-wider hidden sm:inline-block">
                   OFFICIAL
                 </span>
               </div>
@@ -57,10 +57,10 @@ export default function Navbar({ settings }: NavbarProps) {
               <a
                 key={link.name}
                 href={link.href}
-                className="hover:text-white transition-colors py-1 relative group"
+                className="hover:text-[#00df82] transition-colors py-1 relative group"
               >
                 {link.name}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-200 group-hover:w-full" />
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#00df82] transition-all duration-200 group-hover:w-full" />
               </a>
             ))}
           </div>
@@ -69,10 +69,10 @@ export default function Navbar({ settings }: NavbarProps) {
           <div className="hidden sm:flex items-center gap-3">
             <Link
               href="/admin"
-              className="px-3 py-2 rounded-xl text-xs font-semibold text-zinc-400 hover:text-white bg-zinc-950 border border-zinc-800 hover:border-zinc-600 transition-all flex items-center gap-1.5"
+              className="px-3 py-2 rounded-xl text-xs font-semibold text-zinc-400 hover:text-white bg-[#081711] border border-[#143929] hover:border-[#00df82]/50 transition-all flex items-center gap-1.5"
               title="Admin Panel"
             >
-              <Shield className="w-3.5 h-3.5 text-zinc-300" />
+              <Shield className="w-3.5 h-3.5 text-[#00df82]" />
               <span>Admin Panel</span>
             </Link>
 
@@ -80,9 +80,9 @@ export default function Navbar({ settings }: NavbarProps) {
               href={buildWhatsAppConsultUrl(settings.wa_number)}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 rounded-xl bg-white text-black hover:bg-zinc-200 font-bold text-xs flex items-center gap-1.5 shadow-md transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="px-4 py-2 rounded-xl bg-[#00df82] text-[#03140d] hover:bg-[#00c774] font-bold text-xs flex items-center gap-1.5 shadow-md shadow-[#00df82]/20 transition-all hover:scale-[1.02] active:scale-[0.98] font-pixel"
             >
-              <MessageCircle className="w-3.5 h-3.5" />
+              <MessageCircle className="w-3.5 h-3.5 text-[#03140d]" />
               <span>Chat Admin WA</span>
             </a>
           </div>

@@ -5,6 +5,7 @@ import { INITIAL_PRODUCTS, INITIAL_SETTINGS, INITIAL_TRANSACTIONS } from './mock
 const LOCAL_PRODUCTS_KEY = 'nauuvalstore_products_v2';
 const LOCAL_SETTINGS_KEY = 'nauuvalstore_settings_v2';
 const LOCAL_TRANSACTIONS_KEY = 'nauuvalstore_transactions_v2';
+const LOCAL_TRANSACTIONS_INITIALIZED_KEY = 'nauuvalstore_trx_init_flag_v3';
 const LOCAL_EVENT_NAME = 'nauuvalstore_store_update';
 
 // Format angka ke format Rupiah
@@ -70,22 +71,30 @@ function setLocalSettings(settings: StoreSettings): void {
 }
 
 function getLocalTransactions(): TransactionProof[] {
-  if (typeof window === 'undefined') return INITIAL_TRANSACTIONS;
+  if (typeof window === 'undefined') return [];
   try {
+    const initialized = localStorage.getItem(LOCAL_TRANSACTIONS_INITIALIZED_KEY);
     const raw = localStorage.getItem(LOCAL_TRANSACTIONS_KEY);
-    if (!raw) {
+
+    if (!initialized) {
+      localStorage.setItem(LOCAL_TRANSACTIONS_INITIALIZED_KEY, 'true');
       localStorage.setItem(LOCAL_TRANSACTIONS_KEY, JSON.stringify(INITIAL_TRANSACTIONS));
       return INITIAL_TRANSACTIONS;
     }
-    return JSON.parse(raw);
+
+    if (raw !== null) {
+      return JSON.parse(raw);
+    }
+    return [];
   } catch {
-    return INITIAL_TRANSACTIONS;
+    return [];
   }
 }
 
 function setLocalTransactions(transactions: TransactionProof[]): void {
   if (typeof window === 'undefined') return;
   try {
+    localStorage.setItem(LOCAL_TRANSACTIONS_INITIALIZED_KEY, 'true');
     localStorage.setItem(LOCAL_TRANSACTIONS_KEY, JSON.stringify(transactions));
     window.dispatchEvent(new CustomEvent(LOCAL_EVENT_NAME, { detail: { type: 'transactions', data: transactions } }));
   } catch (e) {
@@ -123,6 +132,7 @@ export async function getStoreSettings(): Promise<StoreSettings> {
       .single();
 
     if (!error && data) {
+      setLocalSettings(data as StoreSettings);
       return data as StoreSettings;
     }
   }
@@ -249,7 +259,8 @@ export async function getTransactionProofs(): Promise<TransactionProof[]> {
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (!error && data && data.length > 0) {
+    if (!error && data) {
+      setLocalTransactions(data as TransactionProof[]);
       return data as TransactionProof[];
     }
   }

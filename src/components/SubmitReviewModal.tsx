@@ -135,7 +135,7 @@ export default function SubmitReviewModal({
 
         {isSuccess ? (
           <div className="py-12 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-[#ccff00] text-black flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#ccff00]/30 animate-bounce">
+            <div className="w-14 h-14 rounded-2xl bg-[#00df82] text-black flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#00df82]/30 animate-bounce">
               <CheckCircle2 className="w-8 h-8" />
             </div>
             <h3 className="text-xl font-black text-white uppercase font-mono">
@@ -149,8 +149,8 @@ export default function SubmitReviewModal({
           <>
             {/* Header */}
             <div className="mb-5">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-900 border border-zinc-700 text-[#ccff00] text-[10px] font-mono font-bold mb-1.5 uppercase">
-                <Star className="w-3 h-3 fill-[#ccff00]" />
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-900 border border-zinc-700 text-[#00df82] text-[10px] font-mono font-bold mb-1.5 uppercase">
+                <Star className="w-3 h-3 fill-[#00df82]" />
                 <span>Ulasan Pelanggan nauuvalstore</span>
               </div>
               <h3 className="text-lg font-black text-white uppercase font-mono tracking-tight">
@@ -180,13 +180,13 @@ export default function SubmitReviewModal({
                       <Star
                         className={`w-6 h-6 transition-colors ${
                           star <= (hoverRating || rating)
-                            ? 'fill-[#ccff00] text-[#ccff00]'
+                            ? 'fill-[#00df82] text-[#00df82]'
                             : 'text-zinc-700'
                         }`}
                       />
                     </button>
                   ))}
-                  <span className="text-xs font-mono font-bold text-[#ccff00] ml-2">
+                  <span className="text-xs font-mono font-bold text-[#00df82] ml-2">
                     {rating}.0 / 5.0
                   </span>
                 </div>
@@ -203,7 +203,7 @@ export default function SubmitReviewModal({
                       type="checkbox"
                       checked={maskName}
                       onChange={(e) => setMaskName(e.target.checked)}
-                      className="rounded bg-zinc-900 border-zinc-700 text-[#ccff00] focus:ring-0"
+                      className="rounded bg-zinc-900 border-zinc-700 text-[#00df82] focus:ring-0"
                     />
                     <span>Samarkan Nama (Contoh: Dan***99)</span>
                   </label>
@@ -214,7 +214,7 @@ export default function SubmitReviewModal({
                   value={buyerName}
                   onChange={(e) => setBuyerName(e.target.value)}
                   placeholder="Contoh: Danu_Player atau ProGamer99"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00] font-semibold"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#00df82] font-semibold"
                 />
               </div>
 
@@ -227,7 +227,7 @@ export default function SubmitReviewModal({
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value as ProductCategory)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00] font-semibold"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#00df82] font-semibold"
                   >
                     {CATEGORIES.map((cat) => (
                       <option key={cat} value={cat}>
@@ -247,7 +247,7 @@ export default function SubmitReviewModal({
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="Contoh: 65000"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono focus:outline-none focus:border-[#ccff00]"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono focus:outline-none focus:border-[#00df82]"
                   />
                 </div>
               </div>
@@ -262,7 +262,7 @@ export default function SubmitReviewModal({
                   value={serviceName}
                   onChange={(e) => setServiceName(e.target.value)}
                   placeholder="Contoh: Joki Quest Rod of the Depths / Fruit Kitsune"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#00df82]"
                 />
               </div>
 
@@ -277,7 +277,7 @@ export default function SubmitReviewModal({
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Tulis kepuasan pengerjaan joki, kecepatan layanan, atau keramahan admin..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ccff00]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#00df82]"
                 />
               </div>
 
@@ -302,7 +302,7 @@ export default function SubmitReviewModal({
                         <p className="font-bold text-white text-xs truncate">
                           Bukti Berhasil Dipilih ✓
                         </p>
-                        <p className="text-[10px] text-[#ccff00] font-mono">
+                        <p className="text-[10px] text-[#00df82] font-mono">
                           Siap diunggah ke website
                         </p>
                       </div>
@@ -328,16 +328,16 @@ export default function SubmitReviewModal({
                     />
                     <label
                       htmlFor="customer-proof-file"
-                      className="w-full py-5 px-4 rounded-xl border-2 border-dashed border-zinc-700 hover:border-[#ccff00] bg-black/60 hover:bg-zinc-900/40 text-center flex flex-col items-center justify-center cursor-pointer transition-all group"
+                      className="w-full py-5 px-4 rounded-xl border-2 border-dashed border-zinc-700 hover:border-[#00df82] bg-black/60 hover:bg-zinc-900/40 text-center flex flex-col items-center justify-center cursor-pointer transition-all group"
                     >
                       {isProcessingImage ? (
                         <div className="flex items-center gap-2 text-zinc-300">
-                          <Loader2 className="w-5 h-5 animate-spin text-[#ccff00]" />
+                          <Loader2 className="w-5 h-5 animate-spin text-[#00df82]" />
                           <span className="font-semibold text-xs">Memproses Gambar...</span>
                         </div>
                       ) : (
                         <>
-                          <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-zinc-300 group-hover:text-[#ccff00] group-hover:border-[#ccff00] transition-colors mb-2">
+                          <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-zinc-300 group-hover:text-[#00df82] group-hover:border-[#00df82] transition-colors mb-2">
                             <Upload className="w-5 h-5" />
                           </div>
                           <p className="font-bold text-white text-xs">
@@ -372,7 +372,7 @@ export default function SubmitReviewModal({
                 <button
                   type="submit"
                   disabled={isSubmitting || isProcessingImage}
-                  className="px-5 py-2.5 rounded-xl bg-[#ccff00] text-black hover:bg-[#bbf000] font-black text-xs shadow-lg shadow-[#ccff00]/20 flex items-center gap-2 transition-all disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-xl bg-[#00df82] text-black hover:bg-[#00c774] font-black text-xs shadow-lg shadow-[#00df82]/20 flex items-center gap-2 transition-all disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>

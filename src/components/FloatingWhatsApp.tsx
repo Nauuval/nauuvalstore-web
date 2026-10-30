@@ -37,14 +37,14 @@ export default function FloatingWhatsApp({ settings }: FloatingWhatsAppProps) {
       {openPopup && (
         <div className="mb-3 w-[calc(100vw-2rem)] sm:w-84 max-w-sm rounded-2xl bg-[#0c0d12] border-2 border-zinc-700/80 shadow-[0_10px_40px_rgba(0,0,0,0.9),0_0_25px_rgba(204,255,0,0.15)] p-4 sm:p-5 text-xs animate-in slide-in-from-bottom-3 duration-200 backdrop-blur-xl relative overflow-hidden">
           {/* Top subtle neon lime glow line */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#ccff00] to-transparent opacity-80" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#00df82] to-transparent opacity-80" />
 
           {/* Header */}
           <div className="flex items-center justify-between pb-3 border-b border-zinc-800 mb-3.5">
             <div className="flex items-center gap-2">
               <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-radar-blip-fast absolute inline-flex h-full w-full rounded-full bg-[#ccff00] opacity-80" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#ccff00]" />
+                <span className="animate-radar-blip-fast absolute inline-flex h-full w-full rounded-full bg-[#00df82] opacity-80" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00df82]" />
               </span>
               <div>
                 <span className="font-black text-white text-xs uppercase tracking-wider block font-mono">
@@ -70,11 +70,11 @@ export default function FloatingWhatsApp({ settings }: FloatingWhatsAppProps) {
               href={buildWhatsAppConsultUrl(settings.wa_number)}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-3.5 rounded-xl bg-[#ccff00] hover:bg-[#bbf000] text-black flex items-center justify-between shadow-[0_0_18px_rgba(204,255,0,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98] group"
+              className="p-3.5 rounded-xl bg-[#00df82] hover:bg-[#00c774] text-black flex items-center justify-between shadow-[0_0_18px_rgba(204,255,0,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98] group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-black text-[#ccff00] flex items-center justify-center shrink-0 shadow-sm">
-                  <MessageCircle className="w-5 h-5 text-[#ccff00]" />
+                <div className="w-9 h-9 rounded-xl bg-black text-[#00df82] flex items-center justify-center shrink-0 shadow-sm">
+                  <MessageCircle className="w-5 h-5 text-[#00df82]" />
                 </div>
                 <div className="text-left">
                   <p className="font-black text-xs uppercase tracking-wide leading-tight text-black font-mono">
@@ -96,7 +96,7 @@ export default function FloatingWhatsApp({ settings }: FloatingWhatsAppProps) {
               className="p-3 rounded-xl metallic-card hover:border-zinc-500 text-white flex items-center justify-between transition-colors group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-[#ccff00] shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-[#00df82] shrink-0">
                   <BellRing className="w-4 h-4" />
                 </div>
                 <div className="text-left">
@@ -145,8 +145,8 @@ export default function FloatingWhatsApp({ settings }: FloatingWhatsAppProps) {
             >
               {copied ? (
                 <>
-                  <Check className="w-3 h-3 text-[#ccff00]" />
-                  <span className="text-[#ccff00]">Tersalin!</span>
+                  <Check className="w-3 h-3 text-[#00df82]" />
+                  <span className="text-[#00df82]">Tersalin!</span>
                 </>
               ) : (
                 <>
@@ -162,21 +162,21 @@ export default function FloatingWhatsApp({ settings }: FloatingWhatsAppProps) {
       {/* Main Floating Trigger Button (Bold, Assertive, Eye-Catching) */}
       <button
         onClick={() => setOpenPopup(!openPopup)}
-        className="relative group flex items-center gap-2.5 sm:gap-3 p-1.5 sm:p-2 pr-3.5 sm:pr-5 rounded-full bg-gradient-to-r from-zinc-950 via-zinc-900 to-black border-2 border-[#ccff00] text-white shadow-[0_4px_25px_rgba(0,0,0,0.8),0_0_22px_rgba(204,255,0,0.35)] hover:shadow-[0_0_30px_rgba(204,255,0,0.55)] hover:scale-105 active:scale-95 transition-all duration-300"
+        className="relative group flex items-center gap-2.5 sm:gap-3 p-1.5 sm:p-2 pr-3.5 sm:pr-5 rounded-full bg-gradient-to-r from-zinc-950 via-zinc-900 to-black border-2 border-[#00df82] text-white shadow-[0_4px_25px_rgba(0,0,0,0.8),0_0_22px_rgba(204,255,0,0.35)] hover:shadow-[0_0_30px_rgba(204,255,0,0.55)] hover:scale-105 active:scale-95 transition-all duration-300"
         aria-label="Pesan via WhatsApp Resmi"
       >
         {/* Glowing Radar Icon Capsule */}
-        <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#ccff00] text-black flex items-center justify-center font-black shrink-0 shadow-md">
+        <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#00df82] text-black flex items-center justify-center font-black shrink-0 shadow-md">
           <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 text-black" />
-          <span className="animate-radar-blip-fast absolute -top-0.5 -right-0.5 inline-flex h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-[#ccff00] opacity-80" />
-          <span className="absolute -top-0.5 -right-0.5 inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-[#ccff00] border-2 border-black" />
+          <span className="animate-radar-blip-fast absolute -top-0.5 -right-0.5 inline-flex h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-[#00df82] opacity-80" />
+          <span className="absolute -top-0.5 -right-0.5 inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-[#00df82] border-2 border-black" />
         </div>
 
         {/* Assertive Bold Text (Always clearly visible on mobile & desktop) */}
         <div className="text-left flex flex-col justify-center">
           <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#ccff00] animate-pulse" />
-            <span className="text-[9px] font-black tracking-widest text-[#ccff00] uppercase font-mono">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00df82] animate-pulse" />
+            <span className="text-[9px] font-black tracking-widest text-[#00df82] uppercase font-mono">
               ONLINE 24/7
             </span>
           </div>
@@ -188,7 +188,7 @@ export default function FloatingWhatsApp({ settings }: FloatingWhatsAppProps) {
         {/* Toggle Arrow */}
         <div className="ml-0.5 text-zinc-400 group-hover:text-white transition-colors">
           {openPopup ? (
-            <X className="w-4 h-4 text-[#ccff00]" />
+            <X className="w-4 h-4 text-[#00df82]" />
           ) : (
             <ChevronUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
           )}

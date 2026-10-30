@@ -38,7 +38,7 @@ export default function WhyUs() {
   ];
 
   return (
-    <section id="why-us" className="py-14 sm:py-20 relative bg-[#08090d] border-b border-zinc-800/80 scroll-mt-20">
+    <section id="why-us" className="py-14 sm:py-20 relative bg-[#060b08] border-b border-[#143224] scroll-mt-20">
       <div className="absolute inset-0 bg-topo-grid opacity-20 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

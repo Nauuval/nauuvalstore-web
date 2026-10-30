@@ -45,8 +45,8 @@ export default function Hero({
           <div className="flex items-center gap-3">
             <span className="text-white font-bold flex items-center gap-1.5">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ccff00] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#ccff00]"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00df82] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00df82]"></span>
               </span>
               ONLINE 24/7
             </span>
@@ -66,12 +66,12 @@ export default function Hero({
           <div className="flex flex-wrap items-center gap-3 mb-4">
             <a
               href="#bukti-transaksi"
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-950/90 border border-zinc-700/80 hover:border-[#ccff00] text-zinc-300 text-xs font-semibold tracking-wide backdrop-blur-md transition-all group shadow-sm"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-950/90 border border-zinc-700/80 hover:border-[#00df82] text-zinc-300 text-xs font-semibold tracking-wide backdrop-blur-md transition-all group shadow-sm"
               title="Lihat Semua Testimoni & Bukti Transaksi"
             >
-              <div className="flex items-center gap-0.5 text-[#ccff00]">
+              <div className="flex items-center gap-0.5 text-[#00df82]">
                 {[1, 2, 3, 4, 5].map((s) => (
-                  <Star key={s} className="w-3.5 h-3.5 fill-[#ccff00] text-[#ccff00]" />
+                  <Star key={s} className="w-3.5 h-3.5 fill-[#00df82] text-[#00df82]" />
                 ))}
               </div>
               <span className="font-bold font-mono text-white text-xs">
@@ -85,7 +85,7 @@ export default function Hero({
 
             {/* Slogan Pill */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-950/80 border border-zinc-700 text-zinc-300 text-xs font-bold tracking-widest uppercase backdrop-blur-md">
-              <span className="w-2 h-2 rounded-full bg-[#ccff00]" />
+              <span className="w-2 h-2 rounded-full bg-[#00df82]" />
               <span>{settings.tagline || 'TERMURAH - TERCEPAT - TERPERCAYA'}</span>
             </div>
           </div>
@@ -107,7 +107,7 @@ export default function Hero({
           <div className="mt-8 flex flex-wrap items-center gap-3.5">
             <a
               href="#catalog"
-              className="px-6 py-3.5 rounded-xl bg-white text-black hover:bg-zinc-200 font-extrabold text-xs sm:text-sm transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg flex items-center gap-2"
+              className="px-6 py-3.5 rounded-xl bg-[#00df82] text-[#03140d] hover:bg-[#00c774] font-bold text-xs sm:text-sm transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#00df82]/25 flex items-center gap-2 font-pixel tracking-wide"
             >
               <span>Cek Katalog & Promo</span>
               <ArrowDown className="w-4 h-4" />
@@ -117,7 +117,7 @@ export default function Hero({
               href="#bukti-transaksi"
               className="px-5 py-3.5 rounded-xl bg-zinc-950/90 hover:bg-zinc-900 text-white font-bold text-xs sm:text-sm border border-zinc-700 hover:border-zinc-500 transition-all flex items-center gap-2 backdrop-blur-md"
             >
-              <Award className="w-4 h-4 text-[#ccff00]" />
+              <Award className="w-4 h-4 text-[#00df82]" />
               <span>Bukti Transaksi Sukses</span>
             </a>
 
@@ -147,7 +147,7 @@ export default function Hero({
             {/* Eye-catching Neon Lime Promo Metric */}
             <div className="metallic-card promo-lime-border p-3.5 rounded-xl relative overflow-hidden group">
               <span className="text-[10px] font-mono font-bold flex items-center gap-1 promo-lime-text uppercase">
-                <Zap className="w-3.5 h-3.5 fill-[#ccff00]" />
+                <Zap className="w-3.5 h-3.5 fill-[#00df82]" />
                 <span>Promo Aktif</span>
               </span>
               <p className="text-xl sm:text-2xl font-black font-mono mt-0.5 promo-lime-text">
@@ -159,7 +159,7 @@ export default function Hero({
             <div className="metallic-card p-3.5 rounded-xl">
               <span className="text-[10px] text-zinc-500 uppercase font-mono block">Rating Testimoni</span>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <Star className="w-4 h-4 fill-[#ccff00] text-[#ccff00]" />
+                <Star className="w-4 h-4 fill-[#00df82] text-[#00df82]" />
                 <p className="text-xl sm:text-2xl font-black text-white font-mono">
                   {averageRating ? averageRating.toFixed(1) : '5.0'}
                 </p>
@@ -174,7 +174,7 @@ export default function Hero({
         <div className="mt-14 pt-6 border-t border-zinc-800/80">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-xs font-mono tracking-wider text-zinc-400 uppercase">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#ccff00]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00df82]" />
               <span>SPESIALISASI GAME RESMI:</span>
             </div>
 

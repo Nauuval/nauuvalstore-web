@@ -9,6 +9,7 @@ import Catalog from '@/components/Catalog';
 import TransactionProofSection from '@/components/TransactionProofSection';
 import HowToOrder from '@/components/HowToOrder';
 import WhyUs from '@/components/WhyUs';
+import FaqSection from '@/components/FaqSection';
 import Footer from '@/components/Footer';
 import FloatingWhatsApp from '@/components/FloatingWhatsApp';
 import OrderModal from '@/components/OrderModal';
@@ -26,7 +27,7 @@ import { INITIAL_PRODUCTS, INITIAL_SETTINGS, INITIAL_TRANSACTIONS } from '@/lib/
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [settings, setSettings] = useState<StoreSettings>(INITIAL_SETTINGS);
-  const [transactions, setTransactions] = useState<TransactionProof[]>(INITIAL_TRANSACTIONS);
+  const [transactions, setTransactions] = useState<TransactionProof[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRealtimeActive, setIsRealtimeActive] = useState(false);
@@ -142,6 +143,9 @@ export default function HomePage() {
 
       {/* Why Us Guarantees */}
       <WhyUs />
+
+      {/* Pusat Bantuan & FAQ Interaktif */}
+      <FaqSection />
 
       {/* Footer */}
       <Footer settings={settings} />

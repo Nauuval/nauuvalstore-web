@@ -12,7 +12,7 @@ import {
   MessageSquarePlus,
 } from 'lucide-react';
 import { TransactionProof } from '@/types';
-import { formatRupiah, saveTransactionProof } from '@/lib/store-service';
+import { formatRupiah, saveTransactionProof, formatReviewDate } from '@/lib/store-service';
 import SubmitReviewModal from './SubmitReviewModal';
 
 interface TransactionProofSectionProps {
@@ -28,6 +28,11 @@ export default function TransactionProofSection({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [localTransactions, setLocalTransactions] = useState<TransactionProof[]>(transactions);
+  const [isMounted, setIsMounted] = useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Sync if prop updates
   React.useEffect(() => {
@@ -154,7 +159,7 @@ export default function TransactionProofSection({
                           {trx.buyer_name}
                         </span>
                         <span className="text-[10px] text-zinc-500 font-mono">
-                          {trx.date || 'Baru saja'}
+                          {isMounted ? formatReviewDate(trx.date, trx.created_at, trx.id) : (trx.date || 'Hari ini')}
                         </span>
                       </div>
                     </div>

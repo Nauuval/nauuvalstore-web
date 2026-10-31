@@ -92,6 +92,7 @@ export default function SubmitReviewModal({
       category,
       amount: amount ? parseFloat(amount) : 0,
       date: 'Hari ini',
+      created_at: new Date().toISOString(),
       rating,
       notes: notes.trim(),
       image_url: imagePreview || '',

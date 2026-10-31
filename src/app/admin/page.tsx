@@ -52,6 +52,7 @@ import {
   saveTransactionProof,
   deleteTransactionProof,
   formatRupiah,
+  formatReviewDate,
 } from '@/lib/store-service';
 import { getVisitorAnalytics } from '@/lib/analytics-service';
 import { isSupabaseConfigured } from '@/lib/supabase';
@@ -298,6 +299,7 @@ export default function AdminPage() {
         category: 'JOKI FISCH',
         amount: 50000,
         date: 'Hari ini',
+        created_at: new Date().toISOString(),
         rating: 5,
         image_url: '',
         notes: '',
@@ -1683,7 +1685,7 @@ export default function AdminPage() {
                         <Star key={i} className="w-3.5 h-3.5 fill-[#00df82] text-[#00df82]" />
                       ))}
                       <span className="text-[11px] font-mono text-zinc-400 ml-1">
-                        {trx.date || 'Hari ini'}
+                        {formatReviewDate(trx.date, trx.created_at, trx.id)}
                       </span>
                     </div>
 
@@ -2101,9 +2103,38 @@ export default function AdminPage() {
                     type="text"
                     value={editingTrx.date || 'Hari ini'}
                     onChange={(e) => setEditingTrx({ ...editingTrx, date: e.target.value })}
-                    placeholder="Contoh: Hari ini / 28 Okt 2026"
+                    placeholder="Contoh: Hari ini / Kemarin / 2 hari lalu / 28 Okt 2026"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono focus:outline-none focus:border-[#00df82]"
                   />
+                  <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                    {[
+                      { label: 'Hari ini', daysAgo: 0 },
+                      { label: 'Kemarin', daysAgo: 1 },
+                      { label: '2 hari lalu', daysAgo: 2 },
+                      { label: '3 hari lalu', daysAgo: 3 },
+                      { label: '1 minggu lalu', daysAgo: 7 },
+                    ].map((preset) => (
+                      <button
+                        key={preset.label}
+                        type="button"
+                        onClick={() => {
+                          const targetDate = new Date(Date.now() - preset.daysAgo * 86400000);
+                          setEditingTrx({
+                            ...editingTrx,
+                            date: preset.label,
+                            created_at: targetDate.toISOString(),
+                          });
+                        }}
+                        className={`text-[10px] font-mono px-2 py-0.5 rounded border transition-colors ${
+                          editingTrx.date === preset.label
+                            ? 'bg-[#00df82] text-black border-[#00df82] font-bold'
+                            : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white'
+                        }`}
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 

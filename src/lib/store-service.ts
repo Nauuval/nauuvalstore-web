@@ -18,6 +18,100 @@ export function formatRupiah(amount: number): string {
   }).format(amount);
 }
 
+/**
+ * Dynamic Indonesian Relative Time Formatter for Reviews / Testimonials
+ * Automatically computes "Baru saja", "Hari ini", "Kemarin", "X hari lalu", "X minggu lalu"
+ * based on review creation timestamp to ensure dates are always synchronized and never frozen.
+ */
+export function formatReviewDate(
+  dateStr?: string,
+  createdAt?: string,
+  id?: string
+): string {
+  let dateObj: Date | null = null;
+
+  // 1. Try to parse createdAt ISO timestamp
+  if (createdAt) {
+    const parsed = new Date(createdAt);
+    if (!isNaN(parsed.getTime())) {
+      dateObj = parsed;
+    }
+  }
+
+  // 2. If no valid createdAt, try extracting timestamp from ID (e.g., trx_1730310000000_abc)
+  if (!dateObj && id && id.startsWith('trx_')) {
+    const parts = id.split('_');
+    if (parts.length >= 2) {
+      const timestamp = parseInt(parts[1], 10);
+      if (!isNaN(timestamp) && timestamp > 1600000000000 && timestamp < 3000000000000) {
+        dateObj = new Date(timestamp);
+      }
+    }
+  }
+
+  // 3. If no dateObj yet, check if dateStr is an ISO date string
+  if (!dateObj && dateStr) {
+    const lower = dateStr.trim().toLowerCase();
+    // If it's already a manual relative phrase that isn't "hari ini", keep it if no real timestamp exists
+    if (lower === 'kemarin' || lower.includes('lalu')) {
+      return dateStr;
+    }
+    if (lower !== 'hari ini') {
+      const parsed = new Date(dateStr);
+      if (!isNaN(parsed.getTime())) {
+        dateObj = parsed;
+      }
+    }
+  }
+
+  // 4. If we have a valid Date object, compute relative difference in local days
+  if (dateObj) {
+    const now = new Date();
+    const diffMs = now.getTime() - dateObj.getTime();
+
+    // Reset both to midnight to compare calendar days accurately
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const startOfTarget = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()).getTime();
+    const diffCalendarDays = Math.round((startOfToday - startOfTarget) / (1000 * 60 * 60 * 24));
+
+    if (diffCalendarDays <= 0) {
+      // Created today or clock slightly ahead
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      if (diffHours < 1) {
+        const diffMinutes = Math.max(1, Math.floor(diffMs / (1000 * 60)));
+        return diffMinutes <= 3 ? 'Baru saja' : `${diffMinutes} menit lalu`;
+      }
+      return 'Hari ini';
+    }
+
+    if (diffCalendarDays === 1) {
+      return 'Kemarin';
+    }
+
+    if (diffCalendarDays >= 2 && diffCalendarDays <= 6) {
+      return `${diffCalendarDays} hari lalu`;
+    }
+
+    if (diffCalendarDays >= 7 && diffCalendarDays <= 29) {
+      const weeks = Math.floor(diffCalendarDays / 7);
+      return `${weeks} minggu lalu`;
+    }
+
+    // Over 30 days: format as Indonesian date string, e.g. "28 Okt 2026"
+    const MONTHS_ID = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+      'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'
+    ];
+    const day = dateObj.getDate();
+    const month = MONTHS_ID[dateObj.getMonth()];
+    const year = dateObj.getFullYear();
+    return `${day} ${month} ${year}`;
+  }
+
+  // Fallback
+  return dateStr || 'Hari ini';
+}
+
 // Helper local storage
 export function getLocalProducts(): Product[] {
   if (typeof window === 'undefined') return [];
@@ -292,7 +386,7 @@ export async function saveTransactionProof(proof: Partial<TransactionProof> & { 
     image_url: proof.image_url || '',
     rating: proof.rating ?? 5,
     notes: proof.notes || '',
-    created_at: new Date().toISOString(),
+    created_at: proof.created_at || new Date().toISOString(),
   };
 
   if (supabase) {

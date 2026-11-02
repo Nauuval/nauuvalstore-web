@@ -20,111 +20,124 @@ export const NauuvalPromo: React.FC = () => {
   const RED_ALERT = '#ef4444';
   const WA_GREEN = '#22c55e';
 
-  // Total duration: 660 frames = 22 seconds @ 30fps
-  // Scene 1: 0 - 165 (0.0s - 5.5s) -> TikTok Profile, Stop DM, Click Bio Link
-  // Scene 2: 155 - 330 (5.1s - 11.0s) -> Web Catalog, Realtime Stock, Fisch & Blox Fruit
-  // Scene 3: 320 - 495 (10.6s - 16.5s) -> Multi-item Cart, Auto Ticket ID
-  // Scene 4: 485 - 660 (16.1s - 22.0s) -> 1-Click WhatsApp Checkout, Bio Link Call To Action
+  // Total duration: 780 frames = 26 seconds @ 30fps
+  // Scene 1: 0 - 160 (0.0s - 5.3s)   -> Waspada Akun Fake / Clone (@nauvalstore2 & @knp.nelzz)
+  // Scene 2: 150 - 310 (5.0s - 10.3s) -> Profil Asli (@nauuvalstore) & Klik Link di Bio
+  // Scene 3: 300 - 460 (10.0s - 15.3s) -> Web Catalog & Realtime Stock
+  // Scene 4: 450 - 610 (15.0s - 20.3s) -> Keranjang Multi-item & Tiket Otomatis
+  // Scene 5: 600 - 780 (20.0s - 26.0s) -> 1-Click WhatsApp Checkout & Bio CTA
 
   // Background subtle motion
   const bgOffsetY = (frame * 1.5) % 80;
   const pulse = Math.sin(frame * 0.12) * 0.05 + 1;
+  const alertPulse = Math.sin(frame * 0.25) * 0.06 + 1;
 
   // ==========================================
-  // SCENE 1 ANIMATIONS (0 - 165)
+  // SCENE 1 ANIMATIONS (0 - 160): FAKE ACCOUNTS WARNING
   // ==========================================
-  const s1Opacity = interpolate(frame, [0, 15, 150, 165], [0, 1, 1, 0], {
+  const s1Opacity = interpolate(frame, [0, 15, 145, 160], [0, 1, 1, 0], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
 
-  const s1CardSpring = spring({
-    frame,
+  const s1Fake1Spring = spring({
+    frame: frame - 10,
+    fps,
+    config: { damping: 12, mass: 0.9 },
+  });
+
+  const s1Fake2Spring = spring({
+    frame: frame - 25,
+    fps,
+    config: { damping: 12, mass: 0.9 },
+  });
+
+  const s1StampSpring = spring({
+    frame: frame - 45,
+    fps,
+    config: { damping: 10, mass: 0.6 },
+  });
+
+  // ==========================================
+  // SCENE 2 ANIMATIONS (150 - 310): OFFICIAL PROFILE & BIO LINK
+  // ==========================================
+  const s2Opacity = interpolate(frame, [150, 165, 295, 310], [0, 1, 1, 0], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+  });
+
+  const s2CardSpring = spring({
+    frame: frame - 155,
     fps,
     config: { damping: 13, mass: 0.9 },
   });
 
-  // Animated cursor moving towards the bio link
-  const cursorProgress = interpolate(frame, [45, 95], [0, 1], {
+  // Animated finger cursor
+  const cursorProgress = interpolate(frame, [195, 240], [0, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
 
-  // Click bounce when finger taps bio link at frame 95-125
   const clickTap = interpolate(
     frame,
-    [92, 98, 106, 120],
+    [240, 246, 254, 270],
     [1, 0.78, 1.05, 1],
     { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
   );
 
-  const clickRipple = interpolate(frame, [98, 140], [0, 1], {
+  const clickRipple = interpolate(frame, [246, 285], [0, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
 
   // ==========================================
-  // SCENE 2 ANIMATIONS (155 - 330)
+  // SCENE 3 ANIMATIONS (300 - 460): WEB CATALOG & STOCK
   // ==========================================
-  const s2Opacity = interpolate(frame, [155, 170, 315, 330], [0, 1, 1, 0], {
+  const s3Opacity = interpolate(frame, [300, 315, 445, 460], [0, 1, 1, 0], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
 
-  const s2ZoomIn = spring({
-    frame: frame - 158,
+  const s3ZoomIn = spring({
+    frame: frame - 305,
     fps,
     config: { damping: 14, mass: 0.8 },
   });
 
-  const s2Card1 = spring({
-    frame: frame - 180,
-    fps,
-    config: { damping: 12 },
-  });
-
-  const s2Card2 = spring({
-    frame: frame - 198,
-    fps,
-    config: { damping: 12 },
-  });
-
-  const s2Card3 = spring({
-    frame: frame - 216,
-    fps,
-    config: { damping: 12 },
-  });
+  const s3Card1 = spring({ frame: frame - 320, fps, config: { damping: 12 } });
+  const s3Card2 = spring({ frame: frame - 335, fps, config: { damping: 12 } });
+  const s3Card3 = spring({ frame: frame - 350, fps, config: { damping: 12 } });
 
   // ==========================================
-  // SCENE 3 ANIMATIONS (320 - 495)
+  // SCENE 4 ANIMATIONS (450 - 610): CART & TICKET
   // ==========================================
-  const s3Opacity = interpolate(frame, [320, 335, 480, 495], [0, 1, 1, 0], {
+  const s4Opacity = interpolate(frame, [450, 465, 595, 610], [0, 1, 1, 0], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
 
-  const s3CartSpring = spring({
-    frame: frame - 325,
+  const s4CartSpring = spring({
+    frame: frame - 455,
     fps,
     config: { damping: 13 },
   });
 
-  const s3TicketSpring = spring({
-    frame: frame - 355,
+  const s4TicketSpring = spring({
+    frame: frame - 485,
     fps,
     config: { damping: 12 },
   });
 
   // ==========================================
-  // SCENE 4 ANIMATIONS (485 - 660)
+  // SCENE 5 ANIMATIONS (600 - 780): WA CHECKOUT & BIO CTA
   // ==========================================
-  const s4Opacity = interpolate(frame, [485, 500, 650, 660], [0, 1, 1, 1], {
+  const s5Opacity = interpolate(frame, [600, 615, 770, 780], [0, 1, 1, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
 
-  const s4Spring = spring({
-    frame: frame - 490,
+  const s5Spring = spring({
+    frame: frame - 605,
     fps,
     config: { damping: 12, mass: 0.8 },
   });
@@ -164,8 +177,8 @@ export const NauuvalPromo: React.FC = () => {
       <div
         style={{
           position: 'absolute',
-          width: 800,
-          height: 800,
+          width: 850,
+          height: 850,
           borderRadius: '50%',
           background: 'radial-gradient(circle, rgba(0, 223, 130, 0.22) 0%, rgba(4, 9, 6, 0) 70%)',
           filter: 'blur(50px)',
@@ -228,9 +241,9 @@ export const NauuvalPromo: React.FC = () => {
       </div>
 
       {/* ====================================================================== */}
-      {/* SCENE 1: HOOK - JANGAN CHAT DM TIKTOK, KLIK LINK DI BIO! (0 - 165)     */}
+      {/* SCENE 1: WASPADA AKUN FAKE / CLONE! (0 - 160)                          */}
       {/* ====================================================================== */}
-      {frame < 170 && (
+      {frame < 165 && (
         <div
           style={{
             opacity: s1Opacity,
@@ -244,81 +257,366 @@ export const NauuvalPromo: React.FC = () => {
             maxWidth: 960,
           }}
         >
-          {/* Warning Badge */}
+          {/* Pulsing Red Alert Badge */}
           <div
             style={{
-              padding: '10px 24px',
+              padding: '12px 28px',
               borderRadius: 999,
-              backgroundColor: 'rgba(239, 68, 68, 0.16)',
-              border: `1.5px solid ${RED_ALERT}`,
+              backgroundColor: 'rgba(239, 68, 68, 0.2)',
+              border: `2px solid ${RED_ALERT}`,
               color: '#fca5a5',
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: 900,
-              letterSpacing: 2,
-              marginBottom: 24,
+              letterSpacing: 2.5,
+              marginBottom: 20,
               display: 'flex',
               alignItems: 'center',
-              gap: 10,
-              boxShadow: '0 0 25px rgba(239, 68, 68, 0.3)',
+              gap: 12,
+              transform: `scale(${alertPulse})`,
+              boxShadow: '0 0 35px rgba(239, 68, 68, 0.5)',
             }}
           >
-            <span style={{ fontSize: 22 }}>⚠️</span> PENGUMUMAN PENTING BUYER
+            <span style={{ fontSize: 26 }}>🚨</span> WASPADA AKUN FAKE / CLONE!
           </div>
 
-          {/* Main Title */}
           <h1
             style={{
-              fontSize: 64,
+              fontSize: 60,
               fontWeight: 900,
               lineHeight: 1.15,
-              marginBottom: 16,
+              marginBottom: 14,
               textTransform: 'uppercase',
               letterSpacing: -1,
             }}
           >
-            JANGAN CHAT DI{' '}
+            HATI-HATI DENGAN <br />
             <span
               style={{
                 color: RED_ALERT,
-                textShadow: '0 0 30px rgba(239, 68, 68, 0.6)',
+                textShadow: '0 0 35px rgba(239, 68, 68, 0.7)',
               }}
             >
-              DM TIKTOK!
+              2 AKUN PENIPU INI!
             </span>
           </h1>
 
           <p
             style={{
-              fontSize: 26,
-              color: '#94a3b8',
-              marginBottom: 40,
+              fontSize: 24,
+              color: '#cbd5e1',
+              marginBottom: 35,
               fontWeight: 600,
-              lineHeight: 1.4,
-              maxWidth: 780,
+              lineHeight: 1.35,
+              maxWidth: 820,
             }}
           >
-            DM TikTok rawan tenggelam &amp; slow respon.{' '}
-            <span style={{ color: '#fff', fontWeight: 800 }}>
-              Order resmi wajib lewat link di bio TikTok kami!
+            Mencuri foto profil, nama mimin, &amp; reupload video resmi.{' '}
+            <span style={{ color: '#f87171', fontWeight: 800 }}>
+              JANGAN PERNAH TRANSAKSI DENGAN MEREKA!
             </span>
           </p>
 
-          {/* TikTok Profile Card Mockup */}
+          {/* Side-by-side Fake Account Cards */}
           <div
             style={{
-              transform: `scale(${s1CardSpring})`,
+              display: 'flex',
+              gap: 22,
+              width: '100%',
+              maxWidth: 880,
+              justifyContent: 'center',
+            }}
+          >
+            {/* Fake 1: @nauvalstore2 */}
+            <div
+              style={{
+                flex: 1,
+                transform: `scale(${s1Fake1Spring})`,
+                backgroundColor: '#120808',
+                border: `2px solid ${RED_ALERT}`,
+                borderRadius: 24,
+                padding: '16px',
+                position: 'relative',
+                boxShadow: '0 20px 45px rgba(0,0,0,0.8), 0 0 25px rgba(239, 68, 68, 0.3)',
+                overflow: 'hidden',
+              }}
+            >
+              {/* Header Label */}
+              <div
+                style={{
+                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                  border: `1px solid ${RED_ALERT}`,
+                  padding: '6px 12px',
+                  borderRadius: 10,
+                  fontSize: 14,
+                  fontWeight: 900,
+                  color: '#fca5a5',
+                  marginBottom: 12,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <span>AKUN CLONE #1</span>
+                <span>❌ FAKE</span>
+              </div>
+
+              {/* Profile Image Preview */}
+              <div
+                style={{
+                  height: 380,
+                  borderRadius: 14,
+                  overflow: 'hidden',
+                  position: 'relative',
+                  backgroundColor: '#000',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}
+              >
+                <Img
+                  src={staticFile('fake-account-1.png')}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'top center',
+                  }}
+                />
+
+                {/* Big Red FAKE Stamp */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '40%',
+                    left: '50%',
+                    transform: `translate(-50%, -50%) rotate(-18deg) scale(${s1StampSpring})`,
+                    border: '5px solid #ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.88)',
+                    color: '#ffffff',
+                    fontSize: 26,
+                    fontWeight: 900,
+                    padding: '8px 20px',
+                    borderRadius: 12,
+                    letterSpacing: 2,
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.8)',
+                    whiteSpace: 'nowrap',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  ❌ PALSU / FAKE!
+                </div>
+              </div>
+
+              {/* Fake Account Details */}
+              <div style={{ marginTop: 14, textAlign: 'left' }}>
+                <div style={{ fontSize: 20, fontWeight: 900, color: '#f87171' }}>
+                  @nauvalstore2
+                </div>
+                <div style={{ fontSize: 13, color: '#fca5a5', marginTop: 4, fontWeight: 600 }}>
+                  ⚠️ Menulis nomor WA palsu di bio! Bukan admin kami!
+                </div>
+              </div>
+            </div>
+
+            {/* Fake 2: @knp.nelzz */}
+            <div
+              style={{
+                flex: 1,
+                transform: `scale(${s1Fake2Spring})`,
+                backgroundColor: '#120808',
+                border: `2px solid ${RED_ALERT}`,
+                borderRadius: 24,
+                padding: '16px',
+                position: 'relative',
+                boxShadow: '0 20px 45px rgba(0,0,0,0.8), 0 0 25px rgba(239, 68, 68, 0.3)',
+                overflow: 'hidden',
+              }}
+            >
+              {/* Header Label */}
+              <div
+                style={{
+                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                  border: `1px solid ${RED_ALERT}`,
+                  padding: '6px 12px',
+                  borderRadius: 10,
+                  fontSize: 14,
+                  fontWeight: 900,
+                  color: '#fca5a5',
+                  marginBottom: 12,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <span>AKUN CLONE #2</span>
+                <span>❌ FAKE</span>
+              </div>
+
+              {/* Profile Image Preview */}
+              <div
+                style={{
+                  height: 380,
+                  borderRadius: 14,
+                  overflow: 'hidden',
+                  position: 'relative',
+                  backgroundColor: '#000',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}
+              >
+                <Img
+                  src={staticFile('fake-account-2.png')}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'top center',
+                  }}
+                />
+
+                {/* Big Red FAKE Stamp */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '40%',
+                    left: '50%',
+                    transform: `translate(-50%, -50%) rotate(18deg) scale(${s1StampSpring})`,
+                    border: '5px solid #ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.88)',
+                    color: '#ffffff',
+                    fontSize: 26,
+                    fontWeight: 900,
+                    padding: '8px 20px',
+                    borderRadius: 12,
+                    letterSpacing: 2,
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.8)',
+                    whiteSpace: 'nowrap',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  ❌ PALSU / FAKE!
+                </div>
+              </div>
+
+              {/* Fake Account Details */}
+              <div style={{ marginTop: 14, textAlign: 'left' }}>
+                <div style={{ fontSize: 20, fontWeight: 900, color: '#f87171' }}>
+                  @knp.nelzz
+                </div>
+                <div style={{ fontSize: 13, color: '#fca5a5', marginTop: 4, fontWeight: 600 }}>
+                  ⚠️ Meniru nama *Nauvalstore* &amp; reupload video!
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Alert Banner */}
+          <div
+            style={{
+              marginTop: 26,
+              backgroundColor: 'rgba(239, 68, 68, 0.12)',
+              border: `1.5px dashed ${RED_ALERT}`,
+              borderRadius: 16,
+              padding: '14px 24px',
+              fontSize: 18,
+              fontWeight: 800,
+              color: '#fecaca',
+              letterSpacing: 0.5,
+              width: '100%',
+              maxWidth: 880,
+            }}
+          >
+            🚫 MIMIN TIDAK PERNAH MEMINTA TRANSAKSI DI LUAR WEBSITE RESMI!
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================== */}
+      {/* SCENE 2: AKUN ASLI @nauuvalstore & KLIK LINK BIO! (150 - 310)          */}
+      {/* ====================================================================== */}
+      {frame >= 150 && frame < 315 && (
+        <div
+          style={{
+            opacity: s2Opacity,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+            padding: '0 45px',
+            zIndex: 10,
+            width: '100%',
+            maxWidth: 960,
+          }}
+        >
+          {/* Verified Official Badge */}
+          <div
+            style={{
+              padding: '10px 24px',
+              borderRadius: 999,
+              backgroundColor: 'rgba(0, 223, 130, 0.15)',
+              border: `2px solid ${MINT}`,
+              color: MINT,
+              fontSize: 20,
+              fontWeight: 900,
+              letterSpacing: 2,
+              marginBottom: 20,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              boxShadow: `0 0 30px rgba(0, 223, 130, 0.4)`,
+            }}
+          >
+            <span>✅</span> AKUN RESMI HANYA SATU: @nauuvalstore
+          </div>
+
+          {/* Main Title */}
+          <h2
+            style={{
+              fontSize: 60,
+              fontWeight: 900,
+              lineHeight: 1.15,
+              marginBottom: 14,
+              textTransform: 'uppercase',
+              letterSpacing: -1,
+            }}
+          >
+            ORDER RESMI HANYA{' '}
+            <span
+              style={{
+                color: MINT,
+                textShadow: `0 0 35px rgba(0, 223, 130, 0.6)`,
+              }}
+            >
+              LEWAT LINK BIO!
+            </span>
+          </h2>
+
+          <p
+            style={{
+              fontSize: 24,
+              color: '#94a3b8',
+              marginBottom: 35,
+              fontWeight: 600,
+              lineHeight: 1.35,
+              maxWidth: 780,
+            }}
+          >
+            Jangan chat DM TikTok! Pastikan klik tautan profil asli untuk transaksi aman 100%.
+          </p>
+
+          {/* Official TikTok Profile Card Mockup */}
+          <div
+            style={{
+              transform: `scale(${s2CardSpring})`,
               width: '100%',
               maxWidth: 820,
               borderRadius: 28,
               backgroundColor: CARD_BG,
-              border: `2px solid ${BORDER}`,
-              boxShadow: '0 25px 60px rgba(0,0,0,0.8), 0 0 40px rgba(0, 223, 130, 0.15)',
+              border: `2px solid ${MINT}`,
+              boxShadow: '0 25px 60px rgba(0,0,0,0.8), 0 0 45px rgba(0, 223, 130, 0.25)',
               overflow: 'hidden',
               position: 'relative',
               padding: '24px 28px',
             }}
           >
-            {/* TikTok Top Nav Mockup */}
+            {/* Top Bar */}
             <div
               style={{
                 display: 'flex',
@@ -330,20 +628,30 @@ export const NauuvalPromo: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#ef4444' }} />
-                <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#f59e0b' }} />
-                <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#10b981' }} />
-                <span style={{ fontSize: 15, color: '#64748b', marginLeft: 8, fontWeight: 700 }}>
-                  TikTok Profile Official
+                <span
+                  style={{
+                    backgroundColor: MINT,
+                    color: DARK,
+                    fontSize: 12,
+                    fontWeight: 900,
+                    padding: '3px 10px',
+                    borderRadius: 999,
+                    letterSpacing: 1,
+                  }}
+                >
+                  ORIGINAL
+                </span>
+                <span style={{ fontSize: 16, color: '#e2e8f0', fontWeight: 800 }}>
+                  Akun TikTok Resmi Mimin
                 </span>
               </div>
               <div
                 style={{
-                  fontSize: 14,
-                  fontWeight: 800,
+                  fontSize: 15,
+                  fontWeight: 900,
                   color: MINT,
-                  backgroundColor: 'rgba(0,223,130,0.1)',
-                  padding: '4px 12px',
+                  backgroundColor: 'rgba(0,223,130,0.12)',
+                  padding: '4px 14px',
                   borderRadius: 8,
                 }}
               >
@@ -369,7 +677,7 @@ export const NauuvalPromo: React.FC = () => {
                 }}
               />
 
-              {/* Bio Link Highlight Box Overlay */}
+              {/* Bio Link Highlight Box */}
               <div
                 style={{
                   position: 'absolute',
@@ -379,7 +687,7 @@ export const NauuvalPromo: React.FC = () => {
                   height: '18%',
                   borderRadius: 12,
                   border: `3px solid ${MINT}`,
-                  backgroundColor: 'rgba(0, 223, 130, 0.15)',
+                  backgroundColor: 'rgba(0, 223, 130, 0.18)',
                   boxShadow: `0 0 35px rgba(0, 223, 130, 0.8), inset 0 0 15px rgba(0, 223, 130, 0.4)`,
                   display: 'flex',
                   alignItems: 'center',
@@ -389,7 +697,7 @@ export const NauuvalPromo: React.FC = () => {
                 }}
               >
                 {/* Ripple Effect on Tap */}
-                {frame > 95 && clickRipple < 1 && (
+                {frame > 240 && clickRipple < 1 && (
                   <div
                     style={{
                       position: 'absolute',
@@ -479,13 +787,13 @@ export const NauuvalPromo: React.FC = () => {
       )}
 
       {/* ====================================================================== */}
-      {/* SCENE 2: WEB CATALOG & REALTIME STOCK (155 - 330)                      */}
+      {/* SCENE 3: WEB CATALOG & REALTIME STOCK (300 - 460)                      */}
       {/* ====================================================================== */}
-      {frame >= 155 && frame < 335 && (
+      {frame >= 300 && frame < 465 && (
         <div
           style={{
-            opacity: s2Opacity,
-            transform: `scale(${s2ZoomIn})`,
+            opacity: s3Opacity,
+            transform: `scale(${s3ZoomIn})`,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -560,8 +868,8 @@ export const NauuvalPromo: React.FC = () => {
             {/* Card 1: Fisch Relic */}
             <div
               style={{
-                transform: `translateX(${interpolate(s2Card1, [0, 1], [-80, 0])}px)`,
-                opacity: s2Card1,
+                transform: `translateX(${interpolate(s3Card1, [0, 1], [-80, 0])}px)`,
+                opacity: s3Card1,
                 backgroundColor: CARD_BG,
                 border: `1.5px solid ${BORDER}`,
                 borderRadius: 22,
@@ -613,8 +921,8 @@ export const NauuvalPromo: React.FC = () => {
             {/* Card 2: Song Of The Deep Relic */}
             <div
               style={{
-                transform: `translateX(${interpolate(s2Card2, [0, 1], [80, 0])}px)`,
-                opacity: s2Card2,
+                transform: `translateX(${interpolate(s3Card2, [0, 1], [80, 0])}px)`,
+                opacity: s3Card2,
                 backgroundColor: CARD_BG,
                 border: `1.5px solid ${BORDER}`,
                 borderRadius: 22,
@@ -666,8 +974,8 @@ export const NauuvalPromo: React.FC = () => {
             {/* Card 3: Promo Joki Fisch */}
             <div
               style={{
-                transform: `translateY(${interpolate(s2Card3, [0, 1], [60, 0])}px)`,
-                opacity: s2Card3,
+                transform: `translateY(${interpolate(s3Card3, [0, 1], [60, 0])}px)`,
+                opacity: s3Card3,
                 backgroundColor: CARD_BG,
                 border: `2px solid ${MINT}`,
                 borderRadius: 22,
@@ -773,12 +1081,12 @@ export const NauuvalPromo: React.FC = () => {
       )}
 
       {/* ====================================================================== */}
-      {/* SCENE 3: MULTI-ITEM CART & ORDER TICKET ID (320 - 495)                 */}
+      {/* SCENE 4: MULTI-ITEM CART & ORDER TICKET ID (450 - 610)                 */}
       {/* ====================================================================== */}
-      {frame >= 320 && frame < 500 && (
+      {frame >= 450 && frame < 615 && (
         <div
           style={{
-            opacity: s3Opacity,
+            opacity: s4Opacity,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -843,7 +1151,7 @@ export const NauuvalPromo: React.FC = () => {
           {/* Cart Mockup Container */}
           <div
             style={{
-              transform: `scale(${s3CartSpring})`,
+              transform: `scale(${s4CartSpring})`,
               width: '100%',
               maxWidth: 820,
               backgroundColor: CARD_BG,
@@ -968,7 +1276,7 @@ export const NauuvalPromo: React.FC = () => {
             {/* Order Ticket Badge */}
             <div
               style={{
-                transform: `scale(${s3TicketSpring})`,
+                transform: `scale(${s4TicketSpring})`,
                 backgroundColor: 'rgba(0, 223, 130, 0.1)',
                 border: `1.5px solid ${MINT}`,
                 borderRadius: 16,
@@ -1008,13 +1316,13 @@ export const NauuvalPromo: React.FC = () => {
       )}
 
       {/* ====================================================================== */}
-      {/* SCENE 4: 1-CLICK WHATSAPP CHECKOUT & BIO CTA (485 - 660)               */}
+      {/* SCENE 5: 1-CLICK WHATSAPP CHECKOUT & BIO CTA (600 - 780)               */}
       {/* ====================================================================== */}
-      {frame >= 485 && (
+      {frame >= 600 && (
         <div
           style={{
-            opacity: s4Opacity,
-            transform: `scale(${s4Spring})`,
+            opacity: s5Opacity,
+            transform: `scale(${s5Spring})`,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -1040,12 +1348,12 @@ export const NauuvalPromo: React.FC = () => {
               boxShadow: `0 0 30px rgba(34, 197, 94, 0.4)`,
             }}
           >
-            ⚡ CHECKOUT 1-KLIK KE WHATSAPP
+            ⚡ CHECKOUT 1-KLIK KE WHATSAPP ADMIN
           </div>
 
           <h2
             style={{
-              fontSize: 66,
+              fontSize: 64,
               fontWeight: 900,
               lineHeight: 1.15,
               marginBottom: 16,
@@ -1066,14 +1374,14 @@ export const NauuvalPromo: React.FC = () => {
 
           <p
             style={{
-              fontSize: 26,
+              fontSize: 24,
               color: '#94a3b8',
-              marginBottom: 44,
+              marginBottom: 40,
               fontWeight: 600,
               maxWidth: 780,
             }}
           >
-            Pilih item di web ➔ otomatis kirim format rapi ke WhatsApp Admin resmi!
+            Pilih item di web ➔ otomatis terhubung ke WhatsApp resmi admin Nauuvalstore!
           </p>
 
           {/* Big WhatsApp Glowing Button */}
@@ -1137,7 +1445,7 @@ export const NauuvalPromo: React.FC = () => {
               nauuvalstore.vercel.app
             </div>
             <div style={{ fontSize: 18, color: MINT, fontWeight: 800, marginTop: 6 }}>
-              TikTok: @nauuvalstore
+              TikTok Resmi: @nauuvalstore
             </div>
           </div>
 

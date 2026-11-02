@@ -5,6 +5,8 @@ import {
   useCurrentFrame,
   useVideoConfig,
   Img,
+  Audio,
+  Sequence,
   staticFile,
 } from 'remotion';
 
@@ -158,6 +160,72 @@ export const NauuvalPromo: React.FC = () => {
         justifyContent: 'center',
       }}
     >
+      {/* ====================================================================== */}
+      {/* AUDIO TRACKS: INDONESIAN TTS VOICEOVER & SOUND EFFECTS (SFX)           */}
+      {/* ====================================================================== */}
+      {/* Scene 1 Audio */}
+      <Sequence from={3} durationInFrames={30}>
+        <Audio src={staticFile('audio/sfx-alert.wav')} volume={0.65} />
+      </Sequence>
+      <Sequence from={8} durationInFrames={145}>
+        <Audio src={staticFile('audio/tts-scene1.mp3')} volume={1.0} />
+      </Sequence>
+      <Sequence from={45} durationInFrames={30}>
+        <Audio src={staticFile('audio/sfx-stamp.wav')} volume={0.75} />
+      </Sequence>
+
+      {/* Transition 1 -> 2 */}
+      <Sequence from={146} durationInFrames={25}>
+        <Audio src={staticFile('audio/sfx-whoosh.wav')} volume={0.4} />
+      </Sequence>
+
+      {/* Scene 2 Audio */}
+      <Sequence from={155} durationInFrames={145}>
+        <Audio src={staticFile('audio/tts-scene2.mp3')} volume={1.0} />
+      </Sequence>
+      <Sequence from={246} durationInFrames={20}>
+        <Audio src={staticFile('audio/sfx-click.wav')} volume={0.85} />
+      </Sequence>
+
+      {/* Transition 2 -> 3 */}
+      <Sequence from={296} durationInFrames={25}>
+        <Audio src={staticFile('audio/sfx-whoosh.wav')} volume={0.4} />
+      </Sequence>
+
+      {/* Scene 3 Audio */}
+      <Sequence from={305} durationInFrames={145}>
+        <Audio src={staticFile('audio/tts-scene3.mp3')} volume={1.0} />
+      </Sequence>
+      <Sequence from={320} durationInFrames={30}>
+        <Audio src={staticFile('audio/sfx-coin.wav')} volume={0.35} />
+      </Sequence>
+
+      {/* Transition 3 -> 4 */}
+      <Sequence from={446} durationInFrames={25}>
+        <Audio src={staticFile('audio/sfx-whoosh.wav')} volume={0.4} />
+      </Sequence>
+
+      {/* Scene 4 Audio */}
+      <Sequence from={455} durationInFrames={145}>
+        <Audio src={staticFile('audio/tts-scene4.mp3')} volume={1.0} />
+      </Sequence>
+      <Sequence from={488} durationInFrames={35}>
+        <Audio src={staticFile('audio/sfx-coin.wav')} volume={0.6} />
+      </Sequence>
+
+      {/* Transition 4 -> 5 */}
+      <Sequence from={596} durationInFrames={25}>
+        <Audio src={staticFile('audio/sfx-whoosh.wav')} volume={0.4} />
+      </Sequence>
+
+      {/* Scene 5 Audio */}
+      <Sequence from={605} durationInFrames={175}>
+        <Audio src={staticFile('audio/tts-scene5.mp3')} volume={1.0} />
+      </Sequence>
+      <Sequence from={612} durationInFrames={40}>
+        <Audio src={staticFile('audio/sfx-ding.wav')} volume={0.65} />
+      </Sequence>
+
       {/* Background Cyber Grid */}
       <div
         style={{

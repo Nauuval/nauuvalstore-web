@@ -17,131 +17,151 @@ export const NauuvalPromo: React.FC = () => {
   // Color theme constants
   const MINT = '#00df82';
   const DARK = '#040906';
-  const CARD_BG = '#08140e';
+  const CARD_BG = 'rgba(8, 20, 14, 0.92)';
   const BORDER = '#133d2a';
   const RED_ALERT = '#ef4444';
   const WA_GREEN = '#22c55e';
 
-  // Total duration: 780 frames = 26 seconds @ 30fps
-  // Scene 1: 0 - 160 (0.0s - 5.3s)   -> Waspada Akun Fake / Clone (@nauvalstore2 & @knp.nelzz)
-  // Scene 2: 150 - 310 (5.0s - 10.3s) -> Profil Asli (@nauuvalstore) & Klik Link di Bio
-  // Scene 3: 300 - 460 (10.0s - 15.3s) -> Web Catalog & Realtime Stock
-  // Scene 4: 450 - 610 (15.0s - 20.3s) -> Keranjang Multi-item & Tiket Otomatis
-  // Scene 5: 600 - 780 (20.0s - 26.0s) -> 1-Click WhatsApp Checkout & Bio CTA
+  // Total duration: 1860 frames = 62.0 seconds @ 30fps
+  // Scene 1: 0 - 450    (0.0s - 15.0s) -> Waspada Akun Fake / Clone (@nauvalstore2 & @knp.nelzz)
+  // Scene 2: 450 - 825  (15.0s - 27.5s) -> Akun Resmi @nauuvalstore & Klik Link di Bio
+  // Scene 3: 825 - 1185 (27.5s - 39.5s) -> Web Catalog & Realtime Stock Fisch / Blox Fruit
+  // Scene 4: 1185 - 1515(39.5s - 50.5s) -> Keranjang Multi-Item & Tiket Pesanan Resmi
+  // Scene 5: 1515 - 1860(50.5s - 62.0s) -> 1-Click WhatsApp Checkout Admin & Outro CTA
 
-  // Background subtle motion
-  const bgOffsetY = (frame * 1.5) % 80;
-  const pulse = Math.sin(frame * 0.12) * 0.05 + 1;
-  const alertPulse = Math.sin(frame * 0.25) * 0.06 + 1;
+  // Ambient background subtle drift & floating physics
+  const bgOffsetY = (frame * 1.2) % 80;
+  const floatY = Math.sin(frame * 0.05) * 8;
+  const pulse = Math.sin(frame * 0.12) * 0.04 + 1;
+  const alertPulse = Math.sin(frame * 0.22) * 0.06 + 1;
 
   // ==========================================
-  // SCENE 1 ANIMATIONS (0 - 160): FAKE ACCOUNTS WARNING
+  // SCENE 1 ANIMATIONS (0 - 450): FAKE ACCOUNTS WARNING
   // ==========================================
-  const s1Opacity = interpolate(frame, [0, 15, 145, 160], [0, 1, 1, 0], {
+  const s1Opacity = interpolate(frame, [0, 20, 435, 450], [0, 1, 1, 0], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
 
   const s1Fake1Spring = spring({
-    frame: frame - 10,
+    frame: frame - 25,
     fps,
-    config: { damping: 12, mass: 0.9 },
+    config: { damping: 14, mass: 0.8 },
   });
 
   const s1Fake2Spring = spring({
-    frame: frame - 25,
-    fps,
-    config: { damping: 12, mass: 0.9 },
-  });
-
-  const s1StampSpring = spring({
     frame: frame - 45,
     fps,
-    config: { damping: 10, mass: 0.6 },
+    config: { damping: 14, mass: 0.8 },
   });
 
+  // Stamp appears at frame 130 (around 4.3s into speech)
+  const s1StampSpring = spring({
+    frame: frame - 130,
+    fps,
+    config: { damping: 10, mass: 0.5 },
+  });
+
+  // Number warning highlight at frame 250 (~8.3s into speech)
+  const s1NumberGlow = interpolate(
+    Math.sin((frame - 250) * 0.2),
+    [-1, 1],
+    [0.4, 1]
+  );
+
   // ==========================================
-  // SCENE 2 ANIMATIONS (150 - 310): OFFICIAL PROFILE & BIO LINK
+  // SCENE 2 ANIMATIONS (450 - 825): OFFICIAL PROFILE & BIO LINK
   // ==========================================
-  const s2Opacity = interpolate(frame, [150, 165, 295, 310], [0, 1, 1, 0], {
+  const s2Opacity = interpolate(frame, [450, 470, 810, 825], [0, 1, 1, 0], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
 
   const s2CardSpring = spring({
-    frame: frame - 155,
+    frame: frame - 460,
     fps,
-    config: { damping: 13, mass: 0.9 },
+    config: { damping: 14, mass: 0.8 },
   });
 
-  // Animated finger cursor
-  const cursorProgress = interpolate(frame, [195, 240], [0, 1], {
+  // Animated finger cursor glides in at frame 660 (22s) to 730 (~24s)
+  const cursorProgress = interpolate(frame, [670, 725], [0, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
 
+  // Click tap at frame 725
   const clickTap = interpolate(
     frame,
-    [240, 246, 254, 270],
-    [1, 0.78, 1.05, 1],
+    [723, 730, 740, 760],
+    [1, 0.76, 1.05, 1],
     { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
   );
 
-  const clickRipple = interpolate(frame, [246, 285], [0, 1], {
+  const clickRipple = interpolate(frame, [730, 780], [0, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
 
   // ==========================================
-  // SCENE 3 ANIMATIONS (300 - 460): WEB CATALOG & STOCK
+  // SCENE 3 ANIMATIONS (825 - 1185): WEB CATALOG & STOCK
   // ==========================================
-  const s3Opacity = interpolate(frame, [300, 315, 445, 460], [0, 1, 1, 0], {
+  const s3Opacity = interpolate(frame, [825, 845, 1170, 1185], [0, 1, 1, 0], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
 
   const s3ZoomIn = spring({
-    frame: frame - 305,
+    frame: frame - 835,
     fps,
     config: { damping: 14, mass: 0.8 },
   });
 
-  const s3Card1 = spring({ frame: frame - 320, fps, config: { damping: 12 } });
-  const s3Card2 = spring({ frame: frame - 335, fps, config: { damping: 12 } });
-  const s3Card3 = spring({ frame: frame - 350, fps, config: { damping: 12 } });
+  const s3Card1 = spring({ frame: frame - 860, fps, config: { damping: 13 } });
+  const s3Card2 = spring({ frame: frame - 885, fps, config: { damping: 13 } });
+  const s3Card3 = spring({ frame: frame - 910, fps, config: { damping: 13 } });
 
   // ==========================================
-  // SCENE 4 ANIMATIONS (450 - 610): CART & TICKET
+  // SCENE 4 ANIMATIONS (1185 - 1515): CART & TICKET
   // ==========================================
-  const s4Opacity = interpolate(frame, [450, 465, 595, 610], [0, 1, 1, 0], {
+  const s4Opacity = interpolate(frame, [1185, 1205, 1500, 1515], [0, 1, 1, 0], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
 
   const s4CartSpring = spring({
-    frame: frame - 455,
+    frame: frame - 1195,
     fps,
-    config: { damping: 13 },
+    config: { damping: 13, mass: 0.8 },
   });
+
+  const s4Item1 = spring({ frame: frame - 1230, fps, config: { damping: 12 } });
+  const s4Item2 = spring({ frame: frame - 1255, fps, config: { damping: 12 } });
+  const s4Item3 = spring({ frame: frame - 1280, fps, config: { damping: 12 } });
 
   const s4TicketSpring = spring({
-    frame: frame - 485,
+    frame: frame - 1320,
     fps,
-    config: { damping: 12 },
+    config: { damping: 11, mass: 0.6 },
   });
 
   // ==========================================
-  // SCENE 5 ANIMATIONS (600 - 780): WA CHECKOUT & BIO CTA
+  // SCENE 5 ANIMATIONS (1515 - 1860): WA CHECKOUT & BIO CTA
   // ==========================================
-  const s5Opacity = interpolate(frame, [600, 615, 770, 780], [0, 1, 1, 1], {
+  const s5Opacity = interpolate(frame, [1515, 1535, 1845, 1860], [0, 1, 1, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
 
   const s5Spring = spring({
-    frame: frame - 605,
+    frame: frame - 1525,
     fps,
-    config: { damping: 12, mass: 0.8 },
+    config: { damping: 13, mass: 0.8 },
+  });
+
+  const s5BadgesSpring = spring({
+    frame: frame - 1565,
+    fps,
+    config: { damping: 12 },
   });
 
   return (
@@ -161,69 +181,69 @@ export const NauuvalPromo: React.FC = () => {
       }}
     >
       {/* ====================================================================== */}
-      {/* AUDIO TRACKS: INDONESIAN TTS VOICEOVER & SOUND EFFECTS (SFX)           */}
+      {/* AUDIO TRACKS: USER'S TTS VOICEOVER & SYNCHRONIZED SOUND EFFECTS (SFX) */}
       {/* ====================================================================== */}
-      {/* Scene 1 Audio */}
-      <Sequence from={3} durationInFrames={30}>
+      {/* Scene 1: Fake warning (0 - 450) */}
+      <Sequence from={8} durationInFrames={30}>
         <Audio src={staticFile('audio/sfx-alert.wav')} volume={0.65} />
       </Sequence>
-      <Sequence from={8} durationInFrames={145}>
-        <Audio src={staticFile('audio/tts-scene1.mp3')} volume={1.0} />
+      <Sequence from={15} durationInFrames={448}>
+        <Audio src={staticFile('audio/scene1.mp3')} volume={1.0} />
       </Sequence>
-      <Sequence from={45} durationInFrames={30}>
-        <Audio src={staticFile('audio/sfx-stamp.wav')} volume={0.75} />
+      <Sequence from={132} durationInFrames={30}>
+        <Audio src={staticFile('audio/sfx-stamp.wav')} volume={0.8} />
       </Sequence>
 
       {/* Transition 1 -> 2 */}
-      <Sequence from={146} durationInFrames={25}>
+      <Sequence from={444} durationInFrames={25}>
         <Audio src={staticFile('audio/sfx-whoosh.wav')} volume={0.4} />
       </Sequence>
 
-      {/* Scene 2 Audio */}
-      <Sequence from={155} durationInFrames={145}>
-        <Audio src={staticFile('audio/tts-scene2.mp3')} volume={1.0} />
+      {/* Scene 2: Official account & Bio link (450 - 825) */}
+      <Sequence from={455} durationInFrames={371}>
+        <Audio src={staticFile('audio/scene2.mp3')} volume={1.0} />
       </Sequence>
-      <Sequence from={246} durationInFrames={20}>
+      <Sequence from={730} durationInFrames={20}>
         <Audio src={staticFile('audio/sfx-click.wav')} volume={0.85} />
       </Sequence>
 
       {/* Transition 2 -> 3 */}
-      <Sequence from={296} durationInFrames={25}>
+      <Sequence from={818} durationInFrames={25}>
         <Audio src={staticFile('audio/sfx-whoosh.wav')} volume={0.4} />
       </Sequence>
 
-      {/* Scene 3 Audio */}
-      <Sequence from={305} durationInFrames={145}>
-        <Audio src={staticFile('audio/tts-scene3.mp3')} volume={1.0} />
+      {/* Scene 3: Web catalog & Realtime stock (825 - 1185) */}
+      <Sequence from={830} durationInFrames={354}>
+        <Audio src={staticFile('audio/scene3.mp3')} volume={1.0} />
       </Sequence>
-      <Sequence from={320} durationInFrames={30}>
-        <Audio src={staticFile('audio/sfx-coin.wav')} volume={0.35} />
+      <Sequence from={865} durationInFrames={30}>
+        <Audio src={staticFile('audio/sfx-coin.wav')} volume={0.4} />
       </Sequence>
 
       {/* Transition 3 -> 4 */}
-      <Sequence from={446} durationInFrames={25}>
+      <Sequence from={1178} durationInFrames={25}>
         <Audio src={staticFile('audio/sfx-whoosh.wav')} volume={0.4} />
       </Sequence>
 
-      {/* Scene 4 Audio */}
-      <Sequence from={455} durationInFrames={145}>
-        <Audio src={staticFile('audio/tts-scene4.mp3')} volume={1.0} />
+      {/* Scene 4: Cart & Auto Ticket (1185 - 1515) */}
+      <Sequence from={1190} durationInFrames={323}>
+        <Audio src={staticFile('audio/scene4.mp3')} volume={1.0} />
       </Sequence>
-      <Sequence from={488} durationInFrames={35}>
-        <Audio src={staticFile('audio/sfx-coin.wav')} volume={0.6} />
+      <Sequence from={1325} durationInFrames={35}>
+        <Audio src={staticFile('audio/sfx-coin.wav')} volume={0.65} />
       </Sequence>
 
       {/* Transition 4 -> 5 */}
-      <Sequence from={596} durationInFrames={25}>
+      <Sequence from={1508} durationInFrames={25}>
         <Audio src={staticFile('audio/sfx-whoosh.wav')} volume={0.4} />
       </Sequence>
 
-      {/* Scene 5 Audio */}
-      <Sequence from={605} durationInFrames={175}>
-        <Audio src={staticFile('audio/tts-scene5.mp3')} volume={1.0} />
+      {/* Scene 5: WhatsApp checkout & Outro (1515 - 1860) */}
+      <Sequence from={1520} durationInFrames={325}>
+        <Audio src={staticFile('audio/scene5.mp3')} volume={1.0} />
       </Sequence>
-      <Sequence from={612} durationInFrames={40}>
-        <Audio src={staticFile('audio/sfx-ding.wav')} volume={0.65} />
+      <Sequence from={1530} durationInFrames={40}>
+        <Audio src={staticFile('audio/sfx-ding.wav')} volume={0.7} />
       </Sequence>
 
       {/* Background Cyber Grid */}
@@ -245,11 +265,11 @@ export const NauuvalPromo: React.FC = () => {
       <div
         style={{
           position: 'absolute',
-          width: 850,
-          height: 850,
+          width: 900,
+          height: 900,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(0, 223, 130, 0.22) 0%, rgba(4, 9, 6, 0) 70%)',
-          filter: 'blur(50px)',
+          background: 'radial-gradient(circle, rgba(0, 223, 130, 0.2) 0%, rgba(4, 9, 6, 0) 70%)',
+          filter: 'blur(60px)',
           pointerEvents: 'none',
         }}
       />
@@ -309,9 +329,9 @@ export const NauuvalPromo: React.FC = () => {
       </div>
 
       {/* ====================================================================== */}
-      {/* SCENE 1: WASPADA AKUN FAKE / CLONE! (0 - 160)                          */}
+      {/* SCENE 1: WASPADA AKUN FAKE / CLONE! (0 - 450)                          */}
       {/* ====================================================================== */}
-      {frame < 165 && (
+      {frame < 455 && (
         <div
           style={{
             opacity: s1Opacity,
@@ -323,6 +343,7 @@ export const NauuvalPromo: React.FC = () => {
             zIndex: 10,
             width: '100%',
             maxWidth: 960,
+            transform: `translateY(${floatY * 0.5}px)`,
           }}
         >
           {/* Pulsing Red Alert Badge */}
@@ -349,7 +370,7 @@ export const NauuvalPromo: React.FC = () => {
 
           <h1
             style={{
-              fontSize: 60,
+              fontSize: 58,
               fontWeight: 900,
               lineHeight: 1.15,
               marginBottom: 14,
@@ -378,9 +399,9 @@ export const NauuvalPromo: React.FC = () => {
               maxWidth: 820,
             }}
           >
-            Mencuri foto profil, nama mimin, &amp; reupload video resmi.{' '}
+            Mencuri foto profil &amp; reupload video mimin.{' '}
             <span style={{ color: '#f87171', fontWeight: 800 }}>
-              JANGAN PERNAH TRANSAKSI DENGAN MEREKA!
+              JANGAN PERNAH TRANSAKSI KE NOMOR MEREKA!
             </span>
           </p>
 
@@ -408,7 +429,6 @@ export const NauuvalPromo: React.FC = () => {
                 overflow: 'hidden',
               }}
             >
-              {/* Header Label */}
               <div
                 style={{
                   backgroundColor: 'rgba(239, 68, 68, 0.15)',
@@ -428,7 +448,6 @@ export const NauuvalPromo: React.FC = () => {
                 <span>❌ FAKE</span>
               </div>
 
-              {/* Profile Image Preview */}
               <div
                 style={{
                   height: 380,
@@ -450,36 +469,48 @@ export const NauuvalPromo: React.FC = () => {
                 />
 
                 {/* Big Red FAKE Stamp */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '40%',
-                    left: '50%',
-                    transform: `translate(-50%, -50%) rotate(-18deg) scale(${s1StampSpring})`,
-                    border: '5px solid #ef4444',
-                    backgroundColor: 'rgba(239, 68, 68, 0.88)',
-                    color: '#ffffff',
-                    fontSize: 26,
-                    fontWeight: 900,
-                    padding: '8px 20px',
-                    borderRadius: 12,
-                    letterSpacing: 2,
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.8)',
-                    whiteSpace: 'nowrap',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  ❌ PALSU / FAKE!
-                </div>
+                {frame > 125 && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '40%',
+                      left: '50%',
+                      transform: `translate(-50%, -50%) rotate(-18deg) scale(${s1StampSpring})`,
+                      border: '5px solid #ef4444',
+                      backgroundColor: 'rgba(239, 68, 68, 0.92)',
+                      color: '#ffffff',
+                      fontSize: 26,
+                      fontWeight: 900,
+                      padding: '8px 20px',
+                      borderRadius: 12,
+                      letterSpacing: 2,
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.8)',
+                      whiteSpace: 'nowrap',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    ❌ PALSU / FAKE!
+                  </div>
+                )}
               </div>
 
-              {/* Fake Account Details */}
               <div style={{ marginTop: 14, textAlign: 'left' }}>
                 <div style={{ fontSize: 20, fontWeight: 900, color: '#f87171' }}>
                   @nauvalstore2
                 </div>
-                <div style={{ fontSize: 13, color: '#fca5a5', marginTop: 4, fontWeight: 600 }}>
-                  ⚠️ Menulis nomor WA palsu di bio! Bukan admin kami!
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: frame > 240 ? '#fecaca' : '#fca5a5',
+                    marginTop: 4,
+                    fontWeight: 700,
+                    backgroundColor: frame > 240 ? 'rgba(239, 68, 68, 0.25)' : 'transparent',
+                    padding: '4px 8px',
+                    borderRadius: 6,
+                    border: frame > 240 ? `1px solid rgba(239,68,68,${s1NumberGlow})` : 'none',
+                  }}
+                >
+                  ⚠️ Nomor palsu: +62-859-2363-0279 (Bukan mimin!)
                 </div>
               </div>
             </div>
@@ -498,7 +529,6 @@ export const NauuvalPromo: React.FC = () => {
                 overflow: 'hidden',
               }}
             >
-              {/* Header Label */}
               <div
                 style={{
                   backgroundColor: 'rgba(239, 68, 68, 0.15)',
@@ -518,7 +548,6 @@ export const NauuvalPromo: React.FC = () => {
                 <span>❌ FAKE</span>
               </div>
 
-              {/* Profile Image Preview */}
               <div
                 style={{
                   height: 380,
@@ -540,30 +569,31 @@ export const NauuvalPromo: React.FC = () => {
                 />
 
                 {/* Big Red FAKE Stamp */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '40%',
-                    left: '50%',
-                    transform: `translate(-50%, -50%) rotate(18deg) scale(${s1StampSpring})`,
-                    border: '5px solid #ef4444',
-                    backgroundColor: 'rgba(239, 68, 68, 0.88)',
-                    color: '#ffffff',
-                    fontSize: 26,
-                    fontWeight: 900,
-                    padding: '8px 20px',
-                    borderRadius: 12,
-                    letterSpacing: 2,
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.8)',
-                    whiteSpace: 'nowrap',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  ❌ PALSU / FAKE!
-                </div>
+                {frame > 125 && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '40%',
+                      left: '50%',
+                      transform: `translate(-50%, -50%) rotate(18deg) scale(${s1StampSpring})`,
+                      border: '5px solid #ef4444',
+                      backgroundColor: 'rgba(239, 68, 68, 0.92)',
+                      color: '#ffffff',
+                      fontSize: 26,
+                      fontWeight: 900,
+                      padding: '8px 20px',
+                      borderRadius: 12,
+                      letterSpacing: 2,
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.8)',
+                      whiteSpace: 'nowrap',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    ❌ PALSU / FAKE!
+                  </div>
+                )}
               </div>
 
-              {/* Fake Account Details */}
               <div style={{ marginTop: 14, textAlign: 'left' }}>
                 <div style={{ fontSize: 20, fontWeight: 900, color: '#f87171' }}>
                   @knp.nelzz
@@ -597,9 +627,9 @@ export const NauuvalPromo: React.FC = () => {
       )}
 
       {/* ====================================================================== */}
-      {/* SCENE 2: AKUN ASLI @nauuvalstore & KLIK LINK BIO! (150 - 310)          */}
+      {/* SCENE 2: AKUN ASLI @nauuvalstore & KLIK LINK BIO! (450 - 825)          */}
       {/* ====================================================================== */}
-      {frame >= 150 && frame < 315 && (
+      {frame >= 450 && frame < 830 && (
         <div
           style={{
             opacity: s2Opacity,
@@ -611,6 +641,7 @@ export const NauuvalPromo: React.FC = () => {
             zIndex: 10,
             width: '100%',
             maxWidth: 960,
+            transform: `translateY(${floatY * 0.5}px)`,
           }}
         >
           {/* Verified Official Badge */}
@@ -634,10 +665,9 @@ export const NauuvalPromo: React.FC = () => {
             <span>✅</span> AKUN RESMI HANYA SATU: @nauuvalstore
           </div>
 
-          {/* Main Title */}
           <h2
             style={{
-              fontSize: 60,
+              fontSize: 58,
               fontWeight: 900,
               lineHeight: 1.15,
               marginBottom: 14,
@@ -666,7 +696,7 @@ export const NauuvalPromo: React.FC = () => {
               maxWidth: 780,
             }}
           >
-            Jangan chat DM TikTok! Pastikan klik tautan profil asli untuk transaksi aman 100%.
+            Jangan chat di DM TikTok! Langsung klik tautan bio untuk transaksi aman &amp; instan.
           </p>
 
           {/* Official TikTok Profile Card Mockup */}
@@ -765,7 +795,7 @@ export const NauuvalPromo: React.FC = () => {
                 }}
               >
                 {/* Ripple Effect on Tap */}
-                {frame > 240 && clickRipple < 1 && (
+                {frame > 725 && clickRipple < 1 && (
                   <div
                     style={{
                       position: 'absolute',
@@ -855,13 +885,13 @@ export const NauuvalPromo: React.FC = () => {
       )}
 
       {/* ====================================================================== */}
-      {/* SCENE 3: WEB CATALOG & REALTIME STOCK (300 - 460)                      */}
+      {/* SCENE 3: WEB CATALOG & REALTIME STOCK (825 - 1185)                     */}
       {/* ====================================================================== */}
-      {frame >= 300 && frame < 465 && (
+      {frame >= 825 && frame < 1190 && (
         <div
           style={{
             opacity: s3Opacity,
-            transform: `scale(${s3ZoomIn})`,
+            transform: `scale(${s3ZoomIn}) translateY(${floatY * 0.5}px)`,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -892,7 +922,7 @@ export const NauuvalPromo: React.FC = () => {
 
           <h2
             style={{
-              fontSize: 60,
+              fontSize: 58,
               fontWeight: 900,
               lineHeight: 1.15,
               marginBottom: 14,
@@ -900,7 +930,7 @@ export const NauuvalPromo: React.FC = () => {
               letterSpacing: -1,
             }}
           >
-            CEK HARGA &amp; STOK{' '}
+            PANTAU LAYANAN &amp; STOK{' '}
             <span
               style={{
                 color: MINT,
@@ -920,7 +950,7 @@ export const NauuvalPromo: React.FC = () => {
               maxWidth: 780,
             }}
           >
-            Semua item Fisch &amp; Blox Fruit tertera jelas. Tanpa tanya admin "ready gak min?"
+            Semua item Fisch &amp; Blox Fruit tertera jelas. Gak perlu bolak-balik tanya "ready gak min?"
           </p>
 
           {/* Cards Showcase Vertical Stack */}
@@ -1149,9 +1179,9 @@ export const NauuvalPromo: React.FC = () => {
       )}
 
       {/* ====================================================================== */}
-      {/* SCENE 4: MULTI-ITEM CART & ORDER TICKET ID (450 - 610)                 */}
+      {/* SCENE 4: MULTI-ITEM CART & ORDER TICKET ID (1185 - 1515)               */}
       {/* ====================================================================== */}
-      {frame >= 450 && frame < 615 && (
+      {frame >= 1185 && frame < 1520 && (
         <div
           style={{
             opacity: s4Opacity,
@@ -1163,6 +1193,7 @@ export const NauuvalPromo: React.FC = () => {
             zIndex: 10,
             width: '100%',
             maxWidth: 960,
+            transform: `translateY(${floatY * 0.5}px)`,
           }}
         >
           {/* Badge */}
@@ -1180,12 +1211,12 @@ export const NauuvalPromo: React.FC = () => {
               boxShadow: `0 0 25px rgba(0, 223, 130, 0.3)`,
             }}
           >
-            🛒 FITUR KERANJANG PESANAN
+            🛒 FITUR KERANJANG BELANJA
           </div>
 
           <h2
             style={{
-              fontSize: 60,
+              fontSize: 58,
               fontWeight: 900,
               lineHeight: 1.15,
               marginBottom: 14,
@@ -1213,7 +1244,7 @@ export const NauuvalPromo: React.FC = () => {
               maxWidth: 780,
             }}
           >
-            Masukkan semua item ke keranjang. Otomatis dibuatkan ringkasan pesanan &amp; tiket resmi!
+            Tinggal masukkan ke keranjang belanja, total &amp; tiket pesanan langsung dibuatkan otomatis!
           </p>
 
           {/* Cart Mockup Container */}
@@ -1268,6 +1299,8 @@ export const NauuvalPromo: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
               <div
                 style={{
+                  transform: `translateX(${interpolate(s4Item1, [0, 1], [-40, 0])}px)`,
+                  opacity: s4Item1,
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
@@ -1286,6 +1319,8 @@ export const NauuvalPromo: React.FC = () => {
 
               <div
                 style={{
+                  transform: `translateX(${interpolate(s4Item2, [0, 1], [-40, 0])}px)`,
+                  opacity: s4Item2,
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
@@ -1304,6 +1339,8 @@ export const NauuvalPromo: React.FC = () => {
 
               <div
                 style={{
+                  transform: `translateX(${interpolate(s4Item3, [0, 1], [-40, 0])}px)`,
+                  opacity: s4Item3,
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
@@ -1384,13 +1421,13 @@ export const NauuvalPromo: React.FC = () => {
       )}
 
       {/* ====================================================================== */}
-      {/* SCENE 5: 1-CLICK WHATSAPP CHECKOUT & BIO CTA (600 - 780)               */}
+      {/* SCENE 5: 1-CLICK WHATSAPP CHECKOUT & BIO CTA (1515 - 1860)             */}
       {/* ====================================================================== */}
-      {frame >= 600 && (
+      {frame >= 1515 && (
         <div
           style={{
             opacity: s5Opacity,
-            transform: `scale(${s5Spring})`,
+            transform: `scale(${s5Spring}) translateY(${floatY * 0.5}px)`,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -1421,7 +1458,7 @@ export const NauuvalPromo: React.FC = () => {
 
           <h2
             style={{
-              fontSize: 64,
+              fontSize: 60,
               fontWeight: 900,
               lineHeight: 1.15,
               marginBottom: 16,
@@ -1449,7 +1486,7 @@ export const NauuvalPromo: React.FC = () => {
               maxWidth: 780,
             }}
           >
-            Pilih item di web ➔ otomatis terhubung ke WhatsApp resmi admin Nauuvalstore!
+            Format order langsung terkirim rapi ke WhatsApp admin resmi. Super cepat &amp; anti hackback!
           </p>
 
           {/* Big WhatsApp Glowing Button */}
@@ -1518,7 +1555,14 @@ export const NauuvalPromo: React.FC = () => {
           </div>
 
           {/* Guarantee Badges */}
-          <div style={{ display: 'flex', gap: 24, justifyContent: 'center' }}>
+          <div
+            style={{
+              opacity: s5BadgesSpring,
+              display: 'flex',
+              gap: 24,
+              justifyContent: 'center',
+            }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 18, color: '#e2e8f0', fontWeight: 700 }}>
               <span>🛡️</span> 100% Anti Hackback
             </div>

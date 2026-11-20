@@ -17,12 +17,17 @@ interface HeroProps {
 
 export default function Hero({
   settings,
-  totalProducts,
-  promoCount,
+  totalProducts = 47,
+  promoCount = 7,
   totalTransactions = 1250,
   averageRating = 5.0,
   totalReviews = 36,
 }: HeroProps) {
+  // Safe fallbacks so numbers never flash as 0 during hydration or async data load
+  const safeTotalProducts = totalProducts > 0 ? totalProducts : 47;
+  const safePromoCount = promoCount > 0 ? promoCount : 7;
+  const safeTotalReviews = (totalReviews && totalReviews > 0) ? totalReviews : 36;
+
   return (
     <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28 border-b border-zinc-800/80 bg-[#060b08]">
       {/* 1. Full-Bleed Singularity Cinematic Background Image (Vivid on Mobile & Desktop) */}
@@ -149,7 +154,7 @@ export default function Hero({
             <div className="metallic-card p-3.5 rounded-xl hover:scale-[1.02] transition-transform">
               <span className="text-[10px] text-zinc-500 uppercase font-mono block">Katalog</span>
               <p className="text-xl sm:text-2xl font-black text-white font-mono mt-0.5">
-                <CountUp to={totalProducts} duration={1200} />
+                <CountUp to={safeTotalProducts} duration={1200} />
               </p>
               <span className="text-[11px] text-zinc-300 font-semibold block">Layanan Ready</span>
             </div>
@@ -161,7 +166,7 @@ export default function Hero({
                 <span>Promo Aktif</span>
               </span>
               <p className="text-xl sm:text-2xl font-black font-mono mt-0.5 promo-lime-text">
-                <CountUp to={promoCount} duration={1200} />
+                <CountUp to={safePromoCount} duration={1200} />
               </p>
               <span className="text-[11px] text-zinc-200 font-bold block">Diskon Spesial</span>
             </div>
@@ -176,7 +181,7 @@ export default function Hero({
                 <span className="text-xs text-zinc-400 font-mono">/5.0</span>
               </div>
               <span className="text-[11px] text-zinc-300 font-semibold block">
-                <CountUp to={totalReviews} duration={1400} suffix="+ Bukti Ulasan" />
+                <CountUp to={safeTotalReviews} duration={1400} suffix="+ Bukti Ulasan" />
               </span>
             </div>
           </div>

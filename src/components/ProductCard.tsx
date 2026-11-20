@@ -32,8 +32,8 @@ export default function ProductCard({ product, onOrder }: ProductCardProps) {
 
   return (
     <div
-      className={`metallic-card rounded-2xl p-5 flex flex-col justify-between group relative transition-all duration-300 overflow-hidden ${
-        isPromo ? 'promo-lime-border' : ''
+      className={`metallic-card rounded-2xl p-5 flex flex-col justify-between group relative transition-all duration-300 overflow-hidden hover:scale-[1.015] hover:shadow-[0_10px_30px_-5px_rgba(0,223,130,0.18)] ${
+        isPromo ? 'promo-lime-border shadow-[0_0_20px_rgba(0,223,130,0.22)]' : ''
       }`}
     >
       <div>

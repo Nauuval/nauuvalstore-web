@@ -61,7 +61,8 @@ export default function WhyUs() {
             return (
               <div
                 key={i}
-                className="metallic-card rounded-2xl p-6 flex items-start gap-4"
+                style={{ animationDelay: `${i * 60}ms` }}
+                className="metallic-card rounded-2xl p-6 flex items-start gap-4 hover:border-[#00df82]/50 hover:scale-[1.015] transition-all animate-stagger-item"
               >
                 <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-700 shrink-0 text-white">
                   <Icon className="w-5 h-5" />

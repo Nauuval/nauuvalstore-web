@@ -14,6 +14,9 @@ import {
 } from 'lucide-react';
 import { Product, ProductCategory } from '@/types';
 import ProductCard from './ProductCard';
+import ProductCardSkeleton from './ProductCardSkeleton';
+import PromoCarousel from './PromoCarousel';
+import CountUp from './CountUp';
 
 interface CatalogProps {
   products: Product[];
@@ -45,6 +48,7 @@ export default function Catalog({
   // Page mode pagination state
   const [pageSize, setPageSize] = useState<number>(8); // 8 items default per batch/page
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [isPageTransitioning, setIsPageTransitioning] = useState<boolean>(false);
 
   const catalogGridRef = useRef<HTMLDivElement>(null);
 
@@ -129,10 +133,24 @@ export default function Catalog({
 
   const handlePageChange = (newPage: number) => {
     const target = Math.max(1, Math.min(newPage, totalPages));
+    if (target === currentPage) return;
+    setIsPageTransitioning(true);
     setCurrentPage(target);
     if (catalogGridRef.current) {
       catalogGridRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+    setTimeout(() => {
+      setIsPageTransitioning(false);
+    }, 280);
+  };
+
+  const handleTabSelect = (tab: TabType) => {
+    if (tab === selectedTab) return;
+    setIsPageTransitioning(true);
+    setSelectedTab(tab);
+    setTimeout(() => {
+      setIsPageTransitioning(false);
+    }, 280);
   };
 
   const startItemIndex = filteredProducts.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
@@ -188,48 +206,15 @@ export default function Catalog({
           </div>
         </div>
 
-        {/* Pinned Promo Banner / Top Pinned Section */}
+        {/* Pinned Promo Rotating Carousel (Auto-rotating through all promo products) */}
         {selectedTab === 'ALL' && !searchQuery && pinnedPromoProducts.length > 0 && (
-          <div className="mb-10 p-5 sm:p-6 rounded-2xl bg-gradient-to-b from-zinc-900/90 via-zinc-950 to-black promo-lime-border relative overflow-hidden">
-            {/* Ambient neon lime glow */}
-            <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#00df82]/10 rounded-full blur-3xl pointer-events-none" />
-
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-800 relative z-10">
-              <div className="flex items-center gap-2.5">
-                <span className="promo-lime-badge px-3 py-1 rounded-lg font-black text-xs flex items-center gap-1.5 uppercase tracking-wide font-tech">
-                  <Flame className="w-4 h-4 fill-black text-black" />
-                  <span>⚡ PRODUK PROMO SPESIAL</span>
-                </span>
-                <span className="text-xs text-zinc-300 font-semibold hidden sm:inline">
-                  • Diskon Terbatas Sedang Berlangsung!
-                </span>
-              </div>
-              <span className="text-xs font-mono font-bold text-black bg-[#00df82] px-2.5 py-1 rounded-lg shadow-sm">
-                {pinnedPromoProducts.length} Layanan Promo
-              </span>
-            </div>
-
-            <div
-              className={`grid gap-4 relative z-10 ${
-                pinnedPromoProducts.length === 1
-                  ? 'grid-cols-1 max-w-sm sm:max-w-md'
-                  : pinnedPromoProducts.length === 2
-                  ? 'grid-cols-1 sm:grid-cols-2 max-w-3xl'
-                  : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-              }`}
-            >
-              {pinnedPromoProducts.slice(0, 3).map((product) => (
-                <ProductCard
-                  key={`pinned-${product.id}`}
-                  product={product}
-                  onOrder={onOrderProduct}
-                />
-              ))}
-            </div>
-          </div>
+          <PromoCarousel
+            promoProducts={pinnedPromoProducts}
+            onOrderProduct={onOrderProduct}
+          />
         )}
 
-        {/* Category Tabs with Dynamic Count Pills */}
+        {/* Category Tabs with Dynamic Count Pills & Count-Up */}
         <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none no-scrollbar">
           {TABS.map((tab) => {
             const isSelected = selectedTab === tab;
@@ -242,8 +227,8 @@ export default function Catalog({
             return (
               <button
                 key={tab}
-                onClick={() => setSelectedTab(tab)}
-                className={`px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all whitespace-nowrap flex items-center gap-2 ${
+                onClick={() => handleTabSelect(tab)}
+                className={`px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all whitespace-nowrap flex items-center gap-2 active:scale-95 ${
                   isSelected
                     ? tab === 'PROMO'
                       ? 'promo-lime-badge shadow-md scale-[1.02]'
@@ -261,7 +246,7 @@ export default function Catalog({
                       : 'bg-zinc-900 border border-zinc-800 text-zinc-400'
                   }`}
                 >
-                  {count}
+                  <CountUp to={count} duration={500} />
                 </span>
               </button>
             );
@@ -318,16 +303,31 @@ export default function Catalog({
         {/* Product Grid Anchor */}
         <div ref={catalogGridRef} className="scroll-mt-28" />
 
-        {/* Product Grid */}
-        {filteredProducts.length > 0 ? (
+        {/* Product Grid with Skeleton Loading, Staggered Reveal, and Page Transition */}
+        {products.length === 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+            {Array.from({ length: pageSize }).map((_, i) => (
+              <ProductCardSkeleton key={`skeleton-${i}`} />
+            ))}
+          </div>
+        ) : filteredProducts.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-              {displayedProducts.map((product) => (
-                <ProductCard
+            <div
+              className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 transition-all duration-300 ${
+                isPageTransitioning ? 'animate-page-transition opacity-60' : 'opacity-100'
+              }`}
+            >
+              {displayedProducts.map((product, idx) => (
+                <div
                   key={product.id}
-                  product={product}
-                  onOrder={onOrderProduct}
-                />
+                  className="animate-stagger-item"
+                  style={{ animationDelay: `${idx * 45}ms` }}
+                >
+                  <ProductCard
+                    product={product}
+                    onOrder={onOrderProduct}
+                  />
+                </div>
               ))}
             </div>
 
@@ -339,7 +339,9 @@ export default function Catalog({
                   <div className="flex items-center justify-between text-xs font-mono text-zinc-400 mb-2 px-1">
                     <span>
                       Menampilkan <strong className="text-white font-price">{startItemIndex} - {endItemIndex}</strong> dari{' '}
-                      <strong className="text-white font-price">{filteredProducts.length}</strong> Layanan
+                      <strong className="text-white font-price">
+                        <CountUp to={filteredProducts.length} duration={400} />
+                      </strong> Layanan
                     </span>
                     <span className="text-[#00df82] font-bold font-price">
                       {progressPercent}%

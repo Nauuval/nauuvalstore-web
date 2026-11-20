@@ -144,3 +144,133 @@ body {
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-feature-settings: 'tnum' on, 'zero' on;
 }
+
+/* ======================================================== */
+/* MODERN ANIMATIONS: SKELETON, STAGGER, PAGE TRANSITION, ETC */
+/* ======================================================== */
+
+/* 1. Shimmer Animation for Skeleton Loading */
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(0, 223, 130, 0.05) 25%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(0, 223, 130, 0.05) 75%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer-sweep 1.8s infinite ease-in-out;
+}
+
+/* 2. Staggered Reveal Animation */
+@keyframes stagger-slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-stagger-item {
+  animation: stagger-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* 3. Smooth Page & Tab Transition */
+@keyframes page-fade-in {
+  0% {
+    opacity: 0.3;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-transition {
+  animation: page-fade-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 4. Typewriter Blinking Caret */
+@keyframes typewriter-caret {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.animate-caret {
+  animation: typewriter-caret 0.8s infinite;
+}
+
+/* 5. Subtle Floating Physics */
+@keyframes float-subtle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-float-subtle {
+  animation: float-subtle 4s ease-in-out infinite;
+}
+
+/* 6. Dynamic Promo Neon Aura Pulse */
+@keyframes promo-aura {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(0, 223, 130, 0.28), inset 0 0 10px rgba(0, 223, 130, 0.06);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(0, 223, 130, 0.48), inset 0 0 18px rgba(0, 223, 130, 0.14);
+  }
+}
+
+.animate-promo-aura {
+  animation: promo-aura 2.8s ease-in-out infinite;
+}
+
+/* 7. Button Click Ripple & Pop */
+@keyframes click-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.94);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-click-pop {
+  animation: click-pop 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+

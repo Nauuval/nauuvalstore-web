@@ -44,7 +44,7 @@ export default function FloatingWhatsApp({ settings }: FloatingWhatsAppProps) {
         />
       )}
 
-      <div className="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-40 flex flex-col items-end gap-2.5">
+      <div className="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-40 flex flex-col items-end gap-2.5 animate-float-subtle">
         {/* Expandable Mini Hub with Authentic WhatsApp Branding (Distinct & Non-Intrusive) */}
         {openPopup && (
           <div className="mb-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm rounded-2xl bg-[#0a0f0d] border border-[#1b4332] shadow-[0_12px_45px_rgba(0,0,0,0.9),0_0_20px_rgba(37,211,102,0.15)] p-4 text-xs animate-in slide-in-from-bottom-3 duration-200 backdrop-blur-xl relative overflow-hidden">

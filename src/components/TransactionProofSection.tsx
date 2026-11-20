@@ -142,10 +142,11 @@ export default function TransactionProofSection({
             ref={scrollRef}
             className="flex items-stretch gap-5 overflow-x-auto pb-4 pt-1 no-scrollbar scroll-smooth snap-x snap-mandatory"
           >
-            {localTransactions.map((trx) => (
+            {localTransactions.map((trx, idx) => (
               <div
                 key={trx.id}
-                className="metallic-card rounded-2xl p-5 min-w-[280px] sm:min-w-[340px] max-w-[360px] snap-start flex flex-col justify-between group hover:border-[#00df82]/60 transition-all duration-300 relative"
+                style={{ animationDelay: `${idx * 40}ms` }}
+                className="metallic-card rounded-2xl p-5 min-w-[280px] sm:min-w-[340px] max-w-[360px] snap-start flex flex-col justify-between group hover:border-[#00df82]/60 transition-all duration-300 relative animate-stagger-item"
               >
                 <div>
                   {/* Header Row: Buyer & Category */}

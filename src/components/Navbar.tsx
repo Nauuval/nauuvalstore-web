@@ -116,7 +116,7 @@ export default function Navbar({ settings }: NavbarProps) {
             >
               <ShoppingCart className="w-4 h-4 text-[#00df82]" />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-[#00df82] text-[#03140d] font-bold font-price text-[9px] flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-[#00df82] text-[#03140d] font-bold font-price text-[9px] flex items-center justify-center animate-pulse shadow-[0_0_8px_rgba(0,223,130,0.6)]">
                   {totalItems}
                 </span>
               )}

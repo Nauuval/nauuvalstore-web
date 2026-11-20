@@ -3,6 +3,8 @@
 import React from 'react';
 import { ArrowDown, Users, ShieldCheck, Zap, Radio, CheckCircle, Award, Star } from 'lucide-react';
 import { StoreSettings } from '@/types';
+import TypewriterText from './TypewriterText';
+import CountUp from './CountUp';
 
 interface HeroProps {
   settings: StoreSettings;
@@ -99,11 +101,12 @@ export default function Hero({
             Joki &amp; Kebutuhan Roblox Fisch &amp; Blox Fruit
           </p>
 
-          {/* Subtitle in clean, polished high-tech font with emerald left-accent line */}
-          <div className="mt-3.5 max-w-2xl border-l-2 border-[#00df82] pl-3.5 sm:pl-4 py-1.5 bg-[#06140d]/40 backdrop-blur-xs rounded-r-xl">
-            <p className="text-[11px] sm:text-xs md:text-[13px] text-zinc-200 font-tech font-semibold uppercase tracking-wider leading-relaxed drop-shadow">
-              PILIHAN TEPAT UNTUK LEVELING KILAT, QUEST ROD FISCH, HUNTING MELEE BLOXFRUIT, BUAH FISIK, DAN KOIN FISCH. <span className="text-[#00df82] font-bold">100% AMAN TANPA CHEAT SCRIPT</span>, TRANSPARAN, DAN STOK TERPANTAU REALTIME.
-            </p>
+          {/* Subtitle in clean, polished high-tech font with emerald left-accent line & typewriter animation */}
+          <div className="mt-3.5 max-w-2xl border-l-2 border-[#00df82] pl-3.5 sm:pl-4 py-2 bg-[#06140d]/50 backdrop-blur-xs rounded-r-xl shadow-[0_0_15px_rgba(0,223,130,0.06)] min-h-[4rem] flex items-center">
+            <TypewriterText
+              className="text-[11px] sm:text-xs md:text-[13px] text-zinc-200 font-tech font-semibold uppercase tracking-wider leading-relaxed drop-shadow"
+              speed={16}
+            />
           </div>
 
           {/* Action Buttons */}
@@ -133,42 +136,48 @@ export default function Hero({
             </a>
           </div>
 
-          {/* Technical Metric Blocks (Reference 3 Inspired) */}
+          {/* Technical Metric Blocks (Reference 3 Inspired with Count-Up animations) */}
           <div className="mt-12 pt-6 border-t border-zinc-800/80 grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="metallic-card p-3.5 rounded-xl">
+            <div className="metallic-card p-3.5 rounded-xl hover:scale-[1.02] transition-transform">
               <span className="text-[10px] text-zinc-500 uppercase font-mono block">Security</span>
-              <p className="text-xl sm:text-2xl font-black text-white font-mono mt-0.5">100%</p>
+              <p className="text-xl sm:text-2xl font-black text-white font-mono mt-0.5">
+                <CountUp to={100} duration={1000} suffix="%" />
+              </p>
               <span className="text-[11px] text-zinc-300 font-semibold block">Anti Hackback</span>
             </div>
 
-            <div className="metallic-card p-3.5 rounded-xl">
+            <div className="metallic-card p-3.5 rounded-xl hover:scale-[1.02] transition-transform">
               <span className="text-[10px] text-zinc-500 uppercase font-mono block">Katalog</span>
-              <p className="text-xl sm:text-2xl font-black text-white font-mono mt-0.5">{totalProducts}</p>
+              <p className="text-xl sm:text-2xl font-black text-white font-mono mt-0.5">
+                <CountUp to={totalProducts} duration={1200} />
+              </p>
               <span className="text-[11px] text-zinc-300 font-semibold block">Layanan Ready</span>
             </div>
 
             {/* Eye-catching Neon Lime Promo Metric */}
-            <div className="metallic-card promo-lime-border p-3.5 rounded-xl relative overflow-hidden group">
+            <div className="metallic-card promo-lime-border p-3.5 rounded-xl relative overflow-hidden group hover:scale-[1.02] transition-transform">
               <span className="text-[10px] font-mono font-bold flex items-center gap-1 promo-lime-text uppercase">
                 <Zap className="w-3.5 h-3.5 fill-[#00df82]" />
                 <span>Promo Aktif</span>
               </span>
               <p className="text-xl sm:text-2xl font-black font-mono mt-0.5 promo-lime-text">
-                {promoCount}
+                <CountUp to={promoCount} duration={1200} />
               </p>
               <span className="text-[11px] text-zinc-200 font-bold block">Diskon Spesial</span>
             </div>
 
-            <div className="metallic-card p-3.5 rounded-xl">
+            <div className="metallic-card p-3.5 rounded-xl hover:scale-[1.02] transition-transform">
               <span className="text-[10px] text-zinc-500 uppercase font-mono block">Rating Testimoni</span>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <Star className="w-4 h-4 fill-[#00df82] text-[#00df82]" />
                 <p className="text-xl sm:text-2xl font-black text-white font-mono">
-                  {averageRating ? averageRating.toFixed(1) : '5.0'}
+                  <CountUp to={averageRating || 5.0} decimals={1} duration={1000} />
                 </p>
                 <span className="text-xs text-zinc-400 font-mono">/5.0</span>
               </div>
-              <span className="text-[11px] text-zinc-300 font-semibold block">{totalReviews}+ Bukti Ulasan</span>
+              <span className="text-[11px] text-zinc-300 font-semibold block">
+                <CountUp to={totalReviews} duration={1400} suffix="+ Bukti Ulasan" />
+              </span>
             </div>
           </div>
         </div>
